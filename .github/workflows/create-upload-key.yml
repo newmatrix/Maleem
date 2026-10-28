@@ -1,0 +1,77 @@
+name: Create upload key (run once)
+
+# Creates the Google Play upload key ONCE.
+# The key is never uploaded in clear text: the artifact holds only an AES-256 encrypted copy
+# (encrypted with your KEYSTORE_PASSWORD secret), so downloading the artifact alone is useless.
+# Decrypt it on your own computer (see README) and paste the result into the KEYSTORE_BASE64 secret.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'اكتب CREATE للتأكيد (لو عندك مفتاح قديم، ما تشغلش ده)'
+        required: true
+        default: ''
+
+jobs:
+  key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Safety checks
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          EXISTING_KEY: ${{ secrets.KEYSTORE_BASE64 }}
+          CONFIRM: ${{ github.event.inputs.confirm }}
+        run: |
+          if [ "$CONFIRM" != "CREATE" ]; then
+            echo "::error::Type CREATE in the 'confirm' box to run this workflow."
+            exit 1
+          fi
+          if [ -n "$EXISTING_KEY" ]; then
+            echo "::error::KEYSTORE_BASE64 already exists. Creating a new key would break updates of the published app. Delete that secret first only if you are sure."
+            exit 1
+          fi
+          if [ ${#KEYSTORE_PASSWORD} -lt 12 ]; then
+            echo "::error::Add a secret named KEYSTORE_PASSWORD (at least 12 characters) first."
+            exit 1
+          fi
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Generate and encrypt the upload keystore
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          umask 077
+          mkdir -p "$RUNNER_TEMP/key" out
+          keytool -genkeypair -v \
+            -keystore "$RUNNER_TEMP/key/maleem-upload.jks" -storetype PKCS12 \
+            -alias upload -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$KEYSTORE_PASSWORD" -keypass "$KEYSTORE_PASSWORD" \
+            -dname "CN=Hesham Taha, O=Maleem, C=EG"
+          base64 -w 0 "$RUNNER_TEMP/key/maleem-upload.jks" > "$RUNNER_TEMP/key/KEYSTORE_BASE64.txt"
+          openssl enc -aes-256-cbc -pbkdf2 -iter 600000 -salt \
+            -in "$RUNNER_TEMP/key/KEYSTORE_BASE64.txt" \
+            -out out/KEYSTORE_BASE64.txt.enc -pass env:KEYSTORE_PASSWORD
+          rm -rf "$RUNNER_TEMP/key"
+          cat > out/HOW-TO-DECRYPT.txt <<'TXT'
+          On your computer (Linux / macOS / Git Bash on Windows):
+
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -in KEYSTORE_BASE64.txt.enc -out KEYSTORE_BASE64.txt
+
+          It asks for the same password you saved in the KEYSTORE_PASSWORD secret.
+          Paste the content of KEYSTORE_BASE64.txt into a new secret named KEYSTORE_BASE64,
+          keep a copy of the encrypted file somewhere safe (it is your only copy of the key),
+          then delete the decrypted KEYSTORE_BASE64.txt and delete this workflow run.
+          TXT
+
+      - name: Download the encrypted key from here
+        uses: actions/upload-artifact@v4
+        with:
+          name: maleem-upload-key-encrypted
+          path: out/
+          retention-days: 1
