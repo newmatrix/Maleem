@@ -78,6 +78,8 @@ object WidgetData {
         val budget = d.optDouble("budget", 0.0)
         val topName = if (live) d.optString("topName", "") else ""
         val label = if (live) d.optString("label", "") else ""
+        // "month" = calendar-month spending, "period" = a budget period that may start on any day
+        val perWord = if (d.optString("per", "month") == "period") "الفترة" else "الشهر"
         val pct = if (budget > 0) Math.round(spent / budget * 100).toInt() else -1
         val dots = "\u2022\u2022\u2022\u2022"
         fun money(v: Double): String = if (hide) dots else fmt(v)
@@ -94,8 +96,8 @@ object WidgetData {
             val sub = when {
                 !hasData -> "افتح مليم مرة"
                 !live -> "فترة جديدة"
-                budget > 0 -> "الشهر: $pct% من الميزانية"
-                else -> "الشهر: " + money(spent) + curTxt
+                budget > 0 -> "$perWord: $pct% من الميزانية"
+                else -> "$perWord: " + money(spent) + curTxt
             }
             rv.setTextViewText(R.id.wg_sub, sub)
         } else {

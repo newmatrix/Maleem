@@ -208,11 +208,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         web.addJavascriptInterface(Bridge(), "AndroidBridge")
-        quickAdd = intent?.action == ACTION_ADD_EXPENSE
-        quickVoice = intent?.action == ACTION_ADD_VOICE
-        openCaptures = intent?.action == ACTION_CAPTURES
-        if (savedInstanceState == null) web.loadUrl("https://$APP_HOST/assets/www/index.html")
-        else web.restoreState(savedInstanceState)
+        // Only a fresh start acts on the shortcut / widget / notification action. When the activity is recreated
+        // (dark-mode switch, font size, process restore...) the same intent comes back and must not reopen the sheet.
+        if (savedInstanceState == null) {
+            quickAdd = intent?.action == ACTION_ADD_EXPENSE
+            quickVoice = intent?.action == ACTION_ADD_VOICE
+            openCaptures = intent?.action == ACTION_CAPTURES
+        }
+        // restoreState returns null when the saved WebView state can't be used: load the page instead of a blank screen
+        if (savedInstanceState == null || web.restoreState(savedInstanceState) == null) {
+            web.loadUrl("https://$APP_HOST/assets/www/index.html")
+        }
 
         Reminders.createChannel(this)
         // The notification permission is no longer asked on first launch: the web app asks for it
@@ -261,6 +267,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         stopVoice()
+        // free the WebView (renderer, JS bridge) together with the activity
+        try {
+            web.removeJavascriptInterface("AndroidBridge")
+            root.removeView(web)
+            web.destroy()
+        } catch (_: Exception) { }
         super.onDestroy()
     }
 
@@ -463,18 +475,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
-        fun cancelVoice() = runOnUiThread {
-            voiceWanted = false
-            stopVoice()
+        fun cancelVoice() {
+            if (!pageOk) return
+            runOnUiThread {
+                voiceWanted = false
+                stopVoice()
+            }
         }
 
         @JavascriptInterface
-        fun haptic() = runOnUiThread {
-            root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+        fun haptic() {
+            if (!pageOk) return
+            runOnUiThread { root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY) }
         }
 
         @JavascriptInterface
-        fun canBiometric(): Boolean =
+        fun canBiometric(): Boolean = pageOk &&
             BiometricManager.from(this@MainActivity).canAuthenticate(BIOMETRIC_WEAK) == BiometricManager.BIOMETRIC_SUCCESS
 
         @JavascriptInterface
@@ -502,9 +518,12 @@ class MainActivity : AppCompatActivity() {
 
         /** While a PIN is on: no screenshots / screen recording, and the recent-apps preview stays blank. */
         @JavascriptInterface
-        fun setSecure(on: Boolean) = runOnUiThread {
-            if (on) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-            else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        fun setSecure(on: Boolean) {
+            if (!pageOk) return
+            runOnUiThread {
+                if (on) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            }
         }
 
         /** Android 13+: asks for the notification permission (called when reminders are turned on). */
@@ -517,7 +536,7 @@ class MainActivity : AppCompatActivity() {
 
         /** false when Android may delay the reminders (exact alarms not allowed, Android 12+). */
         @JavascriptInterface
-        fun exactAlarmsAllowed(): Boolean = Reminders.exactAllowed(this@MainActivity)
+        fun exactAlarmsAllowed(): Boolean = pageOk && Reminders.exactAllowed(this@MainActivity)
 
         @JavascriptInterface
         fun openExactAlarmSettings() {
@@ -635,11 +654,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
-        fun setBars(color: String, dark: Boolean) = runOnUiThread {
-            try { root.setBackgroundColor(Color.parseColor(color)) } catch (_: Exception) { }
-            WindowCompat.getInsetsController(window, root).apply {
-                isAppearanceLightStatusBars = !dark
-                isAppearanceLightNavigationBars = !dark
+        fun setBars(color: String, dark: Boolean) {
+            if (!pageOk) return
+            runOnUiThread {
+                try { root.setBackgroundColor(Color.parseColor(color)) } catch (_: Exception) { }
+                WindowCompat.getInsetsController(window, root).apply {
+                    isAppearanceLightStatusBars = !dark
+                    isAppearanceLightNavigationBars = !dark
+                }
             }
         }
     }

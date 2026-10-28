@@ -18,13 +18,22 @@ android {
 
     signingConfigs {
         // مفتاح ثابت للنسخة التجريبية، عشان كل APK تجريبي جديد يتثبت فوق القديم من غير ما تمسح التطبيق.
-        // المفتاح ده موجود في الريبو (يعني معروف للكل)، علشان كده النسخة التجريبية ليها applicationId مختلف (.debug)
-        // ومستحيل تتثبت فوق النسخة الأصلية أو تقرا بياناتها. نسخة Release بتتوقع بمفتاح سري من GitHub Secrets.
+        // لو فيه مفتاح تجريبي سري (DEBUG_KEYSTORE_FILE من GitHub Secrets) بنستخدمه، لأن المفتاح اللي في الريبو
+        // معروف للكل: أي حد يقدر يعمل بيه APK "تحديث" لنسخة .debug ويقرا بيانات المختبرين.
+        // المفتاح اللي في الريبو بيفضل للبناء المحلي بس. نسخة Release بتتوقع بمفتاح سري من GitHub Secrets.
         getByName("debug") {
-            storeFile = file("debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+            val dks = System.getenv("DEBUG_KEYSTORE_FILE")
+            if (dks != null && file(dks).exists()) {
+                storeFile = file(dks)
+                storePassword = System.getenv("DEBUG_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("DEBUG_KEY_ALIAS") ?: "debug"
+                keyPassword = System.getenv("DEBUG_KEYSTORE_PASSWORD")
+            } else {
+                storeFile = file("debug.keystore")
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
         }
         create("release") {
             val ks = System.getenv("KEYSTORE_FILE")

@@ -30,6 +30,10 @@ object PayCapture {
     private const val CHANNEL = "maleem_capture"
     private const val MAX_QUEUE = 30
     private const val NOTIF_ID = 7001
+    /** The same payment reported twice (bank SMS + bank app, or a re-posted notification) arrives within this window */
+    private const val DUP_WINDOW = 3 * 60_000L
+    /** How long a capture is remembered for duplicate checks (also after the web app took it from the queue) */
+    private const val RECENT_KEEP = 10 * 60_000L
 
     /** Set by MainActivity while it is on screen, so a new capture shows up without reopening the app. */
     @Volatile var onNew: (() -> Unit)? = null
@@ -67,7 +71,7 @@ object PayCapture {
     }
 
     /** "تجاهل التطبيق ده دايمًا" (on = true) or "رجّعه" (on = false). */
-    fun setBlocked(c: Context, pkg: String, name: String, on: Boolean) {
+    @Synchronized fun setBlocked(c: Context, pkg: String, name: String, on: Boolean) {
         if (pkg.isBlank() || pkg.length > 200) return
         val old = blocked(c)
         val out = JSONArray()
@@ -94,32 +98,51 @@ object PayCapture {
         return q.toString()
     }
 
+    /**
+     * Adds a capture unless it is a duplicate. A duplicate is the same amount within [DUP_WINDOW] that comes either
+     * from ANOTHER app (bank SMS + bank app report one payment) or with the SAME text (a re-posted notification).
+     * Two different payments of the same amount from the same app (two 50 EGP coffees) are both kept.
+     */
     @Synchronized fun add(c: Context, item: JSONObject): Boolean {
-        val q = queue(c)
+        val p = prefs(c)
         val now = item.optLong("at")
-        // the same payment usually arrives twice (bank SMS + bank app): same amount within 5 minutes = one capture
-        for (i in 0 until q.length()) {
-            val o = q.optJSONObject(i) ?: continue
-            if (o.optDouble("amount") == item.optDouble("amount") && kotlin.math.abs(o.optLong("at") - now) < 5 * 60_000) return false
-        }
-        val lastAmt = prefs(c).getString("lastAmt", "")
-        val lastAt = prefs(c).getLong("lastAt", 0)
-        if (lastAmt == item.optDouble("amount").toString() && kotlin.math.abs(lastAt - now) < 5 * 60_000) return false
-        prefs(c).edit().putString("lastAmt", item.optDouble("amount").toString()).putLong("lastAt", now).apply()
+        val amount = item.optDouble("amount")
+        val pkg = item.optString("pkg")
+        val text = item.optString("text")
 
+        val old = try { JSONArray(p.getString("recent", "[]")) } catch (_: Exception) { JSONArray() }
+        val recent = JSONArray()
+        var dup = false
+        for (i in 0 until old.length()) {
+            val o = old.optJSONObject(i) ?: continue
+            val dt = kotlin.math.abs(o.optLong("at") - now)
+            if (dt >= RECENT_KEEP) continue // forget old ones
+            recent.put(o)
+            if (dt < DUP_WINDOW && o.optDouble("amount") == amount && (o.optString("pkg") != pkg || o.optString("text") == text)) dup = true
+        }
+        if (dup) {
+            p.edit().putString("recent", recent.toString()).apply()
+            return false
+        }
+        recent.put(JSONObject().put("at", now).put("amount", amount).put("pkg", pkg).put("text", text))
+
+        val q = queue(c)
         val out = JSONArray()
         out.put(item)
         for (i in 0 until minOf(q.length(), MAX_QUEUE - 1)) out.put(q.opt(i))
-        prefs(c).edit().putString("queue", out.toString()).apply()
+        p.edit()
+            .putString("queue", out.toString())
+            .putString("recent", recent.toString())
+            .remove("lastAmt").remove("lastAt") // replaced by "recent"
+            .apply()
         return true
     }
 
     fun createChannel(c: Context) {
-        if (Build.VERSION.SDK_INT >= 26) {
-            c.getSystemService(NotificationManager::class.java).createNotificationChannel(
-                NotificationChannel(CHANNEL, "عمليات دفع لقطها مليم", NotificationManager.IMPORTANCE_LOW)
-            )
-        }
+        // minSdk is 26, so notification channels always exist
+        c.getSystemService(NotificationManager::class.java).createNotificationChannel(
+            NotificationChannel(CHANNEL, "عمليات دفع لقطها مليم", NotificationManager.IMPORTANCE_LOW)
+        )
     }
 
     @SuppressLint("MissingPermission")

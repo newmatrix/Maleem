@@ -31,12 +31,10 @@ object Reminders {
     private const val MAX_DUE = 40
 
     fun createChannel(c: Context) {
-        if (Build.VERSION.SDK_INT >= 26) {
-            val nm = c.getSystemService(NotificationManager::class.java)
-            nm.createNotificationChannel(
-                NotificationChannel(CHANNEL, "تذكيرات مليم", NotificationManager.IMPORTANCE_DEFAULT)
-            )
-        }
+        // minSdk is 26, so notification channels always exist
+        c.getSystemService(NotificationManager::class.java).createNotificationChannel(
+            NotificationChannel(CHANNEL, "تذكيرات مليم", NotificationManager.IMPORTANCE_DEFAULT)
+        )
     }
 
     /** Android 12+ needs the user's OK for exact alarms; without it Android may deliver reminders a bit late. */

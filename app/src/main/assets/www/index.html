@@ -1524,7 +1524,6 @@ const $ = s=>document.querySelector(s);
 const esc = s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const cleanE=v=>String(v==null?'':v).replace(/[<>&"'`\\]/g,'').slice(0,8);
 const colr=v=>/^#[0-9a-fA-F]{6}$/.test(String(v))?String(v):'#64748B';
-const safeId=v=>/^[A-Za-z0-9_-]{1,32}$/.test(String(v))?String(v):null;
 const fmt = n=>(Math.round(n*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});
 const money = n=>`<span class="num">${fmt(n)}</span>`;
 const pad = n=>String(n).padStart(2,'0');
@@ -1539,7 +1538,6 @@ const dayName = dk=>{const [y,m,d]=dk.split('-').map(Number);const dt=new Date(y
   return dk===t?'النهارده · '+base: dk===yst?'امبارح · '+base: base};
 const timeStr = ts=>new Date(ts).toLocaleTimeString(LOC,{hour:'numeric',minute:'2-digit'});
 const daysIn = mk=>{const [y,m]=mk.split('-').map(Number);return new Date(y,m,0).getDate()};
-const prevMonth = mk=>{const [y,m]=mk.split('-').map(Number);return monKey(new Date(y,m-2,1))};
 const nextMonth = mk=>{const [y,m]=mk.split('-').map(Number);return monKey(new Date(y,m,1))};
 const ofMonth = mk=>S.expenses.filter(x=>monKey(x.ts)===mk);
 const sum = arr=>arr.reduce((a,x)=>a+x.amount,0);
@@ -1631,8 +1629,6 @@ const CLEAN={debts:cleanDebt,gams:cleanGam,incomes:cleanIncome,goals:cleanGoal,f
   if(!['light','dark','system'].includes(S.theme)) S.theme='system';
 })();
 
-const ICON_EDIT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
-const ICON_DEL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
 
 /* Theme */
 const ACCENTS=[
@@ -1837,7 +1833,6 @@ function renderReports(){
   const dnum=i=>new Date(sd.getFullYear(),sd.getMonth(),sd.getDate()+i).getDate();
   const max=Math.max(...daily,1), W=Math.max(320,n*14), H=170, top=14, bot=24, bw=W/n;
   const isCur=P.key===curP.key, td=isCur? idxOf(Date.now())+1 : 0;
-  const daysWith=daily.filter(v=>v>0).length;
   $('#dailyHint').textContent= total? `متوسط ${fmt(total/(isCur?td:n))} ${CS()} في اليوم · أعلى يوم ${fmt(max)} ${CS()}` : 'مفيش مصاريف في الشهر ده.';
   let bars='';
   daily.forEach((v,i)=>{
@@ -2486,29 +2481,6 @@ $('#wipeConfirm').onclick=()=>{
   toast('اتمسحت المصاريف والالتزامات','تراجع',()=>{Object.assign(S,old);save();renderAll()},5000);
   setTimeout(rcPrune,7000);
 };
-const loadDemoData=()=>{
-  const notes={food:['فطار','غدا مع الشغل','كافيه','عشا','سوبر ماركت'],trans:['أوبر','مترو','ميكروباص','بنزين'],bills:['كهربا','مية','غاز'],phone:['كارت شحن','باقة النت'],travel:['تذكرة قطر'],shop:['هدوم','جزمة'],health:['صيدلية','كشف'],fun:['سينما','خروجة'],home:['منظفات'],edu:['كورس أونلاين'],gift:['هدية عيد ميلاد'],other:['متفرقات']};
-  const now=new Date(), arr=[];
-  for(let back=0;back<2;back++){
-    const y=now.getFullYear(), m=now.getMonth()-back, last= back? new Date(y,m+1,0).getDate(): now.getDate();
-    for(let d=1; d<=last; d++){
-      const cnt=1+Math.floor(Math.random()*3);
-      for(let k=0;k<cnt;k++){
-        const r=Math.random(), cat= r<.38?'food': r<.62?'trans': r<.7?'phone': r<.78?'shop': r<.85?'fun': r<.9?'health': r<.95?'home':'other';
-        const base={food:[40,260],trans:[15,180],phone:[50,200],shop:[150,900],fun:[100,450],health:[60,400],home:[80,300],other:[30,200]}[cat];
-        const hour=back===0&&d===now.getDate()? Math.min(now.getHours(),8+k*3): 8+Math.floor(Math.random()*13);
-        arr.push({id:uid(),cat,amount:Math.round(base[0]+Math.random()*(base[1]-base[0])),note:notes[cat][Math.floor(Math.random()*notes[cat].length)],ts:new Date(y,m,d,hour,Math.floor(Math.random()*60)).getTime()});
-      }
-    }
-    arr.push({id:uid(),cat:'bills',amount:420,note:'كهربا',ts:new Date(y,m,Math.min(5,last),10).getTime()});
-    arr.push({id:uid(),cat:'bills',amount:120,note:'مية',ts:new Date(y,m,Math.min(6,last),11).getTime()});
-    if(back===1) arr.push({id:uid(),cat:'travel',amount:650,note:'تذكرة قطر إسكندرية',ts:new Date(y,m,Math.min(18,last),9).getTime()});
-  }
-  const old=S.expenses, oldB=S.budget;
-  S.expenses=arr.filter(x=>x.ts<=Date.now()).map(x=>CAT[x.cat]?x:{...x,cat:'other'}); if(!S.budget)S.budget=12000;
-  save();renderAll();
-  toast('اتضافت بيانات تجريبية لشهرين','تراجع',()=>{S.expenses=old;S.budget=oldB;save();renderAll()});
-};
 
 /* PIN: only a salted PBKDF2-SHA256 hash is stored (never the digits), and wrong attempts are rate-limited */
 const PIN_ITER=120000;
@@ -2666,7 +2638,6 @@ async function saveFile(filename,data){
   catch(err){ if(err&&err.code==='declined') return; toast(err&&err.code==='rate_limited'?'استنى ثانية وجرب تاني':'معرفناش نحفظ الملف') }
 }
 function monthsWithData(){return [...new Set(S.expenses.map(x=>periodAt(x.ts,repPd()).key))].sort()}
-function rowsFor(list){return list.slice().sort((a,b)=>a.ts-b.ts).map(x=>({'التاريخ':dkToDMY(dayKey(x.ts)),'الوقت':timeStr(x.ts),'الفئة':(CAT[x.cat]||CAT.other).name,['المبلغ ('+CS()+')']:x.amount,'طريقة الدفع':PAY[payOf(x)].name,'ملاحظة':x.note||''}))}
 /* Heavy export libraries are loaded only when needed (keeps app start fast) */
 const _ld={};
 function loadScript(src){return _ld[src]||(_ld[src]=new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>{delete _ld[src];no(new Error(src))};document.head.appendChild(s)}))}
@@ -3382,7 +3353,7 @@ function renderMe(){
       <div class="gbot"><small>${done?'وصلت لهدفك 🎉':'فاضل '+fmt(g.target-(g.saved||0))+' '+CS()}</small>${done?'':`<button class="paybtn" data-gdep="${esc(g.id)}">+ ضيف فلوس</button>`}</div></div>`}).join('');
 
   // stats
-  const mk=monKey(Date.now()), ml=ofPeriod(periodOf(Date.now())), cA=byCat(ml), topId=Object.keys(cA).sort((a,b)=>cA[b]-cA[a])[0];
+  const ml=ofPeriod(periodOf(Date.now())), cA=byCat(ml), topId=Object.keys(cA).sort((a,b)=>cA[b]-cA[a])[0];
   const dayT={}; ml.forEach(x=>{const k=dayKey(x.ts); dayT[k]=(dayT[k]||0)+x.amount}); const topDay=Object.keys(dayT).sort((a,b)=>dayT[b]-dayT[a])[0];
   const all=sum(S.expenses), first=S.expenses.length? Math.min(...S.expenses.map(x=>x.ts)) : null;
   const spanDays= first? Math.max(1,Math.round((todayStart()-new Date(first).setHours(0,0,0,0))/864e5)+1) : 0;
@@ -3620,6 +3591,7 @@ function syncWidget(){
     spent: sum(list),
     budget: fixed&&S.budget>0? S.budget : 0,
     topName: top? ((CAT[top.id]&&CAT[top.id].name)||'') : '',
+    per: fixed? 'period' : 'month',
     cur: CS(),
     hide: !!S.wgHide
   }));
@@ -3722,7 +3694,8 @@ const SP_SHARE_META=[
 const SP_EXTRA_TYPES=['reports','debts','gams','goals','incomes','fixed'];
 let spMemberIds=[], spRemoveArm=null, spRemoveT=null, spListening=false;
 let fbP=null, fb=null, spUnsub=null, spUnsubM=null, spUnsubR=null, spUnsubP=null, spJoinUnsub=null, spTimer=null, spHash={}, spOwners={}, spCloudExpenses={}, spReady=false, spMembers=0, spSt='off', spMode='create', spOwner=false, spRequests=[], spRequestsPrimed=false, spReqErr=false;
-let spExtraUnsubs=[], spExtraData={reports:[],debts:[],gams:[],goals:[],incomes:[],fixed:[]}, spExtraCloud={reports:{},debts:{},gams:{},goals:{},incomes:{},fixed:{}}, spExtraReady={}, spExtraBusy=false, spExtraAgain=false, spMemberProfiles=[], spProfileReady=false;
+const SP_RETRY_MS=10*60*1000; // keep in sync with firestore.rules (requesterRetriesRequest)
+let spExtraUnsubs=[], spExtraData={reports:[],debts:[],gams:[],goals:[],incomes:[],fixed:[]}, spExtraCloud={reports:{},debts:{},gams:{},goals:{},incomes:{},fixed:{}}, spExtraReady={}, spMemberProfiles=[];
 const spMe=()=>(fb&&fb.uid)||(S.space&&S.space.uid)||'';
 function expenseCanManage(e){
   if(!e||!S.space)return true;
@@ -3799,16 +3772,11 @@ function spRenderSharedData(){
     groups.push(`<details class="sp-share-group"><summary>المصروفات <span class="n">${exp.length} عملية</span></summary>${rows}</details>`);
   }
   const titleBy=Object.fromEntries(SP_SHARE_META.map(t=>[t.key,t.label]));
+  // debts / gams / goals / incomes / fixed are merged into the member's own lists (spApplyShared); only reports are listed here
   ['reports'].forEach(type=>{
     const rows=(spExtraData[type]||[]).slice().sort((a,b)=>String(b.localId||'').localeCompare(String(a.localId||'')));
     if(!rows.length)return;
-    let body='';
-    if(type==='reports') body=rows.map(r=>{const d=r.payload||{};const cat=Object.entries(d.categories||{}).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>`${esc((CAT[k]||CAT.other).name)} ${money(v)}`).join(' · ');return `<div class="sp-share-record"><div class="main"><b>${esc(r.ownerName||'عضو')} · ${esc(d.periodLabel||d.periodKey||'تقرير شهري')}</b><small>${+d.count||0} عملية${cat?' · '+cat:''}</small></div><span class="amt">${money(d.total||0)} ${esc(d.currency||CS())}</span></div>`}).join('');
-    if(type==='debts') body=rows.map(r=>{const d=r.payload||{}, paid=(d.payments||[]).reduce((a,x)=>a+(+x.amount||0),0), remaining=Math.max(0,(+d.amount||0)-paid);return `<div class="sp-share-record"><div class="main"><b>${esc(d.person||'التزام')} · ${esc(r.ownerName||'عضو')}</b><small>${d.dir==='in'?'له عند الناس':'عليه للناس'} · المتبقي ${money(remaining)} ${CS()}${d.due?' · استحقاق '+esc(dkToDMY(String(d.due))):''}</small></div><span class="amt">${money(d.amount||0)} ${CS()}</span></div>`}).join('');
-    if(type==='gams') body=rows.map(r=>{const d=r.payload||{}, paid=Object.values(d.paid||{}).filter(x=>x&&x.ts).length;return `<div class="sp-share-record"><div class="main"><b>${esc(d.name||'جمعية')} · ${esc(r.ownerName||'عضو')}</b><small>${+d.members||0} قسط · ${paid} مسدد · الدور ${+d.turn||'—'}</small></div><span class="amt">${money(d.inst||0)} ${CS()} / قسط</span></div>`}).join('');
-    if(type==='goals') body=rows.map(r=>{const d=r.payload||{};return `<div class="sp-share-record"><div class="main"><b>${esc(d.name||'هدف')} · ${esc(r.ownerName||'عضو')}</b><small>تم ادخار ${money(d.saved||0)} من ${money(d.target||0)} ${CS()}</small></div></div>`}).join('');
-    if(type==='incomes') body=rows.map(r=>{const d=r.payload||{};return `<div class="sp-share-record"><div class="main"><b>${esc(d.name||'دخل')} · ${esc(r.ownerName||'عضو')}</b><small>كل شهر</small></div><span class="amt">${money(d.amount||0)} ${CS()}</span></div>`}).join('');
-    if(type==='fixed') body=rows.map(r=>{const d=r.payload||{};return `<div class="sp-share-record"><div class="main"><b>${esc(d.name||'مصروف ثابت')} · ${esc(r.ownerName||'عضو')}</b><small>${+d.day?'يوم '+(+d.day)+' من الشهر · ':''}${(d.log&&Object.values(d.log).filter(x=>x==='done').length)||0} مسجل</small></div><span class="amt">${d.amount?money(d.amount)+' '+CS():'متغير'}</span></div>`}).join('');
+    const body=rows.map(r=>{const d=r.payload||{};const cat=Object.entries(d.categories||{}).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>`${esc((CAT[k]||CAT.other).name)} ${money(v)}`).join(' · ');return `<div class="sp-share-record"><div class="main"><b>${esc(r.ownerName||'عضو')} · ${esc(d.periodLabel||d.periodKey||'تقرير شهري')}</b><small>${+d.count||0} عملية${cat?' · '+cat:''}</small></div><span class="amt">${money(d.total||0)} ${esc(d.currency||CS())}</span></div>`}).join('');
     groups.push(`<details class="sp-share-group"><summary>${titleBy[type]} <span class="n">${rows.length} ${type==='reports'?'فترة':'سجل'}</span></summary>${body}</details>`);
   });
   out.innerHTML=groups.length?groups.join(''):'<div class="sp-empty">لسه مفيش بيانات اتشاركت في المساحة. لما أي عضو يفعّل نوع بيانات، هتظهر هنا.</div>';
@@ -3850,7 +3818,7 @@ $('#spManageBack').onclick=()=>spManage(false);
 function spQueue(){if(!S.space)return;clearTimeout(spTimer);spTimer=setTimeout(spPush,700)}
 function spStop(){
   if(spUnsub){spUnsub();spUnsub=null}if(spUnsubM){spUnsubM();spUnsubM=null}if(spUnsubR){spUnsubR();spUnsubR=null}if(spUnsubP){spUnsubP();spUnsubP=null}
-  spExtraUnsubs.forEach(u=>{try{u()}catch(e){}});spExtraUnsubs=[];spOwner=false;spMemberIds=[];spRemoveArm=null;spRequests=[];spRequestsPrimed=false;spReqErr=false;spReady=false;spHash={};spOwners={};spCloudExpenses={};spProfileReady=false;spMemberProfiles=[];spExtraData={reports:[],debts:[],gams:[],goals:[],incomes:[],fixed:[]};spExtraCloud={reports:{},debts:{},gams:{},goals:{},incomes:{},fixed:{}};spExtraReady={};clearTimeout(spTimer)
+  spExtraUnsubs.forEach(u=>{try{u()}catch(e){}});spExtraUnsubs=[];spOwner=false;spMemberIds=[];spRemoveArm=null;spRequests=[];spRequestsPrimed=false;spReqErr=false;spReady=false;spHash={};spOwners={};spCloudExpenses={};spMemberProfiles=[];spExtraData={reports:[],debts:[],gams:[],goals:[],incomes:[],fixed:[]};spExtraCloud={reports:{},debts:{},gams:{},goals:{},incomes:{},fixed:{}};spExtraReady={};clearTimeout(spTimer)
 }
 function spStopJoinWatch(){if(spJoinUnsub){spJoinUnsub();spJoinUnsub=null}}
 function spActivateJoin(code,uid,name,prefs){
@@ -4084,7 +4052,7 @@ async function spEnsureMemberProfile(f,code){
     const d=snap.data()||{};if(d.sharePrefs&&typeof d.sharePrefs==='object')prefs=spNormPrefs(d.sharePrefs,true);
     if(!d.sharePrefs||!spPrefSame(d.sharePrefs,prefs))await F.setDoc(ref,{uid,name:nm,sharePrefs:prefs,updatedAt:F.serverTimestamp()},{merge:true});
   }else await F.setDoc(ref,{uid,name:nm,sharePrefs:prefs,updatedAt:F.serverTimestamp()});
-  S.space.sharePrefs=prefs;S.space.shareDraft={...prefs};S.space.uid=uid;spProfileReady=true;persist();
+  S.space.sharePrefs=prefs;S.space.shareDraft={...prefs};S.space.uid=uid;persist();
 }
 /* one listener set at a time: the boot timer and the "online" event could both start one */
 async function spListen(){
@@ -4094,8 +4062,8 @@ async function spListen(){
 async function spListenInner(){
   if(!S.space||spUnsub)return;spSetStatus('sync');let f;try{f=await fbInit()}catch(e){spSetStatus('off');return}if(!S.space||spUnsub)return;
   if(S.space.uid&&f.uid!==S.space.uid){spLocalLeave('حساب المساحة على الموبايل ده اتغير (غالبًا بعد مسح بيانات التطبيق أو تثبيته من جديد). ابعت طلب انضمام جديد بنفس الكود من "الانضمام لمساحة".');return}
-  spReady=false;spHash={};spOwners={};spCloudExpenses={};spProfileReady=false;const {F,db}=f,code=S.space.code;
-  try{await spEnsureMemberProfile(f,code)}catch(e){spProfileReady=false}
+  spReady=false;spHash={};spOwners={};spCloudExpenses={};const {F,db}=f,code=S.space.code;
+  try{await spEnsureMemberProfile(f,code)}catch(e){}
   spUnsub=F.onSnapshot(F.collection(db,'spaces',code,'expenses'),snap=>{if(!S.space||S.space.code!==code)return;spApply(snap);spReady=true;spSetStatus((snap.metadata.fromCache&&!navigator.onLine)?'off':'on');spPush()},err=>{spSetStatus(err&&err.code==='permission-denied'?'denied':'err');if(err&&err.code==='permission-denied')spCheckRemoved()});
   SP_EXTRA_TYPES.forEach(type=>{
     spExtraReady[type]=false;
@@ -4142,6 +4110,9 @@ $('#spGo').onclick=async()=>{
           await withTimeout(F.setDoc(reqRef,{uid:f.uid,name,status:'pending',sharePrefs:prefs,requestedAt:F.serverTimestamp()}),12000);S.spaceRequest={code,uid:f.uid,name,status:'pending',sharePrefs:prefs};save();closeSheets();renderSpace();spWatchJoinRequest();toast('طلب الانضمام مستني موافقة صاحب المساحة');
         }
       }else{
+        // after a rejection / removal the rules make the requester wait SP_RETRY_MS before asking again
+        const od=snap.exists()?snap.data():null, rAt=od&&od.resolvedAt&&od.resolvedAt.toMillis?od.resolvedAt.toMillis():0, wait=od&&['rejected','removed'].includes(od.status)&&rAt?SP_RETRY_MS-(Date.now()-rAt):0;
+        if(wait>0){$('#spErr').textContent=`تقدر تبعت طلب انضمام جديد للمساحة دي بعد ${Math.max(1,Math.ceil(wait/60000))} دقيقة`;return}
         await withTimeout(F.setDoc(reqRef,{uid:f.uid,name,status:'pending',sharePrefs:prefs,requestedAt:F.serverTimestamp()}),12000);S.spaceRequest={code,uid:f.uid,name,status:'pending',sharePrefs:prefs};save();closeSheets();renderSpace();spWatchJoinRequest();toast('طلب الانضمام اتبعت لصاحب المساحة');
       }
     }
@@ -4150,7 +4121,7 @@ $('#spGo').onclick=async()=>{
 };
 function armBtn(b,idle,confirmTxt,fn){const id=()=>b.dataset.idle||idle;b.onclick=()=>{if(!b.dataset.arm){b.dataset.arm='1';b.textContent=confirmTxt;clearTimeout(b._t);b._t=setTimeout(()=>{delete b.dataset.arm;b.textContent=id()},4000);return}delete b.dataset.arm;clearTimeout(b._t);b.textContent=id();fn()}}
 armBtn($('#spLeave'),'الخروج من المساحة','دوس تاني للتأكيد',async()=>{
-  const code=S.space&&S.space.code,wasOwner=spOwner,btn=$('#spLeave');if(!code)return;
+  const code=S.space&&S.space.code,wasOwner=spOwner;if(!code)return;
   const netFail=()=>toast('مفيش اتصال بالسيرفر، اتأكد من الإنترنت وجرب الخروج تاني');
   let f=fb;if(!f){try{f=await withTimeout(fbInit(),8000)}catch(e){netFail();return}}
   try{const ref=f.F.doc(f.db,'spaces',code),upd={memberIds:f.F.arrayRemove(f.uid)};

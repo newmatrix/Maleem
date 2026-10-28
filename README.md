@@ -204,6 +204,16 @@ Maleem (Android)
 3. بعد نجاح البناء، نزّل Artifact باسم **`Maleem-APK`**.
 4. هتلاقي بداخله `app-debug.apk`.
 
+> [!WARNING]
+> المفتاح اللي في الريبو معروف للكل، فأي حد يقدر يعمل APK يتثبت كـ«تحديث» فوق «مليم تجربة» ويقرا بياناتها. لو المختبرين بيسجلوا مصاريف حقيقية، اعمل مفتاح تجربة سري مرة واحدة على جهازك:
+>
+> ```bash
+> keytool -genkeypair -keystore maleem-debug.jks -storetype PKCS12 -alias debug -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Maleem Debug"
+> base64 -w 0 maleem-debug.jks > DEBUG_KEYSTORE_BASE64.txt
+> ```
+>
+> وحط محتوى الملف في Secret اسمه `DEBUG_KEYSTORE_BASE64`، والباسورد في Secret اسمه `DEBUG_KEYSTORE_PASSWORD`. من بعدها الـ workflow هيوقّع بيه تلقائيًا. أول APK بالمفتاح الجديد محتاج تمسح نسخة التجربة القديمة مرة واحدة (التوقيع اتغير).
+
 ### نسخة Release — للتحديث فوق النسخة الحالية
 
 1. تأكد إن GitHub Secrets موجودة: `KEYSTORE_PASSWORD` و`KEYSTORE_BASE64`.

@@ -45,8 +45,15 @@ object PayParser {
     private val CUR_THEN_NUM = Regex("(?i)(?<![A-Za-z\\u0600-\\u06FF])$CUR\\s*[:.]?\\s*$NUM")
     private val NUM_THEN_CUR = Regex("(?i)$NUM\\s*$CUR(?![A-Za-z\\u0600-\\u06FF])")
     private val AMOUNT_WORD = Regex("(?i)(?:مبلغ|بمبلغ|قيمة|بقيمة|amount|amt)\\s*[:.]?\\s*$NUM")
-    /** an amount right after one of these words is the balance / limit, not the payment */
-    private val NOT_PAYMENT_BEFORE = Regex("(?i)(رصيد|الرصيد|متاح|المتاح|balance|bal|avail|available|limit|حد|الحد)[^\\d]{0,22}$")
+    /**
+     * An amount right after one of these words is the balance / limit, not the payment.
+     * Arabic words are matched as whole words (with the usual و/ب/ل/ال prefixes and ك/ه/ة/ي suffixes),
+     * so "حد" no longer matches inside "واحد" / "أحد" / "حدث".
+     */
+    private val NOT_PAYMENT_BEFORE = Regex(
+        "(?i)(?:(?<![\\u0600-\\u06FF])[وبل]?(?:ال|ل)?(?:رصيد|متاح|حد)(?:ك|كم|ه|ة|ي)?(?![\\u0600-\\u06FF])" +
+            "|\\b(?:balance|bal|avail|available|avl|limit)\\b)[^\\d]{0,22}$"
+    )
 
     private val MERCHANT_EN = Regex("(?i)\\b(?:at|from merchant|merchant)\\s*:?\\s+([A-Za-z0-9][A-Za-z0-9 &'.*\\-]{1,38}?)(?=\\s+(?:on|at|ref|card|with|via|using|approved|was|is|has|successful(?:ly)?)\\b|\\s*[,.;]|\\s+\\d|$)")
     private val MERCHANT_TO_EN = Regex("(?i)\\bto\\s+([A-Za-z][A-Za-z0-9 &'.\\-]{1,38}?)(?=\\s+(?:on|at|ref|from|via|using|was|is|has|successful(?:ly)?)\\b|\\s*[,.;]|\\s+\\d|$)")
