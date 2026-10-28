@@ -22,6 +22,12 @@
 
 **الإشعارات:** بتستخدم عشان تفكرك بتسجيل المصاريف ومواعيد السلف والجمعيات، وكلها بتتعمل على الموبايل نفسه.
 
+**التسجيل التلقائي من الإشعارات (اختياري، مقفول افتراضيًا):** لو فعّلته من الإعدادات وسمحت بإذن «الوصول للإشعارات»، التطبيق بيقرا نص الإشعارات اللي بتوصل على الموبايل عشان يلاقي رسايل الخصم والدفع من البنوك والمحافظ. الإشعارات اللي مش عمليات دفع بتتجاهل فورًا ومش بتتخزن، وبيتجاهل تطبيقات الشات وأكواد التحقق (OTP) والفلوس الداخلة. عمليات الدفع اللي بيلاقيها (المبلغ، اسم المحل، اسم التطبيق اللي بعت الإشعار، ونص الإشعار لحد 300 حرف) بتتحفظ على موبايلك بس، ومش بتتبعت لأي سيرفر، ومفيش منها حاجة بتبقى مصروف غير لما توافق عليها. تقدر تقفل الميزة في أي وقت من الإعدادات، وساعتها التطبيق بيبطّل يستقبل الإشعارات خالص.
+
+**صور الإيصالات (اختيارية):** لو صوّرت إيصال أو اخترت صورة من المعرض، التطبيق بيصغّرها ويحفظها على موبايلك بس. الصور مش بتتشارك في المساحة المشتركة. النسخة الاحتياطية اليدوية بتشمل الصور، فخلي بالك من الملف ده.
+
+**الملخص الشهري:** بيتحسب على موبايلك من مصاريفك، والإشعار بتاعه بيتجدول على الموبايل نفسه.
+
 **الويدجت (اختيارية):** لو ضفت ويدجت لشاشتك الرئيسية، التطبيق بيحفظ على جهازك ملخص صغير (مصروف النهارده، إجمالي الفترة، الميزانية، أكتر فئة) عشان يعرضه. الملخص ده بيفضل على الموبايل ومش بيتبعت لأي سيرفر، وبيبان على الشاشة الرئيسية لأي حد ماسك الموبايل، فتقدر تخفي المبالغ من الإعدادات.
 
 **مسح البيانات:** تقدر تمسح المصاريف من الإعدادات، أو تمسح كل بيانات التطبيق من إعدادات الموبايل أو بإلغاء تثبيته.
@@ -53,6 +59,12 @@ All data you enter (expenses, budget, categories, loans, savings circles, settin
 **Biometric lock:** The app uses your phone's built-in biometric system to unlock. The app never accesses or stores your fingerprint.
 
 **Notifications:** Used for reminders to log expenses and for loan and savings-circle due dates. They are scheduled on the device only.
+
+**Automatic capture from notifications (optional, off by default):** If you turn it on in Settings and grant Android's "Notification access", the app reads the text of incoming notifications to find payment and debit messages from banks and wallets. Notifications that are not payments are ignored immediately and never stored; chat apps, verification codes (OTP) and incoming money are ignored. The payments it finds (amount, merchant name, the name of the app that posted the notification, and up to 300 characters of the notification text) are kept only on your device, are never sent to any server, and none of them becomes an expense until you confirm it. You can turn the feature off at any time in Settings, after which the app stops receiving notifications entirely.
+
+**Receipt photos (optional):** If you take a photo of a receipt or pick one from your gallery, the app shrinks it and keeps it on your device only. Photos are never shared to the Shared Space. Manual backups include the photos, so keep that file private.
+
+**Monthly summary:** Calculated on your device from your expenses; its notification is scheduled on the device only.
 
 **Widgets (optional):** If you add a widget to your home screen, the app stores a small summary on your device (today's spending, period total, budget, top category) to display it. This summary stays on the device, is never sent to any server, and is visible on the home screen to anyone holding your phone, so you can hide the amounts from Settings.
 
