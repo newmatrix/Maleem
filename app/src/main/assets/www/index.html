@@ -23,7 +23,7 @@ html.booting body{visibility:hidden}
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#061A1D; --surface:#0D252A; --surface-2:#143238; --ink:#E2F3F2; --muted:#8DB1B1;
-    --brand:var(--ac-d,#14B3AC); --brand-2:var(--ac2-d,#0B5A62); --brand-ink:#FFFFFF; --gold:#7DF4E2;
+    --brand:var(--ac-d,#0E8A86); --brand-2:var(--ac2-d,#0A4A51); --brand-ink:#FFFFFF; --gold:#5FCFC1;
     --ok:#3CC487; --warn:#E5A93A; --bad:#EE6B55; --line:rgba(226,243,242,.10);
     --shadow:0 1px 2px rgba(0,0,0,.3);
     color-scheme:dark;
@@ -31,7 +31,7 @@ html.booting body{visibility:hidden}
 }
 :root[data-theme="dark"]{
   --bg:#061A1D; --surface:#0D252A; --surface-2:#143238; --ink:#E2F3F2; --muted:#8DB1B1;
-  --brand:var(--ac-d,#14B3AC); --brand-2:var(--ac2-d,#0B5A62); --brand-ink:#FFFFFF; --gold:#7DF4E2;
+  --brand:var(--ac-d,#0E8A86); --brand-2:var(--ac2-d,#0A4A51); --brand-ink:#FFFFFF; --gold:#5FCFC1;
   --ok:#3CC487; --warn:#E5A93A; --bad:#EE6B55; --line:rgba(226,243,242,.10);
   --shadow:0 1px 2px rgba(0,0,0,.3);
   color-scheme:dark;
@@ -720,6 +720,8 @@ body.sorting{-webkit-user-select:none;user-select:none}
 .crow.srt-drag{background:var(--surface);border-radius:16px;border-top-color:transparent}
 .cat.srt-drag{background:color-mix(in srgb,var(--brand) 14%,var(--surface))}
 #lockMsg.err{color:var(--bad)}
+html,body{scrollbar-width:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .lock .logo{background:none;padding:0;overflow:hidden}
 .lock .logo img,.wl-logo img{width:100%;height:100%;display:block;object-fit:contain}
 .wl-logo:has(img){background:none;box-shadow:none}
@@ -1515,7 +1517,7 @@ const ICON_DEL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strok
 
 /* Theme */
 const ACCENTS=[
-  {id:'maleem',name:'مليم',    l:'#017D84', l2:'#00535F', d:'#14B3AC', d2:'#0B5A62'},
+  {id:'maleem',name:'مليم',    l:'#017D84', l2:'#00535F', d:'#0E8A86', d2:'#0A4A51'},
   {id:'green', name:'أخضر',   l:'#0E6B57', l2:'#0A5243', d:'#2FA586', d2:'#13574A'},
   {id:'blue',  name:'أزرق',   l:'#1D5FBF', l2:'#164A94', d:'#4C8DF0', d2:'#1B3F78'},
   {id:'purple',name:'بنفسجي', l:'#6D3FC0', l2:'#532F96', d:'#9B7BEA', d2:'#43287A'},
