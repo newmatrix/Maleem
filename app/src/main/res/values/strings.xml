@@ -10,4 +10,5 @@
     <string name="widget_small_desc">مصروف النهارده وزرارين للتسجيل السريع</string>
     <string name="widget_medium_desc">الصرف مقابل الميزانية وزرارين للتسجيل السريع</string>
     <string name="tile_voice">مصروف بالصوت</string>
+    <string name="capture_label">مليم: تسجيل المصروفات من إشعارات البنك والمحافظ</string>
 </resources>
