@@ -126,6 +126,9 @@ class MainActivity : AppCompatActivity() {
             setSupportZoom(false)
         }
         web.overScrollMode = View.OVER_SCROLL_NEVER
+        // no native scrollbar (in RTL it shows up on the left edge while scrolling)
+        web.isVerticalScrollBarEnabled = false
+        web.isHorizontalScrollBarEnabled = false
         web.setBackgroundColor(ContextCompat.getColor(this, R.color.app_bg))
 
         web.webViewClient = object : WebViewClientCompat() {
