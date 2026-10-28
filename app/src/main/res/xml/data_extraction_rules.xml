@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Your financial data (and the PIN hash) is never copied to Google's cloud backup.
+  A direct phone-to-phone transfer that you start yourself (cable / Wi-Fi when setting up a new phone) is still allowed.
+  For everything else use the app's own backup (manual file or the automatic file in Download/Maleem).
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="external" path="." />
+    </cloud-backup>
+</data-extraction-rules>

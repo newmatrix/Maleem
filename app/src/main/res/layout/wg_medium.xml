@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/wg_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/wg_bg"
+    android:gravity="center_vertical"
+    android:layoutDirection="rtl"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/wg_period"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="أكتوبر"
+                android:textColor="@color/wg_muted"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/wg_todaysm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="اليوم: 320"
+                android:textColor="@color/wg_text"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/wg_big"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="12,400"
+                android:textColor="@color/wg_text"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/wg_of"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginBottom="3dp"
+                android:maxLines="1"
+                android:text="/ 20,000 ج.م"
+                android:textColor="@color/wg_muted"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/wg_bar_wrap"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginTop="4dp">
+
+            <ProgressBar
+                android:id="@+id/wg_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:indeterminate="false"
+                android:max="100"
+                android:mirrorForRtl="true"
+                android:progress="62"
+                android:progressDrawable="@drawable/wg_bar" />
+
+            <ProgressBar
+                android:id="@+id/wg_bar_bad"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:indeterminate="false"
+                android:max="100"
+                android:mirrorForRtl="true"
+                android:progress="0"
+                android:progressDrawable="@drawable/wg_bar_bad"
+                android:visibility="invisible" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/wg_foot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="باقي 7,600 ج.م · أكتر فئة: أكل وشرب"
+            android:textColor="@color/wg_muted"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="46dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/wg_add"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:background="@drawable/wg_btn_gold"
+            android:contentDescription="@string/shortcut_add"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_wg_plus" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/wg_mic"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/wg_btn_dark"
+            android:contentDescription="@string/shortcut_voice"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_wg_mic" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Maleem palette, taken from the app icon -->
+    <color name="app_bg">#EEF6F6</color>
+    <color name="brand">#017D84</color>
+    <color name="brand_dark">#00535F</color>
+    <color name="gold">#7DF4E2</color>
+
+    <!-- Home-screen widgets (fixed deep petrol + mint, readable on any wallpaper) -->
+    <color name="wg_bg">#00353D</color>
+    <color name="wg_text">#ECFBF9</color>
+    <color name="wg_muted">#8FC4C4</color>
+    <color name="wg_gold">#7DF4E2</color>
+    <color name="wg_track">#0B4F57</color>
+    <color name="wg_bad">#E5604F</color>
+</resources>

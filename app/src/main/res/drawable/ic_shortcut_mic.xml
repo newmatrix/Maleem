@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icon for the "تسجيل مصروف بالصوت" launcher shortcut -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/brand" />
+    <foreground android:drawable="@drawable/ic_shortcut_mic_fg" />
+</adaptive-icon>

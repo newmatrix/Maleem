@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مليم</string>
+    <string name="shortcut_add">مصروف جديد</string>
+    <string name="shortcut_add_long">سجل مصروف جديد</string>
+    <string name="shortcut_voice">تسجيل مصروف بالصوت</string>
+    <string name="shortcut_voice_long">سجل مصروف بالصوت</string>
+    <string name="widget_small_label">مليم (صغيرة)</string>
+    <string name="widget_medium_label">مليم (متوسطة)</string>
+    <string name="widget_small_desc">مصروف النهارده وزرارين للتسجيل السريع</string>
+    <string name="widget_medium_desc">الصرف مقابل الميزانية وزرارين للتسجيل السريع</string>
+    <string name="tile_voice">مصروف بالصوت</string>
+</resources>
