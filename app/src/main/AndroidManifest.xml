@@ -83,6 +83,19 @@
             </intent-filter>
         </service>
 
+        <!-- "تسجيل تلقائي من الإشعارات": off (disabled) until the user turns it on in the app's settings.
+             It only reads payment notifications, keeps the matches on the phone, and the user confirms each one. -->
+        <service
+            android:name=".PayListener"
+            android:enabled="false"
+            android:exported="true"
+            android:label="@string/capture_label"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
         <receiver android:name=".BootReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
