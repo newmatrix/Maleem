@@ -10,6 +10,7 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
@@ -108,11 +109,27 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        // Faster start: hash the page for the CSP header while the WebView is being created, not when the page is requested
+        Thread { csp }.start()
+
+        // The page's own background (theme / accent the user picked), saved last time, so the screen opens in the
+        // right colour instead of flashing the default one until the page has drawn.
+        val ui = getSharedPreferences(UI_PREFS, MODE_PRIVATE)
+        val startBg = if (ui.contains("bg")) ui.getInt("bg", 0) else ContextCompat.getColor(this, R.color.app_bg)
+        window.setBackgroundDrawable(ColorDrawable(startBg))
 
         root = FrameLayout(this)
+        root.setBackgroundColor(startBg)
         web = WebView(this)
         root.addView(web, FrameLayout.LayoutParams(-1, -1))
         setContentView(root)
+        if (ui.contains("dark")) {
+            val dark = ui.getBoolean("dark", false)
+            WindowCompat.getInsetsController(window, root).apply {
+                isAppearanceLightStatusBars = !dark
+                isAppearanceLightNavigationBars = !dark
+            }
+        }
 
         // Keep the page clear of the status bar, navigation bar and keyboard
         ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
@@ -137,7 +154,7 @@ class MainActivity : AppCompatActivity() {
         // no native scrollbar (in RTL it shows up on the left edge while scrolling)
         web.isVerticalScrollBarEnabled = false
         web.isHorizontalScrollBarEnabled = false
-        web.setBackgroundColor(ContextCompat.getColor(this, R.color.app_bg))
+        web.setBackgroundColor(startBg)
 
         web.webViewClient = object : WebViewClientCompat() {
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
@@ -657,7 +674,11 @@ class MainActivity : AppCompatActivity() {
         fun setBars(color: String, dark: Boolean) {
             if (!pageOk) return
             runOnUiThread {
-                try { root.setBackgroundColor(Color.parseColor(color)) } catch (_: Exception) { }
+                try {
+                    val c = Color.parseColor(color)
+                    root.setBackgroundColor(c)
+                    getSharedPreferences(UI_PREFS, MODE_PRIVATE).edit().putInt("bg", c).putBoolean("dark", dark).apply()
+                } catch (_: Exception) { }
                 WindowCompat.getInsetsController(window, root).apply {
                     isAppearanceLightStatusBars = !dark
                     isAppearanceLightNavigationBars = !dark
@@ -668,6 +689,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val APP_HOST = "appassets.androidplatform.net"
+        private const val UI_PREFS = "maleem_ui"
         const val ACTION_ADD_EXPENSE = "com.heshamtaha.maleem.ADD_EXPENSE"
         const val ACTION_ADD_VOICE = "com.heshamtaha.maleem.ADD_EXPENSE_VOICE"
         const val ACTION_CAPTURES = "com.heshamtaha.maleem.CAPTURES"
