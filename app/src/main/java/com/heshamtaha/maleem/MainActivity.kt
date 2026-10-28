@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     private var pausedAt = 0L
     private var quickAdd = false
     private var quickVoice = false
+    private var openCaptures = false
     private var recognizer: SpeechRecognizer? = null
     private var voiceWanted = false
     /** true only while our own page (https://appassets.androidplatform.net) is loaded: the JS bridge refuses anything else */
@@ -65,6 +66,13 @@ class MainActivity : AppCompatActivity() {
 
     private val pickFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         fileCallback?.onReceiveValue(if (uri != null) arrayOf(uri) else null)
+        fileCallback = null
+    }
+    /** Receipt photos: <input capture> opens the camera app straight away (no CAMERA permission needed for that). */
+    private var cameraUri: Uri? = null
+    private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
+        val u = cameraUri
+        fileCallback?.onReceiveValue(if (ok && u != null) arrayOf(u) else null)
         fileCallback = null
     }
     private val askNotifications = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -162,6 +170,11 @@ class MainActivity : AppCompatActivity() {
                     quickVoice = false
                     js("window.__quickVoice && window.__quickVoice()")
                 }
+                // Opened from the "لقيت عملية دفع" notification: show the captured payments
+                if (openCaptures) {
+                    openCaptures = false
+                    js("window.__captures && window.__captures(true)")
+                }
             }
 
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -179,6 +192,17 @@ class MainActivity : AppCompatActivity() {
                 fileCallback?.onReceiveValue(null)
                 fileCallback = callback
                 val wantsImage = params?.acceptTypes?.any { it.startsWith("image") } == true
+                if (wantsImage && params?.isCaptureEnabled == true) {
+                    try {
+                        val dir = File(cacheDir, "camera").apply { mkdirs() }
+                        dir.listFiles()?.forEach { it.delete() } // only the photo being taken stays in the cache
+                        val f = File(dir, "receipt-${System.currentTimeMillis()}.jpg")
+                        val u = FileProvider.getUriForFile(this@MainActivity, "$packageName.files", f)
+                        cameraUri = u
+                        takePhoto.launch(u)
+                        return true
+                    } catch (_: Exception) { /* no camera app: fall back to the gallery */ }
+                }
                 return try { pickFile.launch(if (wantsImage) "image/*" else "*/*"); true } catch (_: Exception) { fileCallback = null; false }
             }
         }
@@ -186,6 +210,7 @@ class MainActivity : AppCompatActivity() {
         web.addJavascriptInterface(Bridge(), "AndroidBridge")
         quickAdd = intent?.action == ACTION_ADD_EXPENSE
         quickVoice = intent?.action == ACTION_ADD_VOICE
+        openCaptures = intent?.action == ACTION_CAPTURES
         if (savedInstanceState == null) web.loadUrl("https://$APP_HOST/assets/www/index.html")
         else web.restoreState(savedInstanceState)
 
@@ -213,6 +238,7 @@ class MainActivity : AppCompatActivity() {
         // App already open in the background and the shortcut was tapped
         if (intent.action == ACTION_ADD_EXPENSE) js("window.__quickAdd && window.__quickAdd()")
         if (intent.action == ACTION_ADD_VOICE) js("window.__quickVoice && window.__quickVoice()")
+        if (intent.action == ACTION_CAPTURES) js("window.__captures && window.__captures(true)")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -222,6 +248,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        PayCapture.onNew = null
         pausedAt = System.currentTimeMillis()
         // Leaving the app while listening: stop the mic and close the voice card.
         // (The permission dialog also pauses the activity, so only do this once listening has started.)
@@ -302,6 +329,9 @@ class MainActivity : AppCompatActivity() {
         pausedAt = 0
         // the exact-alarm permission may have been granted / revoked in system settings meanwhile
         try { Reminders.apply(this) } catch (_: Exception) { }
+        // payments captured while the app is open appear right away; the ones caught while it was closed are picked up now
+        PayCapture.onNew = { js("window.__captures && window.__captures(false)") }
+        js("window.__captures && window.__captures(false)")
     }
 
     private fun js(code: String) = web.post { web.evaluateJavascript(code, null) }
@@ -544,6 +574,66 @@ class MainActivity : AppCompatActivity() {
             return true
         }
 
+        /* ===== Automatic capture from payment notifications ===== */
+
+        /** {"on":bool,"access":bool,"sdk":int} */
+        @JavascriptInterface
+        fun captureState(): String {
+            if (!pageOk) return "{}"
+            return JSONObject()
+                .put("on", PayCapture.enabled(this@MainActivity))
+                .put("access", PayCapture.hasAccess(this@MainActivity))
+                .put("sdk", Build.VERSION.SDK_INT)
+                .toString()
+        }
+
+        @JavascriptInterface
+        fun captureSet(on: Boolean) {
+            if (!pageOk) return
+            PayCapture.setEnabled(this@MainActivity, on)
+        }
+
+        /** Opens Android's "notification access" screen (straight to Maleem's switch on Android 11+). */
+        @JavascriptInterface
+        fun captureOpenSettings() {
+            if (!pageOk) return
+            runOnUiThread {
+                val cn = PayCapture.component(this@MainActivity)
+                try {
+                    if (Build.VERSION.SDK_INT >= 30) startActivity(
+                        Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS)
+                            .putExtra(Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME, cn.flattenToString())
+                    ) else startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                } catch (_: Exception) {
+                    try { startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) } catch (_: Exception) { }
+                }
+            }
+        }
+
+        /** Android 13+ blocks notification access for apps installed from an APK file until
+         *  "Allow restricted settings" is turned on from the app's info screen (⋮ menu). */
+        @JavascriptInterface
+        fun openAppInfo() {
+            if (!pageOk) return
+            runOnUiThread {
+                try { startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))) } catch (_: Exception) { }
+            }
+        }
+
+        /** The captured payments waiting for the user (JSON array). They move to the web app's storage. */
+        @JavascriptInterface
+        fun takeCaptures(): String = if (!pageOk) "[]" else PayCapture.take(this@MainActivity)
+
+        /** Apps the user chose to ignore: JSON array of {pkg,name}. */
+        @JavascriptInterface
+        fun captureBlocked(): String = if (!pageOk) "[]" else PayCapture.blocked(this@MainActivity).toString()
+
+        @JavascriptInterface
+        fun captureBlock(pkg: String, name: String, on: Boolean) {
+            if (!pageOk) return
+            PayCapture.setBlocked(this@MainActivity, pkg, name, on)
+        }
+
         @JavascriptInterface
         fun setBars(color: String, dark: Boolean) = runOnUiThread {
             try { root.setBackgroundColor(Color.parseColor(color)) } catch (_: Exception) { }
@@ -558,5 +648,6 @@ class MainActivity : AppCompatActivity() {
         const val APP_HOST = "appassets.androidplatform.net"
         const val ACTION_ADD_EXPENSE = "com.heshamtaha.maleem.ADD_EXPENSE"
         const val ACTION_ADD_VOICE = "com.heshamtaha.maleem.ADD_EXPENSE_VOICE"
+        const val ACTION_CAPTURES = "com.heshamtaha.maleem.CAPTURES"
     }
 }
