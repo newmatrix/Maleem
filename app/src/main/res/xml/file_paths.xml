@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <cache-path name="share" path="share/" />
+    <!-- receipt photos taken with the camera (deleted before the next photo) -->
+    <cache-path name="camera" path="camera/" />
 </paths>
