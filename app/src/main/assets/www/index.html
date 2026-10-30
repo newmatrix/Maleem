@@ -324,6 +324,15 @@ button{cursor:pointer}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 .lock .keypad{width:min(300px,100%)}
 .pin-sheet .dots{justify-content:center;margin:10px auto 8px}
+.lock-pass{width:min(300px,100%);display:grid;gap:10px}
+.lock-pass .field{margin-top:0}
+.lock-pass.shake{animation:shake .35s}
+#lockSwitch{margin-top:6px}
+.mb-pick{z-index:95;overflow-y:auto}
+.mb-pick-list{display:grid;gap:10px;width:min(320px,100%)}
+.mb-pick-list button{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:1.05rem;font-weight:600;text-align:start}
+.mb-av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-weight:700}
+.mb-row .btn{padding:8px 14px;font-size:.88rem}
 
 .toast{position:fixed;bottom:calc(178px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:14px;display:flex;gap:14px;align-items:center;z-index:80;opacity:0;pointer-events:none;transition:all .2s;max-width:calc(100% - 32px);font-size:.95rem}
 .toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
@@ -1158,13 +1167,24 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
     <div class="card">
       <h3>الحماية</h3>
       <div class="set-row">
-        <div class="txt">قفل بكلمة مرور<small>رقم سري من 4 أرقام عند فتح التطبيق</small></div>
-        <label class="switch"><input type="checkbox" id="pinToggle" aria-label="قفل بكلمة مرور"><i></i></label>
+        <div class="txt">قفل بكلمة سر<small>رقم سري من 4 أرقام أو كلمة سر عند فتح التطبيق</small></div>
+        <label class="switch"><input type="checkbox" id="pinToggle" aria-label="قفل بكلمة سر"><i></i></label>
+      </div>
+      <div class="set-row" id="lockChangeRow" hidden>
+        <div class="txt">تغيير كلمة السر<small>أو التحويل من رقم سري لكلمة سر والعكس</small></div>
+        <button class="btn" id="lockChange" type="button">تغيير</button>
       </div>
       <div class="set-row">
         <div class="txt">قفل بالبصمة<small id="bioHint">بيشتغل في نسخة أندرويد</small></div>
         <label class="switch"><input type="checkbox" id="bioToggle" aria-label="قفل بالبصمة" disabled><i></i></label>
       </div>
+    </div>
+
+    <div class="card" id="mbCard">
+      <h3>الأعضاء</h3>
+      <p class="hint">كل عضو ليه مصاريفه والتزاماته وإعداداته وكلمة السر بتاعته. الويدجت والتذكيرات وتسجيل المصاريف من إشعارات البنك بتشتغل للعضو اللي فتح التطبيق آخر مرة.</p>
+      <div id="mbList"></div>
+      <div class="export-grid"><button class="btn" id="mbAdd" type="button">إضافة عضو</button><button class="btn" id="mbSwitch" type="button">تبديل العضو</button></div>
     </div>
 
     <div class="card">
@@ -1260,6 +1280,32 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <div class="dots" id="pinDots"><i></i><i></i><i></i><i></i></div>
   <div class="keypad" id="pinPad" dir="ltr"></div>
   <button class="btn" id="pinCancel" style="width:100%">إلغاء</button>
+</div>
+
+<!-- Lock setup: choose PIN or password / confirm the current password -->
+<div class="sheet" id="credSheet" role="dialog" aria-modal="true" aria-labelledby="credTitle">
+  <div class="grab"></div>
+  <h2 id="credTitle">اختار طريقة القفل</h2>
+  <div id="credKindBox"><div class="seg" id="credSeg" role="group" aria-label="نوع القفل"><button type="button" data-kind="pin" aria-pressed="true">رقم سري 4 أرقام</button><button type="button" data-kind="pass" aria-pressed="false">كلمة سر</button></div></div>
+  <div id="credPassBox">
+    <div class="field"><input id="credP1" type="password" maxlength="64" autocomplete="new-password" aria-label="كلمة السر" placeholder="كلمة السر"></div>
+    <div class="field" id="credP2Wrap"><input id="credP2" type="password" maxlength="64" autocomplete="new-password" aria-label="تأكيد كلمة السر" placeholder="اكتبها تاني للتأكيد"></div>
+  </div>
+  <p class="err-msg" id="credErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="credGo">كمّل</button><button class="btn" id="credCancel">إلغاء</button></div>
+</div>
+
+<!-- New member -->
+<div class="sheet" id="mbSheet" role="dialog" aria-modal="true" aria-labelledby="mbTitle">
+  <div class="grab"></div>
+  <h2 id="mbTitle">عضو جديد</h2>
+  <div class="field"><input id="mbName" type="text" maxlength="24" placeholder="اسم العضو، مثلاً محمد" autocomplete="off" aria-label="اسم العضو"></div>
+  <div class="seg" id="mbSeg" role="group" aria-label="نوع القفل"><button type="button" data-kind="pin" aria-pressed="true">رقم سري 4 أرقام</button><button type="button" data-kind="pass" aria-pressed="false">كلمة سر</button></div>
+  <div class="field"><input id="mbP1" type="password" maxlength="4" inputmode="numeric" autocomplete="new-password" aria-label="كلمة السر"></div>
+  <div class="field"><input id="mbP2" type="password" maxlength="4" inputmode="numeric" autocomplete="new-password" aria-label="تأكيد كلمة السر"></div>
+  <p class="hint">لو العضو نسي كلمة السر، مفيش طريقة ترجعها. الحل الوحيد إن عضو تاني يمسحه هو وبياناته.</p>
+  <p class="err-msg" id="mbErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="mbGo">إضافة</button><button class="btn" id="mbCancel">إلغاء</button></div>
 </div>
 
 <div class="notif" id="notif" role="alert">
@@ -1488,11 +1534,24 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 
 <div class="lock" id="lock">
   <div class="logo"><img src="img/maleem-logo.png" alt=""></div>
-  <h2>مليم</h2>
+  <h2 id="lockName">مليم</h2>
   <p id="lockMsg" aria-live="polite">اكتب الرقم السري</p>
   <div class="dots" id="lockDots"><i></i><i></i><i></i><i></i></div>
   <div class="keypad" id="lockPad" dir="ltr"></div>
+  <div class="lock-pass" id="lockPassBox" hidden>
+    <div class="field"><input id="lockPass" type="password" maxlength="64" autocomplete="current-password" aria-label="كلمة السر"></div>
+    <button class="btn primary" id="lockPassGo" type="button">فتح</button>
+  </div>
   <button class="linkbtn" id="bioBtn" hidden>افتح بالبصمة</button>
+  <button class="linkbtn" id="lockSwitch" hidden>مش انت؟ بدّل العضو</button>
+</div>
+
+<!-- Member picker (more than one member on this phone) -->
+<div class="lock mb-pick" id="mbPick" role="dialog" aria-modal="true" aria-labelledby="mbPickTitle">
+  <div class="logo"><img src="img/maleem-logo.png" alt=""></div>
+  <h2 id="mbPickTitle">مين بيستخدم مليم؟</h2>
+  <p>اختار اسمك</p>
+  <div class="mb-pick-list" id="mbPickList"></div>
 </div>
 
 <input type="file" id="restoreFile" accept="application/json,.json,text/plain" hidden>
@@ -1518,7 +1577,6 @@ const CATS = [
   {id:'other', name:'أخرى',     e:'📦', c:'#64748B'}
 ];
 let CAT = {};
-const KEY = 'maleem.v1';
 const mem = {};
 function lsGet(k){try{return localStorage.getItem(k)}catch(e){return mem[k]??null}}
 function lsSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){mem[k]=v;return false}}
@@ -1526,7 +1584,29 @@ function lsSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){mem[k]=v;
 let storageWarnAt=0;
 function storageFull(){const now=Date.now(); if(now-storageWarnAt<60000) return; storageWarnAt=now;
   setTimeout(()=>{try{toast('⚠️ مساحة التخزين اتملت، والتعديلات الجديدة مش هتتحفظ لما تقفل التطبيق. اعمل نسخة احتياطية حالًا، وشيل الصورة الشخصية أو امسح بيانات قديمة.',null,null,9000)}catch(e){}},0)}
-function persist(){if(!lsSet(KEY,JSON.stringify(S))) storageFull()}
+function persist(){if(!lsSet(KEY,JSON.stringify(S))) storageFull(); mbSyncName()}
+
+/* ===== Members: several people use the app on one phone, each with his own data, settings and password.
+   The list lives in its own key; each member's data has its own key. The first member keeps the original
+   key 'maleem.v1' (and the original receipts database / Firebase account), so data saved by older versions
+   simply becomes the first member. Switching member saves, then reloads the page with the other member. */
+const MKEY='maleem.members', MB_MAX=6;
+const mbKey=id=>id==='m1'?'maleem.v1':'maleem.m.'+id;
+const rcDbName=id=>id==='m1'?'maleem':'maleem-'+id;
+const fbAppName=id=>id==='m1'?'[DEFAULT]':'maleem-'+id;
+let MB=null;
+try{const r=JSON.parse(lsGet(MKEY)||'null');
+  if(r&&Array.isArray(r.list)) MB={active:String(r.active||''),list:r.list.filter(m=>m&&typeof m.id==='string'&&/^m[a-z0-9]{1,20}$/.test(m.id)).map(m=>({id:m.id,name:String(m.name||'').slice(0,24)}))};
+}catch(e){}
+if(!MB||!MB.list.length) MB={active:'m1',list:[{id:'m1',name:''}]};
+if(!MB.list.some(m=>m.id===MB.active)) MB.active=MB.list[0].id;
+const ME=MB.list.find(m=>m.id===MB.active);
+const KEY=mbKey(ME.id);
+function mbSave(){lsSet(MKEY,JSON.stringify(MB))}
+/* the member's name in the list follows the name he sets in "أنا" */
+function mbSyncName(){const n=String((S.profile&&S.profile.name)||'').trim().replace(/\s+/g,' ').slice(0,24); if(n&&ME.name!==n){ME.name=n;mbSave()}}
+/* "Maleem-هشام": the start of every backup / export file name */
+function fileTag(){const n=String(ME.name||(S.profile&&S.profile.name)||'').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'').replace(/\s+/g,' ').trim().slice(0,24); return n?'Maleem-'+n:'Maleem'}
 
 let S = {expenses:[], budget:0, theme:'system', pin:null, lastBackup:null};
 try{const raw=lsGet(KEY); if(raw){S=Object.assign(S,JSON.parse(raw))}}catch(e){}
@@ -1551,6 +1631,7 @@ if(!Array.isArray(S.gams)) S.gams=[];
 if(S.dueRemind===undefined) S.dueRemind=true;
 if(!S.dueSeen) S.dueSeen={};
 if(!S.profile) S.profile={name:'',age:null};
+mbSyncName();
 if(!Array.isArray(S.incomes)) S.incomes=[];
 if(!Array.isArray(S.goals)) S.goals=[];
 if(!S.saveTarget) S.saveTarget=0;
@@ -1995,14 +2076,15 @@ function renderSettings(){
   $('#row80').classList.toggle('off',!can);
   $('#pctChip').disabled=!can||!S.alert80; $('#rowPct').classList.toggle('off',!can||!S.alert80);
   $('#alertsHint').textContent= can? 'هيظهرلك التنبيه مرة واحدة في الشهر لما توصل النسبة دي.' : 'التنبيهات بتشتغل لما تختار “تحديد ميزانية” وتكتب الرقم.';
-  $('#pinToggle').checked=!!hasPin();
+  $('#pinToggle').checked=!!hasPin(); $('#lockChangeRow').hidden=!hasPin();
+  renderMembers();
   $('#wgCard').hidden=!AB; $('#wgHide').checked=!!S.wgHide;
   {const bits=[]; if(S.lastBackup) bits.push('آخر نسخة يدوية: '+shortDate(S.lastBackup)+' '+timeStr(S.lastBackup)); if(AB&&S.lastAutoBk) bits.push('آخر نسخة تلقائية: '+shortDate(S.lastAutoBk)+' '+timeStr(S.lastAutoBk));
     $('#backupHint').textContent=(bits.length?bits.join(' · ')+'. ':'')+(AB?'النسخة اليدوية بتتحفظ كملف، اختار Google Drive من قايمة المشاركة واسترجعها من هناك في أي وقت.':bits.length?'':'احفظ نسخة من مصاريفك على السحابة واسترجعها في أي وقت.')}
   $('#autoBkRow').hidden=!AB; $('#autoBkNote').hidden=!AB; $('#autoBkChip').textContent=autoBkLabel(S.autoBkDays);
   const bioOk=!!(AB&&AB.canBiometric&&AB.canBiometric());
   $('#bioToggle').disabled=!(bioOk&&hasPin()); $('#bioToggle').checked=!!(S.bio&&hasPin()&&bioOk);
-  $('#bioHint').textContent= !AB? 'بيشتغل في نسخة أندرويد' : !bioOk? 'الموبايل ده مفيهوش بصمة متسجلة' : !hasPin()? 'فعل القفل بالرقم السري الأول' : 'افتح التطبيق ببصمتك بدل الرقم السري';
+  $('#bioHint').textContent= !AB? 'بيشتغل في نسخة أندرويد' : !bioOk? 'الموبايل ده مفيهوش بصمة متسجلة' : !hasPin()? 'فعّل القفل بكلمة سر الأول' : 'افتح التطبيق ببصمتك بدل كلمة السر';
 }
 
 function renderAll(){
@@ -2204,7 +2286,7 @@ function closeSheets(){
   wpCloseAll();
   rcStage=null; capOpen=null;
   closePayMenu(); closeDateMenu();
-  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','spSheet','capSheet','impSheet'].forEach(i=>$('#'+i).classList.remove('open'));
+  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','spSheet','capSheet','impSheet','credSheet','mbSheet'].forEach(i=>$('#'+i).classList.remove('open'));
   $('#noteInput').blur();$('#catName').blur();amtIn.blur();
   if(pinMode){pinMode=null;$('#pinToggle').checked=!!hasPin()}
 }
@@ -2616,12 +2698,12 @@ function applySecure(){try{AB&&AB.setSecure&&AB.setSecure(hasPin())}catch(e){}}
 if(typeof S.pin==='string'&&!(S.pinH&&S.pinH.h)){ if(/^\d{4}$/.test(S.pin)){const p=S.pin; pinMake(p).then(h=>{if(S.pin===p){S.pinH=h;delete S.pin;save()}}).catch(()=>{})} else delete S.pin }
 else if(S.pin!==undefined) delete S.pin;
 
-let pinMode=null, pinBuf='', pinFirst='', pinBusy=false;
+let pinMode=null, pinBuf='', pinFirst='', pinBusy=false, pinChkFn=null;
 function dots(el,n){el.querySelectorAll('i').forEach((d,i)=>d.classList.toggle('on',i<n))}
 function shake(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')}
 buildPad($('#pinPad'),k=>{
   if(pinBusy) return;
-  if(pinMode==='off'){const w=pinWait(); if(w){$('#pinTitle').textContent=waitTxt(w);shake($('#pinDots'));return}}
+  if(pinMode==='chk'){const w=pinWait(); if(w){$('#pinTitle').textContent=waitTxt(w);shake($('#pinDots'));return}}
   if(k==='⌫'){pinBuf=pinBuf.slice(0,-1)} else if(pinBuf.length<4) pinBuf+=k;
   dots($('#pinDots'),pinBuf.length);
   if(pinBuf.length===4){
@@ -2630,30 +2712,72 @@ buildPad($('#pinPad'),k=>{
       try{
         if(pinMode==='set1'){pinFirst=typed;pinBuf='';pinMode='set2';$('#pinTitle').textContent='اكتب الرقم السري تاني للتأكيد';dots($('#pinDots'),0)}
         else if(pinMode==='set2'){
-          if(typed===pinFirst){$('#pinTitle').textContent='لحظة...'; S.pinH=await pinMake(typed); delete S.pin; delete S.pinFail; pinFirst=''; save();pinMode=null;closeSheets();renderSettings();applySecure();toast('اتفعل القفل بالرقم السري')}
+          if(typed===pinFirst){$('#pinTitle').textContent='لحظة...'; S.pinH=await pinMake(typed); S.lockKind='pin'; delete S.pin; delete S.pinFail; pinFirst=''; save();pinMode=null;closeSheets();renderSettings();applySecure();toast('اتفعل القفل بالرقم السري')}
           else{shake($('#pinDots'));pinBuf='';pinFirst='';pinMode='set1';$('#pinTitle').textContent='الرقمين مش زي بعض. اختار رقم سري تاني';dots($('#pinDots'),0)}
         }
-        else if(pinMode==='off'){
-          if(await pinCheck(typed)){pinOk();S.pinH=null;delete S.pin;S.bio=false;save();pinMode=null;closeSheets();renderSettings();applySecure();$('#bioBtn').hidden=true;toast('اتلغى القفل')}
+        else if(pinMode==='chk'){
+          if(await pinCheck(typed)){pinOk();pinMode=null;const fn=pinChkFn;pinChkFn=null;closeSheets();if(fn)fn()}
           else{pinFailed();shake($('#pinDots'));pinBuf='';dots($('#pinDots'),0);const w=pinWait();$('#pinTitle').textContent=w?waitTxt(w):'الرقم غلط، جرب تاني'}
         }
       }finally{pinBusy=false; if(pinBuf.length===4){pinBuf='';dots($('#pinDots'),0)}}
     },120);
   }
 },false);
-$('#pinToggle').onchange=e=>{
-  pinBuf='';pinFirst='';dots($('#pinDots'),0);
-  if(e.target.checked){pinMode='set1';$('#pinTitle').textContent='اختار رقم سري من 4 أرقام'}
-  else{pinMode='off';const w=pinWait();$('#pinTitle').textContent=w?waitTxt(w):'اكتب الرقم السري الحالي عشان تلغي القفل'}
-  $('#scrim').classList.add('open');$('#pinSheet').classList.add('open');
+/* Lock setup: the member chooses a 4-digit PIN (keypad above) or a password (credSheet). Both are stored the same
+   way (S.pinH, PBKDF2) and S.lockKind says which screen to show. */
+let credMode=null, credKind='pin', credFn=null;
+function credPaint(){const v=credMode==='verify', pass=v||credKind==='pass';
+  document.querySelectorAll('#credSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.kind===credKind));
+  $('#credTitle').textContent=v?'اكتب كلمة السر الحالية':'اختار طريقة القفل';
+  $('#credKindBox').hidden=v; $('#credPassBox').hidden=!pass; $('#credP2Wrap').hidden=v;
+  $('#credP1').autocomplete=v?'current-password':'new-password';
+  $('#credP1').placeholder=v?'كلمة السر':'كلمة سر (4 حروف أو أرقام على الأقل)';
+  $('#credGo').textContent=v?'تأكيد':pass?'حفظ':'كمّل'; $('#credErr').textContent=''}
+function credOpen(mode,fn){credMode=mode;credFn=fn||null;$('#credP1').value='';$('#credP2').value='';if(mode==='new')credKind=S.lockKind==='pass'?'pass':'pin';credPaint();openSheetEl('credSheet')}
+function pinPadOpen(mode,title){pinBuf='';pinFirst='';dots($('#pinDots'),0);pinMode=mode;$('#pinTitle').textContent=title;openSheetEl('pinSheet')}
+/* asks for the current PIN / password, then runs fn */
+function credVerify(fn){
+  if(S.lockKind==='pass'){credOpen('verify',fn);return}
+  pinChkFn=fn; const w=pinWait(); pinPadOpen('chk',w?waitTxt(w):'اكتب الرقم السري الحالي');
+}
+$('#credSeg').onclick=e=>{const b=e.target.closest('[data-kind]'); if(b){credKind=b.dataset.kind;credPaint()}};
+$('#credCancel').onclick=closeSheets;
+['#credP1','#credP2'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#credGo').click()}}));
+$('#credGo').onclick=async()=>{
+  const b=$('#credGo'); if(b.disabled) return; const err=t=>{$('#credErr').textContent=t};
+  if(credMode==='verify'){
+    const w=pinWait(); if(w) return err(waitTxt(w));
+    const v=$('#credP1').value; if(!v) return err('اكتب كلمة السر');
+    b.disabled=true; let ok=false; try{ok=await pinCheck(v)}catch(e){} b.disabled=false;
+    if(ok){pinOk(); const fn=credFn; credFn=null; closeSheets(); if(fn) fn()}
+    else{pinFailed(); $('#credP1').value=''; const w2=pinWait(); err(w2?waitTxt(w2):'كلمة السر غلط، جرب تاني')}
+    return;
+  }
+  if(credKind==='pin'){closeSheets(); pinPadOpen('set1','اختار رقم سري من 4 أرقام'); return}
+  const p1=$('#credP1').value, p2=$('#credP2').value;
+  if(p1.length<4) return err('كلمة السر لازم تكون 4 حروف أو أرقام على الأقل');
+  if(p1!==p2) return err('كلمتين السر مش زي بعض');
+  b.disabled=true; b.textContent='لحظة...';
+  try{S.pinH=await pinMake(p1); S.lockKind='pass'; delete S.pin; delete S.pinFail; save(); closeSheets(); renderSettings(); applySecure(); toast('اتفعل القفل بكلمة السر')}
+  catch(e){err('حصلت مشكلة، جرب تاني')}
+  finally{b.disabled=false; credPaint()}
 };
+function lockOff(){S.pinH=null;delete S.pin;delete S.lockKind;S.bio=false;save();renderSettings();applySecure();$('#bioBtn').hidden=true;toast('اتلغى القفل')}
+$('#pinToggle').onchange=e=>{
+  const on=e.target.checked; e.target.checked=!!hasPin();
+  if(on){credOpen('new');return}
+  if(MB.list.length>1){toast('طول ما فيه أكتر من عضو على الموبايل، لازم كل عضو يكون ليه كلمة سر',null,null,4500);return}
+  credVerify(lockOff);
+};
+$('#lockChange').onclick=()=>credVerify(()=>credOpen('new'));
 $('#pinCancel').onclick=closeSheets;
 
 let lockBuf='', lockBusy=false, lockMsgT=null;
 function lockMsgPaint(){
   clearTimeout(lockMsgT); const el=$('#lockMsg'); if(!el) return;
   const w=pinWait();
-  el.textContent= w? 'محاولات غلط كتير. '+waitTxt(w) : (S.pinFail&&S.pinFail.n? 'الرقم غلط، جرب تاني' : 'اكتب الرقم السري');
+  const pass=S.lockKind==='pass';
+  el.textContent= w? 'محاولات غلط كتير. '+waitTxt(w) : (S.pinFail&&S.pinFail.n? (pass?'كلمة السر غلط، جرب تاني':'الرقم غلط، جرب تاني') : (pass?'اكتب كلمة السر':'اكتب الرقم السري'));
   el.classList.toggle('err',!!(w||(S.pinFail&&S.pinFail.n)));
   if(w&&$('#lock').classList.contains('open')) lockMsgT=setTimeout(lockMsgPaint,1000);
 }
@@ -2672,13 +2796,50 @@ buildPad($('#lockPad'),k=>{
     },120);
   }
 },false);
-if(hasPin()){$('#lock').classList.add('open');lockMsgPaint()}
+function lockPaintKind(){const pass=S.lockKind==='pass';
+  $('#lockDots').hidden=pass; $('#lockPad').hidden=pass; $('#lockPassBox').hidden=!pass;
+  $('#lockName').textContent=MB.list.length>1&&ME.name?ME.name:'مليم'; $('#lockSwitch').hidden=MB.list.length<2}
+async function lockPassTry(){
+  if(lockBusy) return; if(pinWait()){lockMsgPaint();shake($('#lockPassBox'));return}
+  const v=$('#lockPass').value; if(!v) return;
+  lockBusy=true; let ok=false; try{ok=await pinCheck(v)}catch(e){} lockBusy=false;
+  $('#lockPass').value='';
+  if(ok){$('#lockPass').blur();unlockApp()} else{pinFailed();shake($('#lockPassBox'));lockMsgPaint()}
+}
+$('#lockPassGo').onclick=lockPassTry;
+$('#lockPass').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lockPassTry()}});
+/* Member picker: shown when the app starts with more than one member, and from the lock screen / settings */
+let mbPickFrom=null;
+function mbPickOpen(from){
+  mbPickFrom=from;
+  $('#mbPickList').innerHTML=MB.list.map(m=>`<button type="button" data-mb="${esc(m.id)}"><span class="mb-av" aria-hidden="true">${esc(mbInitial(m.name))}</span><span>${esc(m.name||'بدون اسم')}</span></button>`).join('');
+  $('#mbPick').classList.add('open');
+}
+function mbPickClose(){$('#mbPick').classList.remove('open');mbPickFrom=null}
+function mbInitial(n){const t=String(n||'').trim(); return t?[...t][0]:'؟'}
+/* switch to another member: save, remember the choice, reload (his lock screen shows unless he was just created) */
+function mbGo(id,unlocked){
+  try{save()}catch(e){}
+  MB.active=id; mbSave();
+  try{sessionStorage.setItem('maleem.picked','1'); if(unlocked) sessionStorage.setItem('maleem.unlock',id)}catch(e){}
+  location.reload();
+}
+$('#mbPickList').onclick=e=>{const b=e.target.closest('[data-mb]'); if(!b) return; const id=b.dataset.mb;
+  if(id!==ME.id){mbGo(id);return}
+  mbPickClose(); if($('#lock').classList.contains('open')) setTimeout(askBio,200); else runQuickAdd();
+};
+$('#lockSwitch').onclick=()=>mbPickOpen('lock');
+let mbPicked=false, mbSkipLock=false;
+try{mbPicked=sessionStorage.getItem('maleem.picked')==='1'; mbSkipLock=sessionStorage.getItem('maleem.unlock')===ME.id; sessionStorage.removeItem('maleem.picked'); sessionStorage.removeItem('maleem.unlock')}catch(e){}
+lockPaintKind();
+if(hasPin()&&!mbSkipLock){$('#lock').classList.add('open');lockMsgPaint()}
+if(MB.list.length>1&&!mbPicked) mbPickOpen('boot');
 applySecure();
 window.__bioResult=ok=>{if(ok) unlockApp()};
 /* Launcher shortcut "مصروف جديد": opens the add sheet (after unlocking if the app is locked) */
 let quickAddWanted=false, quickVoiceWanted=false, capWanted=false;
 function runQuickAdd(){
-  if($('#lock').classList.contains('open')) return;
+  if($('#lock').classList.contains('open')||$('#mbPick').classList.contains('open')) return;
   if(capWanted){capWanted=false; capPull(); go('expenses'); renderHome(); setTimeout(()=>{const b=$('#capBox'); if(b&&b.firstChild) b.scrollIntoView({behavior:'smooth',block:'center'})},200)}
   if(quickAddWanted){quickAddWanted=false; quickVoiceWanted=false; go('expenses'); openSheet(); return}
   if(quickVoiceWanted){quickVoiceWanted=false; go('expenses'); try{closeSheets()}catch(e){} setTimeout(()=>{if(!voiceOn) $('#micFab').click()},250)}
@@ -2688,9 +2849,66 @@ window.__quickAdd=()=>{quickAddWanted=true; setTimeout(runQuickAdd,150)};
 window.__quickVoice=()=>{quickVoiceWanted=true; setTimeout(runQuickAdd,150)};
 function askBio(){if(AB&&S.bio&&hasPin()){try{AB.authenticate()}catch(e){}}}
 $('#bioBtn').hidden=!(AB&&S.bio&&hasPin()); $('#bioBtn').onclick=askBio;
-if(hasPin()) setTimeout(askBio,450);
+if(hasPin()&&!mbSkipLock&&!$('#mbPick').classList.contains('open')) setTimeout(askBio,450);
 $('#bioToggle').onchange=e=>{S.bio=e.target.checked;save();$('#bioBtn').hidden=!S.bio;toast(S.bio?'اتفعل القفل بالبصمة':'اتقفل القفل بالبصمة')};
-window.__relock=()=>{if(hasPin()&&!$('#lock').classList.contains('open')){closeSheets();$('#lock').classList.add('open');lockMsgPaint();$('#bioBtn').hidden=!(AB&&S.bio);setTimeout(askBio,300)}};
+window.__relock=()=>{if(hasPin()&&!$('#lock').classList.contains('open')){closeSheets();$('#lock').classList.add('open');lockPaintKind();lockMsgPaint();$('#bioBtn').hidden=!(AB&&S.bio);setTimeout(askBio,300)}};
+
+/* ===== Members (settings card) ===== */
+function renderMembers(){
+  $('#mbList').innerHTML=MB.list.map(m=>{const me=m.id===ME.id;
+    return `<div class="set-row mb-row"><span class="mb-av" aria-hidden="true">${esc(mbInitial(m.name))}</span><div class="txt">${esc(m.name||'بدون اسم')}<small>${me?'انت فاتح دلوقتي':'بياناته منفصلة وليه كلمة سر'}</small></div>${me?'':`<button class="btn danger" type="button" data-mb-del="${esc(m.id)}">مسح</button>`}</div>`}).join('');
+  $('#mbSwitch').hidden=MB.list.length<2;
+}
+$('#mbSwitch').onclick=()=>mbPickOpen('settings');
+$('#mbList').onclick=e=>{const b=e.target.closest('[data-mb-del]'); if(!b) return; const id=b.dataset.mbDel, m=MB.list.find(x=>x.id===id); if(!m||id===ME.id) return;
+  if(!b.dataset.arm){b.dataset.arm='1'; b.textContent='دوس تاني للتأكيد'; clearTimeout(b._t); b._t=setTimeout(()=>{delete b.dataset.arm; b.textContent='مسح'},4000);
+    toast(`هيتمسح ${m.name||'العضو'} وكل بياناته من الموبايل ده، ومفيش رجوع`,null,null,4000); return}
+  mbDelete(id);
+};
+function mbDelete(id){
+  const m=MB.list.find(x=>x.id===id); if(!m||id===ME.id) return;
+  let inSpace=false; try{const o=JSON.parse(lsGet(mbKey(id))||'{}'); inSpace=!!(o.space&&o.space.code)}catch(e){}
+  MB.list=MB.list.filter(x=>x.id!==id); mbSave();
+  try{localStorage.removeItem(mbKey(id))}catch(e){} delete mem[mbKey(id)];
+  try{indexedDB.deleteDatabase(rcDbName(id))}catch(e){}
+  try{indexedDB.deleteDatabase(`firestore/${fbAppName(id)}/${FB_CFG.projectId}/main`)}catch(e){}
+  renderMembers();
+  toast(inSpace?`اتمسح ${m.name||'العضو'} وبياناته. كان في مساحة مشتركة، فهيفضل ظاهر فيها لحد ما صاحبها يشيله`:`اتمسح ${m.name||'العضو'} وكل بياناته من الموبايل ده`,null,null,6000);
+}
+let mbKind='pin';
+const digitsEn=v=>String(v).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+const mbNorm=v=>String(v||'').trim().replace(/\s+/g,' ').toLowerCase();
+function mbKindSet(k){mbKind=k; const pin=k==='pin';
+  document.querySelectorAll('#mbSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.kind===k));
+  ['#mbP1','#mbP2'].forEach((sel,i)=>{const el=$(sel); el.value=''; el.inputMode=pin?'numeric':'text'; el.maxLength=pin?4:64;
+    el.placeholder=pin?(i?'اكتب الرقم تاني للتأكيد':'رقم سري من 4 أرقام'):(i?'اكتب كلمة السر تاني للتأكيد':'كلمة سر (4 حروف أو أرقام على الأقل)')});
+  $('#mbErr').textContent=''}
+$('#mbSeg').onclick=e=>{const b=e.target.closest('[data-kind]'); if(b) mbKindSet(b.dataset.kind)};
+$('#mbAdd').onclick=()=>{
+  if(!hasPin()){toast('عشان تضيف عضو، اعمل كلمة سر لنفسك الأول، عشان محدش يفتح بياناتك',null,null,5000); credOpen('new'); return}
+  if(MB.list.length>=MB_MAX){toast(`أقصى عدد ${MB_MAX} أعضاء على الموبايل`);return}
+  $('#mbName').value=''; mbKindSet('pin'); openSheetEl('mbSheet');
+};
+$('#mbCancel').onclick=closeSheets;
+['#mbName','#mbP1','#mbP2'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#mbGo').click()}}));
+function mbNewId(){const a='abcdefghijkmnpqrstuvwxyz23456789';let id;do{const r=new Uint32Array(8);crypto.getRandomValues(r);id='m'+Array.from(r,x=>a[x%32]).join('')}while(MB.list.some(m=>m.id===id));return id}
+$('#mbGo').onclick=async()=>{
+  const b=$('#mbGo'); if(b.disabled) return; const err=t=>{$('#mbErr').textContent=t};
+  const name=$('#mbName').value.trim().replace(/\s+/g,' ').slice(0,24);
+  if(!name) return err('اكتب اسم العضو');
+  if(MB.list.some(m=>mbNorm(m.name)===mbNorm(name))) return err('فيه عضو بنفس الاسم، اختار اسم تاني');
+  let p1=$('#mbP1').value, p2=$('#mbP2').value;
+  if(mbKind==='pin'){p1=digitsEn(p1);p2=digitsEn(p2); if(!/^\d{4}$/.test(p1)) return err('الرقم السري لازم يكون 4 أرقام')}
+  else if(p1.length<4) return err('كلمة السر لازم تكون 4 حروف أو أرقام على الأقل');
+  if(p1!==p2) return err(mbKind==='pin'?'الرقمين مش زي بعض':'كلمتين السر مش زي بعض');
+  b.disabled=true; b.textContent='لحظة...';
+  try{
+    const id=mbNewId(), ns={onboarded:false,profile:{name,age:null},pinH:await pinMake(p1),lockKind:mbKind,theme:S.theme,accent:S.accent,style:S.style,currency:S.currency};
+    if(!lsSet(mbKey(id),JSON.stringify(ns))){try{localStorage.removeItem(mbKey(id))}catch(e){} delete mem[mbKey(id)]; err('مساحة التخزين مش كفاية لعضو جديد'); return}
+    MB.list.push({id,name}); mbGo(id,true);
+  }catch(e){err('حصلت مشكلة، جرب تاني')}
+  finally{b.disabled=false; b.textContent='إضافة'}
+};
 
 /* Exports */
 let downloads=null;
@@ -2779,7 +2997,7 @@ async function exportXlsx(all){
       rows.push([],['الإجمالي','','',r2(sum(x.l))]);
       sheets.push({name:repSheetName(x.P),rows,widths:[12,10,14,12,14,30],bold:[0,rows.length-1]});
     });
-    await saveFile(all?`مليم - ${repAllWord()}.xlsx`:`مليم - ${repName(repP(curMonth))}.xlsx`, XL.book(sheets));
+    await saveFile(all?`${fileTag()} - ${repAllWord()}.xlsx`:`${fileTag()} - ${repName(repP(curMonth))}.xlsx`, XL.book(sheets));
   }catch(e){console.error(e);toast('معرفناش نعمل ملف Excel')}
 }
 async function exportPdf(all){
@@ -2834,7 +3052,7 @@ async function exportPdf(all){
     }
     box.style.paddingTop=box.style.paddingBottom='';
     box.innerHTML='';
-    await saveFile(all?`مليم - ${repAllWord()}.pdf`:`مليم - ${repName(repP(curMonth))}.pdf`, pdf.output('blob'));
+    await saveFile(all?`${fileTag()} - ${repAllWord()}.pdf`:`${fileTag()} - ${repName(repP(curMonth))}.pdf`, pdf.output('blob'));
   }catch(e){box.innerHTML='';box.style.paddingTop=box.style.paddingBottom='';toast('معرفناش نعمل ملف PDF')}
 }
 let expFmt='xlsx';
@@ -2853,7 +3071,7 @@ $('#expCancel').onclick=closeSheets;
 
 /* Cloud backup */
 let db=null, myId=null;
-async function backupDoc(){return db.collection('data/users/'+myId).doc('backup')}
+async function backupDoc(){return db.collection('data/users/'+myId).doc(ME.id==='m1'?'backup':'backup-'+ME.id)}
 const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,pays:S.pays,lastPay:S.lastPay,prefs:{theme:S.theme,accent:S.accent,style:S.style,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn}});
 function applyBackup(p,at){
   if(S.space) spDetach();
@@ -2867,6 +3085,7 @@ function applyBackup(p,at){
   if(p.payday!==undefined) S.payday=intIn(p.payday,1,31,1);
   Object.keys(CLEAN).forEach(k=>{if(Array.isArray(p[k])) S[k]=p[k].map(CLEAN[k]).filter(Boolean)});
   if(p.profile&&typeof p.profile==='object') S.profile=cleanProfile(p.profile);
+  if(MB.list.length>1&&ME.name) S.profile.name=ME.name; // a backup restored into a member keeps that member's name
   if(p.fixedLog&&typeof p.fixedLog==='object') S.fixedLog=cleanFixedLog(p.fixedLog);
   {const ps=Array.isArray(p.pays)?p.pays.map(cleanPay).filter(Boolean):[]; if(ps.length){S.pays=ps; if(!S.pays.some(x=>x.id==='cash')) S.pays.unshift({...PAYS[0]})}}
   if(isId(p.lastPay)) S.lastPay=p.lastPay;
@@ -2890,7 +3109,7 @@ async function androidBackup(){
   const at=Date.now(), file={app:'maleem',version:1,at,data:backupData()}; if(rc.out) file.receipts=rc.out;
   const json=JSON.stringify(file);
   if(rc.skipped) setTimeout(()=>toast(`${rc.skipped} صورة إيصال مدخلتش النسخة عشان حجمها كبير`,null,null,4000),2600);
-  try{ const ok=AB.shareFile(`maleem-backup-${dayKey(at)}.json`, await toB64(new Blob([json])), 'application/json');
+  try{ const ok=AB.shareFile(`${fileTag()}-${dayKey(at)}.json`, await toB64(new Blob([json])), 'application/json');
     if(ok){S.lastBackup=at;save();renderHome();renderSettings();toast('اختار Google Drive عشان تحفظ النسخة')} else toast('معرفناش نعمل نسخة احتياطية');
   }catch(e){toast('معرفناش نعمل نسخة احتياطية')}
 }
@@ -3968,7 +4187,7 @@ async function maybeAutoBackup(){
   autoBkBusy=true;
   try{
     const json=JSON.stringify({app:'maleem',version:1,at:now,auto:true,data:backupData()});
-    const ok=AB.autoBackup(`maleem-auto-${dayKey(now)}.json`, await toB64(new Blob([json])));
+    const ok=AB.autoBackup(`${fileTag()}-auto-${dayKey(now)}.json`, await toB64(new Blob([json])));
     if(ok){S.lastAutoBk=now; save(); renderSettings(); if(!$('#lock').classList.contains('open')) toast('اتعملت نسخة احتياطية تلقائية في Download/Maleem',null,null,3200)}
   }catch(e){}
   autoBkBusy=false;
@@ -4126,6 +4345,7 @@ function syncNative(){ if(AB) try{syncWidget()}catch(e){}
   try{AB.syncReminders(JSON.stringify({daily:!!S.remind,dailyAt:S.remindAt,due}))}catch(e){}
 }
 window.__onBack=()=>{
+  if($('#mbPick').classList.contains('open')){ if(mbPickFrom==='boot') return false; mbPickClose(); return true }
   if($('#lock').classList.contains('open')) return false;
   if(!$('#rcView').hidden){rcViewClose();return true}
   if(voiceOn){voiceCancel();return true}
@@ -4158,7 +4378,7 @@ function wlModeSet(m){
   wlMode=m; document.querySelectorAll('#wlSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
   $('#wlFixed').hidden=m!=='fixed'; $('#wlOpen').hidden=m!=='open'; $('#wlErr').textContent='';
 }
-function showWelcome(){$('#welcome').hidden=false; document.documentElement.style.overflow='hidden'; wlModeSet('fixed'); wlGo(1)}
+function showWelcome(){$('#wlName').value=(S.profile&&S.profile.name)||''; $('#welcome').hidden=false; document.documentElement.style.overflow='hidden'; wlModeSet('fixed'); wlGo(1)}
 function hideWelcome(){const w=$('#welcome'); if(w.hidden) return; w.hidden=true; document.documentElement.style.overflow=''}
 $('#wlSeg').onclick=e=>{const b=e.target.closest('[data-mode]'); if(b) wlModeSet(b.dataset.mode)};
 $('#wlNext1').onclick=()=>{$('#wlName').blur(); wlGo(2)};
@@ -4235,7 +4455,7 @@ function spErrMsg(e){const c=e&&e.code;
 function fbInit(){
   if(fbP) return fbP;
   fbP=loadScript('libs/fb.js').then(async()=>{
-    const F=window.FB, app=F.initializeApp(FB_CFG);
+    const F=window.FB, app=ME.id==='m1'?F.initializeApp(FB_CFG):F.initializeApp(FB_CFG,fbAppName(ME.id)); // each member has his own anonymous account
     const auth=F.initializeAuth(app,{persistence:[F.indexedDBLocalPersistence,F.browserLocalPersistence]});
     let db; try{db=F.initializeFirestore(app,{localCache:F.persistentLocalCache({tabManager:F.persistentSingleTabManager(undefined)}),experimentalAutoDetectLongPolling:true})}
     catch(e){db=F.initializeFirestore(app,{localCache:F.memoryLocalCache(),experimentalAutoDetectLongPolling:true})}
@@ -4736,7 +4956,7 @@ function rcDB(){
   if(RC.db) return Promise.resolve(RC.db);
   return new Promise((res,rej)=>{
     if(!RC.can) return rej(new Error('no-idb'));
-    let r; try{r=indexedDB.open('maleem',1)}catch(e){return rej(e)}
+    let r; try{r=indexedDB.open(rcDbName(ME.id),1)}catch(e){return rej(e)}
     r.onupgradeneeded=()=>{const d=r.result; if(!d.objectStoreNames.contains('receipts')) d.createObjectStore('receipts')};
     r.onsuccess=()=>{RC.db=r.result; RC.db.onversionchange=()=>{try{RC.db.close()}catch(e){} RC.db=null}; res(RC.db)};
     r.onerror=()=>rej(r.error); r.onblocked=()=>rej(new Error('blocked'));

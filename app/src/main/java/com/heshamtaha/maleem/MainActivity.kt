@@ -365,21 +365,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun js(code: String) = web.post { web.evaluateJavascript(code, null) }
 
-    /** Keeps only the newest [keep] automatic backups (maleem-auto-*.json) in Download/Maleem. */
-    private fun pruneAutoBackups(keep: Int) {
+    /**
+     * Keeps the newest [keep] automatic backups that start with [prefix]. Each member has his own prefix
+     * ("Maleem-هشام-auto-"), so one member's backups never push out another's. The names are compared here
+     * in Kotlin, not with SQL LIKE, because a member's name may contain "_" or "%".
+     */
+    private fun pruneAutoBackups(prefix: String, keep: Int) {
         try {
             if (Build.VERSION.SDK_INT >= 29) {
                 val base = MediaStore.Downloads.EXTERNAL_CONTENT_URI
                 val cursor = contentResolver.query(
                     base,
-                    arrayOf(MediaStore.Downloads._ID),
-                    "${MediaStore.Downloads.RELATIVE_PATH} = ? AND ${MediaStore.Downloads.DISPLAY_NAME} LIKE ?",
-                    arrayOf(Environment.DIRECTORY_DOWNLOADS + "/Maleem/", "maleem-auto-%"),
+                    arrayOf(MediaStore.Downloads._ID, MediaStore.Downloads.DISPLAY_NAME),
+                    "${MediaStore.Downloads.RELATIVE_PATH} = ?",
+                    arrayOf(Environment.DIRECTORY_DOWNLOADS + "/Maleem/"),
                     "${MediaStore.Downloads.DATE_ADDED} DESC"
                 ) ?: return
                 cursor.use { c ->
                     var n = 0
                     while (c.moveToNext()) {
+                        if (!(c.getString(1) ?: "").startsWith(prefix)) continue
                         n++
                         if (n > keep) contentResolver.delete(ContentUris.withAppendedId(base, c.getLong(0)), null, null)
                     }
@@ -387,7 +392,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 listOf(legacyPublicDir(), File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Maleem")).forEach { dir ->
                     dir.listFiles()
-                        ?.filter { it.name.startsWith("maleem-auto-") }
+                        ?.filter { it.name.startsWith(prefix) }
                         ?.sortedByDescending { it.lastModified() }
                         ?.drop(keep)
                         ?.forEach { it.delete() }
@@ -457,8 +462,11 @@ class MainActivity : AppCompatActivity() {
         fun autoBackup(name: String, base64: String): Boolean {
             if (!pageOk) return false
             return try {
-                val ok = writeDownload(safeName(name, "maleem-auto.json"), "application/json", Base64.decode(base64, Base64.DEFAULT), true)
-                if (ok) pruneAutoBackups(7)
+                val file = safeName(name, "maleem-auto.json")
+                val ok = writeDownload(file, "application/json", Base64.decode(base64, Base64.DEFAULT), true)
+                // "Maleem-هشام-auto-2026-10-30.json" -> prune that member's files only
+                val prefix = Regex("^(.*-auto-)\\d{4}-\\d{2}-\\d{2}\\.json$").find(file)?.groupValues?.get(1) ?: "maleem-auto-"
+                if (ok) pruneAutoBackups(prefix, 7)
                 ok
             } catch (_: Exception) { false }
         }
