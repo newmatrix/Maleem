@@ -1411,7 +1411,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   </div>
   <div id="spCodeWrap" hidden>
     <label class="wl-lab" for="spCodeIn">كود المساحة</label>
-    <div class="field"><input id="spCodeIn" type="text" dir="ltr" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="XXXXX-XXXXX" style="text-align:center;letter-spacing:.1em"></div>
+    <div class="field"><input id="spCodeIn" type="text" dir="ltr" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX" style="text-align:center;letter-spacing:.1em"></div>
   </div>
   <label class="wl-lab" for="spName" style="margin-top:12px">اسمك في المساحة</label>
   <div class="field"><input id="spName" type="text" maxlength="24" placeholder="مثلاً محمد"></div>
@@ -4210,9 +4210,11 @@ function expenseCanManage(e){
 }
 function expenseReadOnly(e){return !expenseCanManage(e)}
 const hashE=e=>JSON.stringify([+e.amount,e.cat,e.note||'',e.pay||'',+e.ts]);
-const spFmt=c=>String(c||'').replace(/^(.{5})(.{5})$/,'$1-$2');
+const SP_CODE_LEN=8; // new spaces get 8 characters; spaces made before keep their 10-character codes
+const spFmt=c=>String(c||'').replace(/^(.{4})(.{4})$/,'$1-$2').replace(/^(.{5})(.{5})$/,'$1-$2');
+const spCodeOk=c=>/^[A-HJ-NP-Z2-9]{8}(?:[A-HJ-NP-Z2-9]{2})?$/.test(c);
 const spNorm=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-const spGen=()=>{const a=new Uint32Array(10);crypto.getRandomValues(a);return Array.from(a,x=>SP_ABC[x%32]).join('')};
+const spGen=()=>{const a=new Uint32Array(SP_CODE_LEN);crypto.getRandomValues(a);return Array.from(a,x=>SP_ABC[x%32]).join('')};
 const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,no)=>setTimeout(()=>no({code:'timeout'}),ms))]);
 function spBlankPrefs(expenses=true){return {expenses:!!expenses,reports:false,debts:false,gams:false,goals:false,incomes:false,fixed:false}}
 function spNormPrefs(p,legacy=true){const d=spBlankPrefs(false), src=p&&typeof p==='object'?p:{};SP_SHARE_META.forEach(x=>{d[x.key]=typeof src[x.key]==='boolean'?src[x.key]:(legacy&&x.key==='expenses')});return d}
@@ -4337,12 +4339,19 @@ function spWatchJoinRequest(){
     const ref=f.F.doc(f.db,'spaces',pending.code,'joinRequests',pending.uid);
     spJoinUnsub=f.F.onSnapshot(ref,snap=>{
       if(!S.spaceRequest||S.spaceRequest.code!==pending.code||S.spaceRequest.uid!==pending.uid)return;
-      if(!snap.exists()){spStopJoinWatch();S.spaceRequest=null;save();renderSpace();return}
+      if(!snap.exists()){spStopJoinWatch();S.spaceRequest=null;save();renderSpace();spIsClosed(f,pending.code).then(c=>{if(c)toast(SP_CLOSED_MSG,null,null,7000)});return}
       const d=snap.data()||{};
       if(d.status==='approved'){spActivateJoin(pending.code,pending.uid,pending.name,d.sharePrefs||pending.sharePrefs);return}
       if(d.status==='rejected'){spStopJoinWatch();S.spaceRequest.status='rejected';S.spaceRequest.sharePrefs=spNormPrefs(d.sharePrefs||pending.sharePrefs,true);save();renderSpace();return}
       if(d.status==='cancelled'){spStopJoinWatch();S.spaceShareDraft=spNormPrefs(d.sharePrefs||pending.sharePrefs,true);S.spaceRequest=null;save();renderSpace()}
     },()=>{});
+    // a request left pending on a space that closed before anyone answered: nobody can approve it anymore
+    spIsClosed(f,pending.code).then(c=>{
+      if(!c||!S.spaceRequest||S.spaceRequest.code!==pending.code||S.spaceRequest.status!=='pending')return;
+      spStopJoinWatch();S.spaceRequest=null;save();renderSpace();toast(SP_CLOSED_MSG,null,null,7000);
+      const ref2=f.F.doc(f.db,'spaces',pending.code,'joinRequests',pending.uid);
+      f.F.updateDoc(ref2,{status:'cancelled',resolvedBy:pending.uid,resolvedAt:f.F.serverTimestamp()}).catch(()=>{});
+    });
   }).catch(()=>{});
 }
 async function spDecideRequest(uid,approve){
@@ -4374,11 +4383,45 @@ function spLocalLeave(msg){
   if(!S.space)return;const code=S.space.code,me=S.space.uid||spMe();
   spStop();spPurgeOthers(code,me);S.spaceLostCode=code;S.space=null;save();renderSpace();renderAll();toast(msg,null,null,8000);
 }
+// One server read of a collection (the bundled Firebase has no getDocs): the first snapshot that is not from the cache.
+function spReadOnce(f,ref,ms=12000){
+  return new Promise((res,rej)=>{let un=null,done=false;
+    const end=(fn,v)=>{if(done)return;done=true;clearTimeout(t);if(un)un();fn(v)};
+    const t=setTimeout(()=>end(rej,Object.assign(new Error('timeout'),{code:'timeout'})),ms);
+    un=f.F.onSnapshot(ref,{includeMetadataChanges:true},snap=>{if(!snap.metadata.fromCache)end(res,snap.docs.map(d=>d.ref))},e=>end(rej,e));
+    if(done)un();
+  });
+}
+// The last member wipes the space's shared data before leaving. Best effort: what can't be deleted stays
+// locked, because a space with no members can't be read or joined.
+async function spWipeSpace(f,code){
+  const {F,db}=f,res={deleted:0,failed:0};
+  const cols=[['expenses'],...SP_EXTRA_TYPES.map(t=>['sharedData',t,'items']),['joinRequests'],['members']];
+  for(const c of cols){
+    let refs;try{refs=await spReadOnce(f,F.collection(db,'spaces',code,...c))}catch(e){res.failed++;continue}
+    for(let i=0;i<refs.length;i+=50){
+      const part=refs.slice(i,i+50);
+      try{const b=F.writeBatch(db);part.forEach(r=>b.delete(r));await withTimeout(b.commit(),12000);res.deleted+=part.length}
+      catch(e){ // one refused delete fails the whole batch: retry them one by one
+        const out=await Promise.allSettled(part.map(r=>{const b=F.writeBatch(db);b.delete(r);return withTimeout(b.commit(),12000)}));
+        out.forEach(o=>{if(o.status==='fulfilled')res.deleted++;else res.failed++});
+      }
+    }
+  }
+  return res;
+}
+// true when the space exists and every member has left (the rules let anyone read a closed space)
+async function spIsClosed(f,code){
+  try{const s=await withTimeout(f.F.getDoc(f.F.doc(f.db,'spaces',code)),10000),d=s.exists()?(s.data()||{}):null;return !!(d&&Array.isArray(d.memberIds)&&d.memberIds.length===0)}
+  catch(e){return false}
+}
+const SP_CLOSED_MSG='المساحة دي اتقفلت لأن كل الأعضاء خرجوا منها، ومحدش يقدر ينضم ليها تاني. اطلب من صاحبك يعمل مساحة جديدة';
 let spRemovedCheck=false;
 async function spCheckRemoved(){
   if(!S.space||!fb||spRemovedCheck)return;spRemovedCheck=true;const code=S.space.code;
   try{const {F,db,uid}=fb,s=await withTimeout(F.getDoc(F.doc(db,'spaces',code,'joinRequests',uid)),10000);
     if(S.space&&S.space.code===code&&s.exists()&&(s.data()||{}).status==='removed')spLocalLeave('صاحب المساحة شالك من المساحة المشتركة. بياناتك الخاصة فضلت عندك.');
+    else if(S.space&&S.space.code===code&&await spIsClosed(fb,code))spLocalLeave('المساحة المشتركة اتقفلت لأن كل الأعضاء خرجوا منها. بياناتك الخاصة فضلت عندك.');
   }catch(e){}finally{spRemovedCheck=false}
 }
 async function spRemoveMember(uid){
@@ -4594,15 +4637,21 @@ function openSpSheet(mode){spMode=mode;$('#spTitle').textContent=mode==='create'
 $('#spCreate').onclick=()=>openSpSheet('create');$('#spJoin').onclick=()=>openSpSheet('join');$('#spCancel').onclick=closeSheets;
 $('#spGo').onclick=async()=>{
   const btn=$('#spGo');if(btn.disabled)return;$('#spErr').textContent='';const name=$('#spName').value.trim().replace(/\s+/g,' ').slice(0,24);let code='';
-  if(spMode==='join'){if(!name){$('#spErr').textContent='اكتب اسمك عشان صاحب المساحة يعرف مين مقدم الطلب';return}code=spNorm($('#spCodeIn').value);if(!/^[A-HJ-NP-Z2-9]{10}$/.test(code)){$('#spErr').textContent='الكود لازم يكون 10 حروف وأرقام';return}}
+  if(spMode==='join'){if(!name){$('#spErr').textContent='اكتب اسمك عشان صاحب المساحة يعرف مين مقدم الطلب';return}code=spNorm($('#spCodeIn').value);if(!spCodeOk(code)){$('#spErr').textContent='الكود لازم يكون 8 حروف وأرقام (المساحات القديمة كودها 10)';return}}
   btn.disabled=true;const t0=btn.textContent;btn.textContent='لحظة...';
   try{
     const f=await withTimeout(fbInit(),15000),{F,db}=f,prefs=spNormPrefs(spDraftPrefs(),false);
     if(spMode==='create'){
-      code=spGen();const spaceRef=F.doc(db,'spaces',code),memberRef=F.doc(db,'spaces',code,'members',f.uid),batch=F.writeBatch(db);
-      batch.set(spaceRef,{owner:f.uid,memberIds:[f.uid],createdAt:F.serverTimestamp()});batch.set(memberRef,{uid:f.uid,name,sharePrefs:prefs,updatedAt:F.serverTimestamp()});await withTimeout(batch.commit(),12000);
+      // a code that is already taken is refused by the rules (writing it would be an update, not a create),
+      // so try a fresh code a couple of times before showing an error
+      for(let tries=0;;tries++){
+        code=spGen();const spaceRef=F.doc(db,'spaces',code),memberRef=F.doc(db,'spaces',code,'members',f.uid),batch=F.writeBatch(db);
+        batch.set(spaceRef,{owner:f.uid,memberIds:[f.uid],createdAt:F.serverTimestamp()});batch.set(memberRef,{uid:f.uid,name,sharePrefs:prefs,updatedAt:F.serverTimestamp()});
+        try{await withTimeout(batch.commit(),12000);break}catch(e){if(tries>=2||!e||e.code!=='permission-denied')throw e}
+      }
       S.space={code,uid:f.uid,name,auto:false,old:S.expenses.map(e=>e.id),sharePrefs:prefs,shareDraft:{...prefs}};S.spaceRequest=null;S.spaceShareDraft=null;save();closeSheets();renderSpace();spListen();toast('اتعملت المساحة. ابعت الكود لصاحبك');
     }else{
+      if(await spIsClosed(f,code)){$('#spErr').textContent=SP_CLOSED_MSG;return}
       const reqRef=F.doc(db,'spaces',code,'joinRequests',f.uid),snap=await withTimeout(F.getDoc(reqRef),12000);
       if(snap.exists()&&snap.data().status==='pending'){
         const requested=spNormPrefs(snap.data().sharePrefs||prefs,true);S.spaceRequest={code,uid:f.uid,name,status:'pending',sharePrefs:requested};save();closeSheets();renderSpace();spWatchJoinRequest();toast('طلب الانضمام مستني موافقة صاحب المساحة');
@@ -4622,16 +4671,26 @@ $('#spGo').onclick=async()=>{
   }catch(e){$('#spErr').textContent=(spMode==='join'&&e&&e.code==='permission-denied')?'الكود غلط، أو المساحة اكتملت (5 أعضاء)':spErrMsg(e)}finally{btn.disabled=false;btn.textContent=t0}
 };
 function armBtn(b,idle,confirmTxt,fn){const id=()=>b.dataset.idle||idle;b.onclick=()=>{if(!b.dataset.arm){b.dataset.arm='1';b.textContent=confirmTxt;clearTimeout(b._t);b._t=setTimeout(()=>{delete b.dataset.arm;b.textContent=id()},4000);return}delete b.dataset.arm;clearTimeout(b._t);b.textContent=id();fn()}}
+let spLeaving=false;
 armBtn($('#spLeave'),'الخروج من المساحة','دوس تاني للتأكيد',async()=>{
-  const code=S.space&&S.space.code,wasOwner=spOwner;if(!code)return;
+  const code=S.space&&S.space.code;if(!code||spLeaving)return;
   const netFail=()=>toast('مفيش اتصال بالسيرفر، اتأكد من الإنترنت وجرب الخروج تاني');
   let f=fb;if(!f){try{f=await withTimeout(fbInit(),8000)}catch(e){netFail();return}}
+  spLeaving=true;let last=false,wipe=null;
   try{const ref=f.F.doc(f.db,'spaces',code),upd={memberIds:f.F.arrayRemove(f.uid)};
-    if(wasOwner){const s=await withTimeout(f.F.getDoc(ref),8000),ids=((s.data()||{}).memberIds||[]).filter(x=>x!==f.uid);if(ids.length)upd.owner=ids[0]}
+    const s=await withTimeout(f.F.getDoc(ref),8000),data=s.data()||{},ids=Array.isArray(data.memberIds)?data.memberIds:[],others=ids.filter(x=>x!==f.uid);
+    if(data.owner===f.uid&&others.length)upd.owner=others[0];
+    // the last member out closes the space: its shared data is wiped first (while he is still a member),
+    // then he leaves, and the empty space stays as a marker so nobody can join it or take its code again
+    last=ids.length===1&&ids[0]===f.uid;
+    if(last){spStop();toast('بنقفل المساحة ونمسح بياناتها المشتركة...',null,null,8000);wipe=await spWipeSpace(f,code)}
     await withTimeout(f.F.updateDoc(ref,upd),8000)}
-  catch(e){if(!e||(e.code!=='permission-denied'&&e.code!=='not-found')){netFail();return}}
+  catch(e){if(!e||(e.code!=='permission-denied'&&e.code!=='not-found')){spLeaving=false;if(last)spListen();netFail();return}}
+  spLeaving=false;
   const me=(S.space&&S.space.uid)||spMe();spStop();const n=spPurgeOthers(code,me);
-  S.space=null;save();renderSpace();renderAll();toast(n?`خرجت من المساحة. بياناتك فضلت عندك، واتشالت ${n} سجلات بتاعة الأعضاء التانيين`:'خرجت من المساحة. بياناتك المحلية فضلت عندك');
+  S.space=null;save();renderSpace();renderAll();
+  if(last)toast(wipe&&wipe.failed?'خرجت من المساحة واتقفلت، ومحدش يقدر ينضم ليها تاني. شوية بيانات مقدرتش تتمسح من السيرفر، بس محدش يقدر يوصلها':'خرجت من المساحة واتقفلت، واتمسحت بياناتها المشتركة من السيرفر. بياناتك فضلت على موبايلك',null,null,7000);
+  else toast(n?`خرجت من المساحة. بياناتك فضلت عندك، واتشالت ${n} سجلات بتاعة الأعضاء التانيين`:'خرجت من المساحة. بياناتك المحلية فضلت عندك');
 });
 armBtn($('#spUpload'),'مشاركة مصاريفي يدويًا','دوس تاني للتأكيد',()=>{
   if(!S.space||!spNormPrefs(S.space.sharePrefs,true).expenses)return;
