@@ -333,6 +333,15 @@ button{cursor:pointer}
 .mb-pick-list button{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:1.05rem;font-weight:600;text-align:start}
 .mb-av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-weight:700}
 .mb-row .btn{padding:8px 14px;font-size:.88rem}
+.mb-lab{display:block;font-weight:600;font-size:.9rem;color:var(--muted);margin:16px 2px 0}
+h2 + .mb-lab{margin-top:4px}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.choice button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border-radius:14px;
+  border:1.5px solid var(--line);border-color:color-mix(in srgb,var(--ink) 22%,transparent);
+  background:var(--surface-2);color:var(--ink);font:inherit;font-weight:600;font-size:.95rem;box-shadow:var(--shadow);transition:transform .1s,border-color .15s,background .15s}
+.choice button .ci{font-size:1.35rem;line-height:1}
+.choice button:active{transform:scale(.97)}
+.choice button[aria-pressed="true"]{border-color:var(--brand);background:var(--surface);background:color-mix(in srgb,var(--brand) 16%,var(--surface));color:var(--brand)}
 
 .toast{position:fixed;bottom:calc(178px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:14px;display:flex;gap:14px;align-items:center;z-index:80;opacity:0;pointer-events:none;transition:all .2s;max-width:calc(100% - 32px);font-size:.95rem}
 .toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
@@ -1286,7 +1295,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 <div class="sheet" id="credSheet" role="dialog" aria-modal="true" aria-labelledby="credTitle">
   <div class="grab"></div>
   <h2 id="credTitle">اختار طريقة القفل</h2>
-  <div id="credKindBox"><div class="seg" id="credSeg" role="group" aria-label="نوع القفل"><button type="button" data-kind="pin" aria-pressed="true">رقم سري 4 أرقام</button><button type="button" data-kind="pass" aria-pressed="false">كلمة سر</button></div></div>
+  <div id="credKindBox"><div class="choice" id="credSeg" role="group" aria-label="نوع القفل"><button type="button" data-kind="pin" aria-pressed="true"><span class="ci" aria-hidden="true">🔢</span>رقم سري 4 أرقام</button><button type="button" data-kind="pass" aria-pressed="false"><span class="ci" aria-hidden="true">🔤</span>كلمة سر</button></div></div>
   <div id="credPassBox">
     <div class="field"><input id="credP1" type="password" maxlength="64" autocomplete="new-password" aria-label="كلمة السر" placeholder="كلمة السر"></div>
     <div class="field" id="credP2Wrap"><input id="credP2" type="password" maxlength="64" autocomplete="new-password" aria-label="تأكيد كلمة السر" placeholder="اكتبها تاني للتأكيد"></div>
@@ -1299,8 +1308,11 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 <div class="sheet" id="mbSheet" role="dialog" aria-modal="true" aria-labelledby="mbTitle">
   <div class="grab"></div>
   <h2 id="mbTitle">عضو جديد</h2>
-  <div class="field"><input id="mbName" type="text" maxlength="24" placeholder="اسم العضو، مثلاً محمد" autocomplete="off" aria-label="اسم العضو"></div>
-  <div class="seg" id="mbSeg" role="group" aria-label="نوع القفل"><button type="button" data-kind="pin" aria-pressed="true">رقم سري 4 أرقام</button><button type="button" data-kind="pass" aria-pressed="false">كلمة سر</button></div>
+  <label class="mb-lab" for="mbName">اسم العضو</label>
+  <div class="field"><input id="mbName" type="text" maxlength="24" placeholder="مثلاً محمد" autocomplete="off"></div>
+  <span class="mb-lab" id="mbKindLab">نوع القفل</span>
+  <div class="choice" id="mbSeg" role="group" aria-labelledby="mbKindLab"><button type="button" data-kind="pin" aria-pressed="true"><span class="ci" aria-hidden="true">🔢</span>رقم سري 4 أرقام</button><button type="button" data-kind="pass" aria-pressed="false"><span class="ci" aria-hidden="true">🔤</span>كلمة سر</button></div>
+  <label class="mb-lab" for="mbP1" id="mbPassLab">الرقم السري</label>
   <div class="field"><input id="mbP1" type="password" maxlength="4" inputmode="numeric" autocomplete="new-password" aria-label="كلمة السر"></div>
   <div class="field"><input id="mbP2" type="password" maxlength="4" inputmode="numeric" autocomplete="new-password" aria-label="تأكيد كلمة السر"></div>
   <p class="hint">لو العضو نسي كلمة السر، مفيش طريقة ترجعها. الحل الوحيد إن عضو تاني يمسحه هو وبياناته.</p>
@@ -2679,18 +2691,26 @@ async function pinMake(pin){
   return {s,h:await pinDerive(pin,s,PIN_ITER),i:PIN_ITER};
 }
 function hasPin(){return !!(S.pinH&&S.pinH.h)||(typeof S.pin==='string'&&S.pin.length===4)}
+/* Whose lock is being checked: null = the member loaded now (S). When another member is picked on the member
+   screen, LK holds his stored data so his lock shows at once, without reloading the page first; the page
+   reloads into him only after the right PIN / password. */
+let LK=null;
+const lkS=()=>LK?LK.st:S;
+function lkSave(){if(LK) lsSet(mbKey(LK.id),JSON.stringify(LK.st)); else save()}
+const lkHas=st=>!!(st&&st.pinH&&st.pinH.h)||(st&&typeof st.pin==='string'&&st.pin.length===4);
 async function pinCheck(pin){
-  if(!(S.pinH&&S.pinH.h)){ // an older version kept the plain digits: check once, then store only the hash
-    if(typeof S.pin!=='string') return false;
-    const ok=pin===S.pin; if(ok){S.pinH=await pinMake(pin); delete S.pin; save()} return ok;
+  const T=lkS();
+  if(!(T.pinH&&T.pinH.h)){ // an older version kept the plain digits: check once, then store only the hash
+    if(typeof T.pin!=='string') return false;
+    const ok=pin===T.pin; if(ok){T.pinH=await pinMake(pin); delete T.pin; lkSave()} return ok;
   }
-  const h=await pinDerive(pin,S.pinH.s,+S.pinH.i||PIN_ITER);
-  let d=h.length^S.pinH.h.length; for(let i=0;i<h.length;i++) d|=h.charCodeAt(i)^(S.pinH.h.charCodeAt(i)||0); return d===0;
+  const h=await pinDerive(pin,T.pinH.s,+T.pinH.i||PIN_ITER);
+  let d=h.length^T.pinH.h.length; for(let i=0;i<h.length;i++) d|=h.charCodeAt(i)^(T.pinH.h.charCodeAt(i)||0); return d===0;
 }
 /* 5 wrong tries -> wait 30s, then 60s, 120s ... up to 15 minutes */
-function pinWait(){const f=S.pinFail; return f&&+f.until>Date.now()? Math.ceil((f.until-Date.now())/1000) : 0}
-function pinFailed(){const f=S.pinFail=(S.pinFail&&typeof S.pinFail==='object')?S.pinFail:{n:0,until:0}; f.n=(+f.n||0)+1; if(f.n>=5) f.until=Date.now()+Math.min(15*60e3,30e3*2**(f.n-5)); save()}
-function pinOk(){if(S.pinFail){delete S.pinFail;save()}}
+function pinWait(){const f=lkS().pinFail; return f&&+f.until>Date.now()? Math.ceil((f.until-Date.now())/1000) : 0}
+function pinFailed(){const T=lkS(), f=T.pinFail=(T.pinFail&&typeof T.pinFail==='object')?T.pinFail:{n:0,until:0}; f.n=(+f.n||0)+1; if(f.n>=5) f.until=Date.now()+Math.min(15*60e3,30e3*2**(f.n-5)); lkSave()}
+function pinOk(){const T=lkS(); if(T.pinFail){delete T.pinFail;lkSave()}}
 const waitTxt=w=>w>90? `استنى ${Math.ceil(w/60)} دقيقة وجرب تاني` : `استنى ${w} ثانية وجرب تاني`;
 /* FLAG_SECURE while a PIN is on: no screenshots and no preview of your numbers in the recent-apps screen */
 function applySecure(){try{AB&&AB.setSecure&&AB.setSecure(hasPin())}catch(e){}}
@@ -2776,12 +2796,14 @@ let lockBuf='', lockBusy=false, lockMsgT=null;
 function lockMsgPaint(){
   clearTimeout(lockMsgT); const el=$('#lockMsg'); if(!el) return;
   const w=pinWait();
-  const pass=S.lockKind==='pass';
-  el.textContent= w? 'محاولات غلط كتير. '+waitTxt(w) : (S.pinFail&&S.pinFail.n? (pass?'كلمة السر غلط، جرب تاني':'الرقم غلط، جرب تاني') : (pass?'اكتب كلمة السر':'اكتب الرقم السري'));
-  el.classList.toggle('err',!!(w||(S.pinFail&&S.pinFail.n)));
+  const T=lkS(), pass=T.lockKind==='pass';
+  el.textContent= w? 'محاولات غلط كتير. '+waitTxt(w) : (T.pinFail&&T.pinFail.n? (pass?'كلمة السر غلط، جرب تاني':'الرقم غلط، جرب تاني') : (pass?'اكتب كلمة السر':'اكتب الرقم السري'));
+  el.classList.toggle('err',!!(w||(T.pinFail&&T.pinFail.n)));
   if(w&&$('#lock').classList.contains('open')) lockMsgT=setTimeout(lockMsgPaint,1000);
 }
-function unlockApp(){pinOk();$('#lock').classList.remove('open');lockBuf='';dots($('#lockDots'),0);lockMsgPaint();runQuickAdd()}
+function unlockApp(){
+  if(LK){const id=LK.id; pinOk(); $('#lockMsg').textContent='لحظة...'; $('#lockMsg').classList.remove('err'); mbGo(id,true); return} // right PIN of another member: open his data
+  pinOk();$('#lock').classList.remove('open');lockBuf='';dots($('#lockDots'),0);lockMsgPaint();runQuickAdd()}
 buildPad($('#lockPad'),k=>{
   if(lockBusy) return;
   if(pinWait()){lockMsgPaint();shake($('#lockDots'));return}
@@ -2796,9 +2818,10 @@ buildPad($('#lockPad'),k=>{
     },120);
   }
 },false);
-function lockPaintKind(){const pass=S.lockKind==='pass';
+function lockPaintKind(){const T=lkS(), pass=T.lockKind==='pass', nm=LK?LK.name:ME.name;
   $('#lockDots').hidden=pass; $('#lockPad').hidden=pass; $('#lockPassBox').hidden=!pass;
-  $('#lockName').textContent=MB.list.length>1&&ME.name?ME.name:'مليم'; $('#lockSwitch').hidden=MB.list.length<2}
+  $('#lockName').textContent=MB.list.length>1&&nm?nm:'مليم'; $('#lockSwitch').hidden=MB.list.length<2;
+  $('#bioBtn').hidden=!(AB&&T.bio&&lkHas(T))}
 async function lockPassTry(){
   if(lockBusy) return; if(pinWait()){lockMsgPaint();shake($('#lockPassBox'));return}
   const v=$('#lockPass').value; if(!v) return;
@@ -2824,9 +2847,20 @@ function mbGo(id,unlocked){
   try{sessionStorage.setItem('maleem.picked','1'); if(unlocked) sessionStorage.setItem('maleem.unlock',id)}catch(e){}
   location.reload();
 }
+/* the picked member's lock shows right away (his PIN / password is checked against his stored data) */
+function lockShowFor(id){
+  if(id===ME.id) LK=null;
+  else{let st=null; try{st=JSON.parse(lsGet(mbKey(id))||'null')}catch(e){}
+    const m=MB.list.find(x=>x.id===id);
+    if(!st||typeof st!=='object'||!lkHas(st)){mbGo(id);return} // no lock to ask for: just open him
+    LK={id,name:(m&&m.name)||'',st}}
+  lockBuf=''; dots($('#lockDots'),0); $('#lockPass').value='';
+  $('#lock').classList.add('open'); lockPaintKind(); lockMsgPaint(); setTimeout(askBio,250);
+}
 $('#mbPickList').onclick=e=>{const b=e.target.closest('[data-mb]'); if(!b) return; const id=b.dataset.mb;
-  if(id!==ME.id){mbGo(id);return}
-  mbPickClose(); if($('#lock').classList.contains('open')) setTimeout(askBio,200); else runQuickAdd();
+  mbPickClose();
+  if(id===ME.id&&!hasPin()){LK=null;$('#lock').classList.remove('open');runQuickAdd();return}
+  lockShowFor(id);
 };
 $('#lockSwitch').onclick=()=>mbPickOpen('lock');
 let mbPicked=false, mbSkipLock=false;
@@ -2847,11 +2881,11 @@ function runQuickAdd(){
 window.__quickAdd=()=>{quickAddWanted=true; setTimeout(runQuickAdd,150)};
 /* Launcher shortcut "تسجيل مصروف بالصوت": opens the voice card straight away (after unlocking if the app is locked) */
 window.__quickVoice=()=>{quickVoiceWanted=true; setTimeout(runQuickAdd,150)};
-function askBio(){if(AB&&S.bio&&hasPin()){try{AB.authenticate()}catch(e){}}}
+function askBio(){const T=lkS(); if(AB&&T.bio&&lkHas(T)&&$('#lock').classList.contains('open')&&!$('#mbPick').classList.contains('open')){try{AB.authenticate()}catch(e){}}}
 $('#bioBtn').hidden=!(AB&&S.bio&&hasPin()); $('#bioBtn').onclick=askBio;
 if(hasPin()&&!mbSkipLock&&!$('#mbPick').classList.contains('open')) setTimeout(askBio,450);
 $('#bioToggle').onchange=e=>{S.bio=e.target.checked;save();$('#bioBtn').hidden=!S.bio;toast(S.bio?'اتفعل القفل بالبصمة':'اتقفل القفل بالبصمة')};
-window.__relock=()=>{if(hasPin()&&!$('#lock').classList.contains('open')){closeSheets();$('#lock').classList.add('open');lockPaintKind();lockMsgPaint();$('#bioBtn').hidden=!(AB&&S.bio);setTimeout(askBio,300)}};
+window.__relock=()=>{if(hasPin()&&!$('#lock').classList.contains('open')){LK=null;closeSheets();$('#lock').classList.add('open');lockPaintKind();lockMsgPaint();setTimeout(askBio,300)}};
 
 /* ===== Members (settings card) ===== */
 function renderMembers(){
@@ -2880,6 +2914,7 @@ const digitsEn=v=>String(v).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf
 const mbNorm=v=>String(v||'').trim().replace(/\s+/g,' ').toLowerCase();
 function mbKindSet(k){mbKind=k; const pin=k==='pin';
   document.querySelectorAll('#mbSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.kind===k));
+  $('#mbPassLab').textContent=pin?'الرقم السري':'كلمة السر';
   ['#mbP1','#mbP2'].forEach((sel,i)=>{const el=$(sel); el.value=''; el.inputMode=pin?'numeric':'text'; el.maxLength=pin?4:64;
     el.placeholder=pin?(i?'اكتب الرقم تاني للتأكيد':'رقم سري من 4 أرقام'):(i?'اكتب كلمة السر تاني للتأكيد':'كلمة سر (4 حروف أو أرقام على الأقل)')});
   $('#mbErr').textContent=''}
