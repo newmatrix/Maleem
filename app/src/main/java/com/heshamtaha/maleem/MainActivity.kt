@@ -41,6 +41,7 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -64,6 +65,8 @@ class MainActivity : AppCompatActivity() {
     private var voiceWanted = false
     /** true only while our own page (https://appassets.androidplatform.net) is loaded: the JS bridge refuses anything else */
     @Volatile private var pageOk = false
+    // The splash stays until the page has drawn its first frame (or 3 seconds at most)
+    @Volatile private var splashDone = false
 
     private val pickFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         fileCallback?.onReceiveValue(if (uri != null) arrayOf(uri) else null)
@@ -107,6 +110,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen().setKeepOnScreenCondition { !splashDone }
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         // Faster start: hash the page for the CSP header while the WebView is being created, not when the page is requested
@@ -123,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         web = WebView(this)
         root.addView(web, FrameLayout.LayoutParams(-1, -1))
         setContentView(root)
+        root.postDelayed({ splashDone = true }, 3000)
         if (ui.contains("dark")) {
             val dark = ui.getBoolean("dark", false)
             WindowCompat.getInsetsController(window, root).apply {
@@ -177,6 +182,8 @@ class MainActivity : AppCompatActivity() {
             override fun onPageFinished(view: WebView, url: String) {
                 super.onPageFinished(view, url)
                 pageOk = Uri.parse(url).host == APP_HOST
+                // let the page paint its first frame, then lift the splash
+                view.postDelayed({ splashDone = true }, 120)
                 // Opened from the "مصروف جديد" shortcut: show the add sheet once the page is ready
                 if (quickAdd) {
                     quickAdd = false

@@ -333,6 +333,18 @@ button{cursor:pointer}
 .mb-pick-list button{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:1.05rem;font-weight:600;text-align:start}
 .mb-av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-weight:700}
 .mb-row .btn{padding:8px 14px;font-size:.88rem}
+.sf-bar{display:flex;align-items:center;gap:10px;margin-top:10px}
+.sf-btn{border:1px solid var(--fl);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;font-size:.9rem;font-weight:600}
+.sf-btn.on{border-color:var(--brand);color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface))}
+.sf-bar .linkbtn{padding:0}
+.sf-panel{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;background:var(--surface);border-radius:var(--r-card,18px);padding:12px;box-shadow:var(--shadow)}
+.sf-panel label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted);font-weight:600;min-width:0}
+.sf-panel select,.sf-panel input{width:100%;min-width:0;box-sizing:border-box;border:0;border-radius:10px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:.92rem;padding:9px 10px;color-scheme:light dark}
+.crow .n .lim-warn{color:var(--warn,#B7791F);font-weight:600}
+.crow .n .lim-bad{color:var(--bad);font-weight:600}
+.lim-bar{display:block;height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-top:4px;max-width:180px}
+.lim-bar i{display:block;height:100%;border-radius:3px;background:var(--cc,var(--brand))}
+.lim-bar.warn i{background:#E0A23A}.lim-bar.bad i{background:var(--bad)}
 /* ===== UI looks (Settings ▸ المظهر ▸ شكل الواجهة). CSS only, on top of any theme / style / accent.
    classic = no attribute (the original look). ===== */
 :root{--fl:color-mix(in srgb,var(--ink) 15%,transparent)}
@@ -912,6 +924,9 @@ details.closed-list[open] summary::before{transform:rotate(-90deg)}
 .note-sug button{flex:none;border:0;border-radius:999px;padding:6px 12px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:.82rem;font-weight:500;white-space:nowrap;max-width:60vw;overflow:hidden;text-overflow:ellipsis;outline:none}
 /* forecast line in the hero card */
 .hero .fc{margin:12px 0 0;font-size:.86rem;opacity:.92;line-height:1.5}
+.hero .fc.daily{margin-top:12px;background:rgba(255,255,255,.12);border-radius:12px;padding:8px 12px;opacity:1}
+.hero .fc.daily b{font-size:1.05rem}
+.hero .fc.daily+.fc{margin-top:8px}
 /* search */
 .search-field{margin-top:0}
 .search-field svg{width:20px;height:20px;color:var(--muted);flex:none}
@@ -1011,6 +1026,15 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
         <button class="back" id="searchBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
       </div>
       <div class="field search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="searchIn" type="search" placeholder="ملاحظة أو فئة أو مبلغ أو طريقة دفع" autocomplete="off" enterkeyhint="search" aria-label="بحث في المصاريف"></div>
+      <div class="sf-bar"><button type="button" class="sf-btn" id="sfBtn" aria-expanded="false">فلاتر</button><button type="button" class="linkbtn" id="sfClear" hidden>مسح الفلاتر</button></div>
+      <div class="sf-panel" id="sfPanel" hidden>
+        <label>الفئة<select id="sfCat"></select></label>
+        <label>طريقة الدفع<select id="sfPay"></select></label>
+        <label>من يوم<input id="sfFrom" type="date"></label>
+        <label>لحد يوم<input id="sfTo" type="date"></label>
+        <label>من مبلغ<input id="sfMin" type="text" inputmode="decimal" placeholder="0"></label>
+        <label>لحد مبلغ<input id="sfMax" type="text" inputmode="decimal" placeholder="—"></label>
+      </div>
       <p class="search-sum" id="searchSum"></p>
       <div id="searchRes"></div>
     </div>
@@ -1627,6 +1651,9 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <div class="emoji-grid" id="emojiGrid" role="group" aria-label="الأيقونة"></div>
   <div class="lbl">اللون</div>
   <div class="swatches" id="swatches" role="group" aria-label="اللون"></div>
+  <div class="lbl">حد شهري للفئة (اختياري)</div>
+  <div class="field"><input id="catLim" type="text" inputmode="decimal" maxlength="12" placeholder="مثلاً 2000، وسيبه فاضي لو مش عايز حد" aria-label="حد شهري للفئة"></div>
+  <p class="hint" style="margin:6px 2px 0">هننبهك لما تقرب منه (بنفس نسبة تنبيه الميزانية)، ولما تعدّيه.</p>
   <p class="err-msg" id="catErr"></p>
   <div class="sheet-actions"><button class="btn primary" id="catSave">حفظ</button><button class="btn" id="catCancel">إلغاء</button></div>
 </div>
@@ -1885,7 +1912,7 @@ function cleanFixed(f){
 }
 const FXLOG_KEY=/^[A-Za-z0-9_-]{1,64}:\d{4}-\d{2}$/;
 function cleanFixedLog(l){const o={}; if(l&&typeof l==='object') Object.keys(l).forEach(k=>{if(FXLOG_KEY.test(k)&&(l[k]==='done'||l[k]==='skip')) o[k]=l[k]}); return o}
-function cleanCat(c){return c&&isId(c.id)?{id:c.id,name:str(c.name,30).trim()||'فئة',e:cleanE(c.e)||'📦',c:colr(c.c)}:null}
+function cleanCat(c){if(!(c&&isId(c.id))) return null; const o={id:c.id,name:str(c.name,30).trim()||'فئة',e:cleanE(c.e)||'📦',c:colr(c.c)}; const l=+c.lim; if(l>0&&l<1e9) o.lim=Math.round(l*100)/100; return o}
 function cleanPay(x){return x&&isId(x.id)?{id:x.id,name:str(x.name,30).trim()||'طريقة دفع',e:cleanE(x.e)||'💵'}:null}
 /* a payment captured from a bank / wallet notification, waiting for the user to confirm it */
 function cleanCap(x){
@@ -2044,6 +2071,14 @@ function forecastLine(list,start,end,B){
   const d=new Date(t0); d.setDate(d.getDate()+Math.max(1,Math.ceil(avail/rate)));
   return `<p class="fc">📈 بالمعدل ده الميزانية هتخلص يوم ${shortDate(d.getTime())}</p>`;
 }
+/* "how much can I spend a day": what is left (minus fixed expenses still to come) over the days left, today included */
+function dailyLine(rem,P){
+  const dl=Math.max(1,Math.round((P.next-todayStart())/864e5));
+  let pend=0; try{pend=fixedPendingIn(P.start,P.next)||0}catch(e){}
+  const per=Math.floor((rem-pend)/dl);
+  if(rem<=0||per<=0) return '';
+  return `<p class="fc daily">💡 تقدر تصرف حوالي <b>${money(per)}</b> ${CS()} في اليوم${dl===1?' النهارده':' لحد آخر الشهر'}${pend>0?'، بعد المصاريف الثابتة الجاية':''}</p>`;
+}
 function renderHome(){
   const now=Date.now(), mk=monKey(now), tk=dayKey(now);
   greet();
@@ -2058,7 +2093,7 @@ function renderHome(){
          <span class="chip">${daysLeft(P)?'فاضل '+daysTxt(daysLeft(P)):'آخر يوم'}</span></div>
        <div class="bar ${cls}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.min(100,pct)}" aria-label="نسبة الصرف من الميزانية"><i id="heroFill" style="width:0"></i><span class="pct${w>.84?' dark':''}">${pct}%</span></div>
        <div class="meta"><div class="m"><small>صرفت</small><b>${money(spent)}</b> <small style="display:inline">${CS()}</small></div>
-         <div class="m left${rem<0?' over':''}"><small>${rem<0?'متجاوز الميزانية':'المتبقي'}</small><b>${money(Math.abs(rem))}</b> <small style="display:inline">${CS()}</small></div></div>${forecastLine(ofPeriod(P),P.start,P.next,B)}`;
+         <div class="m left${rem<0?' over':''}"><small>${rem<0?'متجاوز الميزانية':'المتبقي'}</small><b>${money(Math.abs(rem))}</b> <small style="display:inline">${CS()}</small></div></div>${dailyLine(rem,P)}${forecastLine(ofPeriod(P),P.start,P.next,B)}`;
   }else if(fixed){
     h=`<div class="label">${periodLabel(P)}</div><div class="big">—</div>
        <p class="ctxt">اخترت تحديد ميزانية بس لسه مكتبتش الرقم.</p>
@@ -2180,23 +2215,48 @@ function renderDetail(){
     return `<div class="day-h"><span>${dayName(k)}</span><span>${money(sum(arr))} ${CS()}</span></div><div class="day-list">${arr.map(itemRow).join('')}</div>`}).join('');
 }
 
-function showSub(name){
+var repMainY=0; // where the reports' main screen was when a page was opened from it
+function showSub(name,quiet){
   const ids={main:'#reportsMain',detail:'#reportsDetail',search:'#reportsSearch'};
+  if(name!=='main'&&!$('#reportsMain').hidden) repMainY=pageY();
   Object.entries(ids).forEach(([k,s])=>$(s).hidden=k!==name);
-  const el=$(ids[name]); el.classList.remove('sub-anim');void el.offsetWidth;el.classList.add('sub-anim');
+  const el=$(ids[name]); if(!quiet){el.classList.remove('sub-anim');void el.offsetWidth;el.classList.add('sub-anim')}
   if(name==='detail') renderDetail();
   if(name==='search'){renderSearch();setTimeout(()=>$('#searchIn').focus({preventScroll:true}),60)} else $('#searchIn').blur();
-  window.scrollTo(0,0);
+  if(!quiet) pageTo(name==='main'?repMainY:0);
 }
 function showDetail(on){showSub(on?'detail':'main')}
 
 /* Search */
 const normAr=s=>String(s||'').toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/ء/g,'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+/* search filters: category, payment method, date range, amount range */
+const sfNum=v=>{const t=String(v||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,،\s]/g,'').replace('٫','.'); if(!t) return null; const n=parseFloat(t); return isFinite(n)?n:null};
+const sfDay=v=>{if(!v) return null; const [y,m,d]=v.split('-').map(Number); return y?new Date(y,m-1,d).getTime():null};
+function sfGet(){const f={cat:$('#sfCat').value,pay:$('#sfPay').value,from:sfDay($('#sfFrom').value),to:sfDay($('#sfTo').value),min:sfNum($('#sfMin').value),max:sfNum($('#sfMax').value)};
+  f.on=!!(f.cat||f.pay||f.from!==null||f.to!==null||f.min!==null||f.max!==null); return f}
+function sfFill(){
+  const c=$('#sfCat').value, p=$('#sfPay').value;
+  $('#sfCat').innerHTML='<option value="">كل الفئات</option>'+S.cats.map(x=>`<option value="${esc(x.id)}">${esc(x.e+' '+x.name)}</option>`).join('');
+  $('#sfPay').innerHTML='<option value="">كل الطرق</option>'+S.pays.map(x=>`<option value="${esc(x.id)}">${esc(x.e+' '+x.name)}</option>`).join('');
+  $('#sfCat').value=CAT[c]?c:''; $('#sfPay').value=S.pays.some(x=>x.id===p)?p:'';
+}
+function sfPass(x,f){
+  if(f.cat&&x.cat!==f.cat) return false;
+  if(f.pay&&payOf(x)!==f.pay) return false;
+  if(f.from!==null&&x.ts<f.from) return false;
+  if(f.to!==null&&x.ts>=f.to+864e5) return false;
+  if(f.min!==null&&x.amount<f.min) return false;
+  if(f.max!==null&&x.amount>f.max) return false;
+  return true;
+}
 function renderSearch(){
-  const q=normAr($('#searchIn').value.trim());
-  if(!q){$('#searchSum').textContent='دور في كل مصاريفك بالملاحظة أو اسم الفئة أو المبلغ أو طريقة الدفع.';$('#searchRes').innerHTML='';return}
-  const words=q.split(/\s+/), numQ=/^\d+(\.\d+)?$/.test(q)? parseFloat(q) : null;
+  const q=normAr($('#searchIn').value.trim()), f=sfGet();
+  $('#sfBtn').classList.toggle('on',f.on); $('#sfBtn').textContent=f.on?'فلاتر شغالة':'فلاتر'; $('#sfClear').hidden=!f.on;
+  if(!q&&!f.on){$('#searchSum').textContent='دور في كل مصاريفك بالملاحظة أو اسم الفئة أو المبلغ أو طريقة الدفع، أو استخدم الفلاتر.';$('#searchRes').innerHTML='';return}
+  const words=q?q.split(/\s+/):[], numQ=/^\d+(\.\d+)?$/.test(q)? parseFloat(q) : null;
   const hits=S.expenses.filter(x=>{
+    if(!sfPass(x,f)) return false;
+    if(!q) return true;
     if(numQ!==null && x.amount===numQ) return true;
     const hay=normAr((x.note||'')+' '+(CAT[x.cat]||CAT.other).name+' '+PAY[payOf(x)].name);
     return words.every(w=>hay.includes(w));
@@ -2209,7 +2269,11 @@ function renderSearch(){
 let searchT;
 $('#searchIn').addEventListener('input',()=>{clearTimeout(searchT);searchT=setTimeout(renderSearch,150)});
 $('#searchIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#searchIn').blur()}});
-$('#searchBtn').onclick=()=>showSub('search');
+$('#searchBtn').onclick=()=>{sfFill();showSub('search')};
+$('#sfBtn').onclick=()=>{const p=$('#sfPanel'); p.hidden=!p.hidden; $('#sfBtn').setAttribute('aria-expanded',!p.hidden); if(!p.hidden) sfFill()};
+['#sfCat','#sfPay','#sfFrom','#sfTo'].forEach(id=>$(id).addEventListener('change',renderSearch));
+['#sfMin','#sfMax'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(searchT);searchT=setTimeout(renderSearch,200)}));
+$('#sfClear').onclick=()=>{['#sfCat','#sfPay','#sfFrom','#sfTo','#sfMin','#sfMax'].forEach(id=>{$(id).value=''}); renderSearch()};
 $('#searchBack').onclick=()=>showSub('main');
 
 /* Settings */
@@ -2258,23 +2322,28 @@ function renderAll(){
 /* Navigation */
 let tab='expenses';
 const TABS=['expenses','reports','debts','me','settings'];
+/* Each tab remembers how far down its main screen you were (until the app closes). A page opened inside a tab
+   (a settings section, managing the shared space, a report's details, search) closes when you leave the tab,
+   and coming back puts you on the main screen at the place you opened it from. */
+var tabY={};
 function go(t){
   renderRest(); // a tab tapped in the very first moment
   if(t==='settings'&&tab==='settings'&&(setPage||spManageOn)){if(spManageOn)spManage(false); setGo(null); return}
-  if(t!=='settings'&&setPage) setGo(null,true);
-  if(t===tab && t!=='reports'){window.scrollTo({top:0,behavior:'smooth'});return}
+  if(t===tab){ if(t==='reports'&&$('#reportsMain').hidden) showSub('main'); else pageTopSmooth(); return }
+  tabY[tab]=pageY();
+  if(tab==='settings'){ if(spManageOn) spManage(false); if(setPage){tabY.settings=setHomeY; setGo(null,true)} }
+  if(tab==='reports'&&$('#reportsMain').hidden){tabY.reports=repMainY; showSub('main',true)}
   const dir=TABS.indexOf(t)-TABS.indexOf(tab); tab=t;
   closeMenu();
-  if(spManageOn&&t!=='settings')spManage(false);
   document.querySelectorAll('.view').forEach(v=>{
     const on=v.id==='v-'+t;
     if(on){v.style.setProperty('--dx',dir>0?'-24px':dir<0?'24px':'0px');v.classList.remove('active');void v.offsetWidth}
     v.classList.toggle('active',on)});
   document.querySelectorAll('.nav button').forEach(b=>{if(b.dataset.tab===t)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
   $('#fab').hidden = t==='settings'||t==='me'; $('#micFab').hidden = t==='settings'||t==='me'||t==='debts';
-  if(t==='reports'){showDetail(false);renderReports()}
+  if(t==='reports') renderReports();
   if(t==='debts') renderDebts();
-  window.scrollTo(0,0);
+  const y=tabY[t]||0; pageTo(y); if(y) requestAnimationFrame(()=>pageTo(y));
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.tab));
 $('#homeAv').onclick=()=>go('me');
@@ -2535,6 +2604,17 @@ function voiceCat(stems){
   if(r[1]&&r[1][1]===r[0][1]) return null; /* a tie: ask instead of guessing */
   return r[0][0];
 }
+/* the category you used before for the same words (your corrections included, since the newest expense wins) */
+function learnedCat(note){
+  const n=normAr(String(note||'').trim()); if(n.length<2) return null;
+  const xs=S.expenses.filter(x=>x.note&&CAT[x.cat]&&x.cat!=='other').sort((a,b)=>b.ts-a.ts).slice(0,400);
+  const hit=xs.find(x=>normAr(x.note.trim())===n); if(hit) return hit.cat;
+  const w=n.split(/\s+/).find(t=>t.length>=3); if(!w) return null;
+  const votes={}; let tot=0;
+  xs.forEach(x=>{if(normAr(x.note.trim()).split(/\s+/).includes(w)){votes[x.cat]=(votes[x.cat]||0)+1;tot++}});
+  const best=Object.entries(votes).sort((a,b)=>b[1]-a[1])[0];
+  return best&&best[1]>=2&&best[1]/tot>=.6?best[0]:null;
+}
 function parseVoice(text){
   const tok=String(text||'').trim().split(/\s+/).filter(Boolean), out={amount:null,cat:null,note:'',yday:false};
   if(!tok.length) return out;
@@ -2563,6 +2643,7 @@ function parseVoice(text){
   while(words.length&&VFILL.has(vStem(words[0]))) words.shift();
   while(words.length&&VFILL.has(vStem(words[words.length-1]))) words.pop();
   out.note=words.join(' ').replace(/[،,.؟?!]+$/g,'').slice(0,80);
+  out.cat=learnedCat(out.note)||out.cat;
   return out;
 }
 function voiceOpen(){voiceOn=true;$('#vcTitle').textContent='بحضّر المايك…';$('#vcText').textContent='';$('#vcHint').hidden=false;$('#vcOrb').classList.remove('on');$('#scrim').classList.add('open');$('#voiceCard').classList.add('open')}
@@ -2638,7 +2719,7 @@ $('#menu').onclick=e=>{const b=e.target.closest('[data-act]');if(!b||!menuFor)re
   else if(kind==='goal'){ if(b.dataset.act==='edit') openGoal(id); else deleteGoal(id) }
   else if(kind==='photo'){ if(b.dataset.act==='edit') $('#photoFile').click(); else removePhoto() }
   else { const a=b.dataset.act; if(a==='edit') openSheet(id); else if(a==='date') openDateSheet(id); else delExpense(id) }};
-window.addEventListener('scroll',closeMenu,{passive:true});
+window.addEventListener('scroll',closeMenu,{passive:true}); document.body.addEventListener('scroll',closeMenu,{passive:true});
 window.addEventListener('resize',closeMenu);
 $('#delInSheet').onclick=()=>{const id=editId;closeSheets();delExpense(id)};
 document.addEventListener('click',e=>{
@@ -2769,7 +2850,21 @@ function checkRemind(){
 (function(){const sel=$('#payday');for(let i=1;i<=31;i++)sel.insertAdjacentHTML('beforeend',`<option value="${i}">يوم ${i}</option>`)})();
 $('#payday').onchange=e=>{S.payday=+e.target.value;save();renderAll();
   toast(S.payday===1?'الشهر بقى يبدأ من أول الشهر':'الشهر بقى يبدأ يوم '+S.payday);setTimeout(checkAlerts,500)};
+/* a category with its own monthly limit: warn once near it (same % as the budget alert) and once over it */
+function checkCatAlerts(){
+  const lims=S.cats.filter(c=>c.lim>0); if(!lims.length) return;
+  const P=periodOf(Date.now()), by={}; ofPeriod(P).forEach(x=>{by[x.cat]=(by[x.cat]||0)+x.amount});
+  const A=S.alerted[P.key]=S.alerted[P.key]||{}, cc=A.c=(A.c&&typeof A.c==='object')?A.c:{}, before=JSON.stringify(cc), th=S.alertPct/100;
+  let msg=null;
+  lims.forEach(c=>{const sp=(by[c.id]||0)/c.lim, f=cc[c.id]=cc[c.id]||{};
+    if(sp<th) f.w=false; if(sp<1) f.o=false;
+    if(sp>=1&&!f.o){f.o=true;f.w=true;msg=msg||`🚨 فئة ${c.name} عدّت الحد: صرفت ${fmt(by[c.id])} من ${fmt(c.lim)} ${CS()}`}
+    else if(sp>=th&&!f.w){f.w=true;msg=msg||`⚠️ فئة ${c.name} قربت من الحد: صرفت ${fmt(by[c.id])} من ${fmt(c.lim)} ${CS()}`}});
+  if(JSON.stringify(cc)!==before) save();
+  if(msg&&S.alert80) setTimeout(()=>toast(msg,null,null,6000),2600);
+}
 function checkAlerts(){
+  try{checkCatAlerts()}catch(e){console.error(e)}
   if(S.budgetMode!=='fixed'||!(S.budget>0)) return;
   const P=periodOf(Date.now()), sp=sum(ofPeriod(P))/S.budget;
   const a=S.alerted[P.key]=S.alerted[P.key]||{}, before=JSON.stringify(a);
@@ -3105,6 +3200,7 @@ var setPage=null, setHomeY=0; // var on purpose: go() may run before this line o
 /* the app scrolls inside <body> (html and body are 100% high), not the window: read and set both */
 function pageY(){return Math.max(document.body.scrollTop||0,(document.scrollingElement||document.documentElement).scrollTop||0,window.scrollY||0)}
 function pageTo(y){document.body.scrollTop=y;(document.scrollingElement||document.documentElement).scrollTop=y;if(window.scrollY!==y)window.scrollTo(0,y)}
+function pageTopSmooth(){[document.body,document.scrollingElement||document.documentElement].forEach(el=>{try{el.scrollTo({top:0,behavior:'smooth'})}catch(e){el.scrollTop=0}})}
 const SET_T_NAMES={}; document.querySelectorAll('#setGroups [data-set-go]').forEach(b=>{SET_T_NAMES[b.dataset.setGo]=b.querySelector('b').textContent});
 function setGo(p,quiet){
   if(p&&!setPage) setHomeY=pageY();
@@ -3137,7 +3233,7 @@ const SET_IDX=[
   ['members','الأعضاء','عضو مستخدم اسم'],['members','إضافة عضو','جديد','mbAdd'],['members','تبديل العضو','غير','mbSwitch'],['members','مسح عضو','حذف نسي كلمة السر','mbList'],
   ['security','قفل بكلمة سر','رقم سري باسورد كلمة مرور pin','pinToggle'],['security','تغيير كلمة السر','رقم سري باسورد','lockChangeRow'],['security','قفل بالبصمة','بصمه fingerprint','bioToggle'],
   ['appearance','فاتح وداكن','ثيم الوضع الليلي dark light','themeSeg'],['appearance','ستايل التطبيق','ثيمات شكل تصميم','styleGrid'],['appearance','لون التطبيق','الوان','accentRow'],['appearance','شكل الواجهة','تصميم مسطح مضغوط مريح ناعم كلاسيك خط كبير صغير','lookCard'],
-  ['cats','الفئات','فئه تصنيف ترتيب','catList'],['cats','إضافة فئة جديدة','فئه','addCat'],
+  ['cats','الفئات','فئه تصنيف ترتيب','catList'],['cats','إضافة فئة جديدة','فئه','addCat'],['cats','حد شهري للفئة','ميزانيه فئه حد اقصي','catList'],
   ['pays','طرق الدفع','كاش فيزا محفظه انستاباي الافتراضيه','payList'],['pays','إضافة طريقة دفع','','addPay'],
   ['alerts','تنبيه قرب نهاية الميزانية','80% ميزانيه','row80'],['alerts','نسبة التنبيه','ميزانيه','rowPct'],['alerts','التذكير اليومي','تذكير','remindToggle'],['alerts','وقت التذكير','ساعه','remindTimeRow'],
   ['alerts','تذكير بالمواعيد','سلف جمعيات مصاريف ثابته','dueToggle'],['alerts','الملخص الشهري','ملخص','sumToggle'],['alerts','التذكير في الميعاد بالظبط','منبهات بطاريه','exactRow'],
@@ -3497,6 +3593,7 @@ function impGuessCat(note,catText,hist){
   }
   const n=AR_NORM(note); if(!n&&!ct) return 'other';
   if(n&&hist&&hist.has(n)) return hist.get(n);
+  {const l=learnedCat(note); if(l) return l}
   const all=(n+' '+ct).trim(), toks=impToks(all);
   let best='other', score=0;
   S.cats.forEach(c=>{ if(c.id==='other') return;
@@ -3803,9 +3900,11 @@ let catEdit=null, catEmoji=EMOJIS[0], catColor=COLORS[0], justAddedCat=null;
 function renderCatList(){
   const counts={}; S.expenses.forEach(x=>{counts[x.cat]=(counts[x.cat]||0)+1});
   $('#catCount').textContent=S.cats.length+' فئة';
+  const byCat={}; if(S.cats.some(c=>c.lim>0)) ofPeriod(periodOf(Date.now())).forEach(x=>{byCat[x.cat]=(byCat[x.cat]||0)+x.amount});
+  const limTxt=c=>{const sp=byCat[c.id]||0, r=sp/c.lim; return `<small class="${r>=1?'lim-bad':r>=S.alertPct/100?'lim-warn':''}">صرفت ${money(sp)} من حد ${money(c.lim)} ${CS()}</small><span class="lim-bar${r>=1?' bad':r>=S.alertPct/100?' warn':''}"><i style="width:${Math.min(100,Math.round(r*100))}%"></i></span>`};
   $('#catList').innerHTML=S.cats.map(c=>`<div class="crow${c.id===justAddedCat?' new':''}" data-cid="${esc(c.id)}" style="--cc:${colr(c.c)}">
     <div class="tile">${esc(c.e)}</div>
-    <div class="n">${esc(c.name)}<small>${counts[c.id]?counts[c.id]+' مصروف':'مفيش مصاريف لسه'}</small></div>
+    <div class="n">${esc(c.name)}${c.lim>0?limTxt(c):`<small>${counts[c.id]?counts[c.id]+' مصروف':'مفيش مصاريف لسه'}</small>`}</div>
     <span class="grip" role="img" aria-label="اسحب لتغيير ترتيب ${esc(c.name)}"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.7"/><circle cx="15" cy="6" r="1.7"/><circle cx="9" cy="12" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="9" cy="18" r="1.7"/><circle cx="15" cy="18" r="1.7"/></svg></span>
     <button class="more" data-catmore="${esc(c.id)}" aria-label="خيارات ${esc(c.name)}" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button></div>`).join('');
 }
@@ -3910,7 +4009,7 @@ function openCatSheet(id){
   const c=id?CAT[id]:null; catEdit=c?id:null;
   $('#catTitle').textContent=c?'تعديل الفئة':'فئة جديدة';
   $('#catSave').textContent=c?'حفظ التعديل':'إضافة';
-  $('#catName').value=c?c.name:'';
+  $('#catName').value=c?c.name:''; $('#catLim').value=c&&c.lim?c.lim:'';
   catEmoji=c?c.e:EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
   catColor=c?c.c:COLORS[S.cats.length%COLORS.length];
   if(!EMOJIS.includes(catEmoji)) $('#emojiGrid').insertAdjacentHTML('afterbegin',`<button type="button" data-emoji="${esc(catEmoji)}" aria-pressed="false">${esc(catEmoji)}</button>`);
@@ -3926,8 +4025,11 @@ $('#catSave').onclick=()=>{
   const name=$('#catName').value.trim().replace(/\s+/g,' ');
   if(!name){$('#catErr').textContent='اكتب اسم الفئة';$('#catName').focus();return}
   if(S.cats.some(c=>c.id!==catEdit&&c.name.toLowerCase()===name.toLowerCase())){$('#catErr').textContent='فيه فئة بالاسم ده بالفعل';return}
-  if(catEdit){Object.assign(CAT[catEdit],{name,e:catEmoji,c:catColor})}
-  else{const id='c_'+uid(); S.cats.push({id,name,e:catEmoji,c:catColor}); justAddedCat=id}
+  const limRaw=String($('#catLim').value).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,،\s]/g,'').replace('٫','.');
+  const lim=limRaw?parseFloat(limRaw):0;
+  if(limRaw&&!(lim>0&&lim<1e9)){$('#catErr').textContent='اكتب الحد رقم بس، أو سيبه فاضي';$('#catLim').focus();return}
+  if(catEdit){Object.assign(CAT[catEdit],{name,e:catEmoji,c:catColor}); if(lim) CAT[catEdit].lim=Math.round(lim*100)/100; else delete CAT[catEdit].lim}
+  else{const id='c_'+uid(), nc={id,name,e:catEmoji,c:catColor}; if(lim) nc.lim=Math.round(lim*100)/100; S.cats.push(nc); justAddedCat=id}
   const was=catEdit; save();syncCats();closeSheets();renderAll();justAddedCat=null;
   toast(was?'اتعدلت الفئة':'اتضافت فئة '+name);
 };
@@ -4786,7 +4888,7 @@ function spManage(on){
   spManageOn=!!on;$('#v-settings').classList.toggle('sp-managing',spManageOn);
   $('#spManageTitle').textContent=S.space?'إدارة المساحة':'اختيارات المشاركة';
   if(spManageOn){const m=$('#spManage');m.classList.remove('sub-anim');void m.offsetWidth;m.classList.add('sub-anim')}
-  window.scrollTo(0,0);
+  pageTo(0);
 }
 $('#spManageBtn').onclick=()=>spManage(true);
 $('#spManageWait').onclick=()=>spManage(true);
@@ -5337,6 +5439,7 @@ function capPay(c){
   const hit=want&&S.pays.find(p=>want.test(p.name)); return hit?hit.id:null;
 }
 function capCat(c){
+  {const l=learnedCat(c.merchant); if(l) return l}
   const m=normAr(c.merchant);
   if(m){const hit=S.expenses.slice().sort((a,b)=>b.ts-a.ts).find(x=>x.note&&normAr(x.note.trim())===m&&CAT[x.cat]); if(hit) return hit.cat}
   try{const st=vNorm(c.merchant+' '+c.text).split(/\s+/).map(vStem).filter(Boolean); return voiceCat(st)}catch(e){return null}
