@@ -333,6 +333,106 @@ button{cursor:pointer}
 .mb-pick-list button{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:1.05rem;font-weight:600;text-align:start}
 .mb-av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-weight:700}
 .mb-row .btn{padding:8px 14px;font-size:.88rem}
+/* ===== UI looks (Settings ▸ المظهر ▸ شكل الواجهة). CSS only, on top of any theme / style / accent.
+   classic = no attribute (the original look). ===== */
+:root{--fl:color-mix(in srgb,var(--ink) 15%,transparent)}
+/* flat: hairline borders, no shadows, solid hero, small icon tiles */
+:root[data-look="flat"]{--shadow:none;--r-card:12px;--r-hero:16px}
+:root[data-look="flat"] body{background:var(--bg)}
+[data-look="flat"] .card,[data-look="flat"] .xp,[data-look="flat"] .set-search{box-shadow:none;border:1px solid var(--fl)}
+[data-look="flat"] .xp{border-radius:12px}
+[data-look="flat"] .xp .tile{width:38px;height:38px;border-radius:10px;font-size:1.15rem}
+[data-look="flat"] .hero{background:var(--brand);box-shadow:none}
+[data-look="flat"] .hero::after{display:none}
+[data-look="flat"] .hero .bar{box-shadow:none}
+[data-look="flat"] .btn:not(.primary):not(.danger):not(.danger-solid):not(.teal):not(.goldb){background:transparent;border:1px solid var(--fl)}
+[data-look="flat"] .field{background:transparent;border:1px solid var(--fl)}
+[data-look="flat"] .seg{background:transparent;border:1px solid var(--fl)}
+[data-look="flat"] .seg button[aria-pressed="true"]{box-shadow:none;background:var(--surface-2)}
+[data-look="flat"] .fab,[data-look="flat"] .home-av,[data-look="flat"] .back{box-shadow:none}
+[data-look="flat"] .back{border:1px solid var(--fl)}
+[data-look="flat"] .crow .tile,[data-look="flat"] .pay-cell .pe{width:34px;height:34px;border-radius:9px;font-size:1.05rem}
+[data-look="flat"] .set-item .si{width:30px;height:30px;border-radius:8px}
+[data-look="flat"] .nav{box-shadow:none}
+/* compact: smaller type and tighter spacing, more on one screen */
+:root[data-look="compact"]{font-size:14.5px;--r-card:14px;--r-hero:18px}
+[data-look="compact"] body{font-size:14.5px}
+[data-look="compact"] .card{padding:12px;margin-bottom:10px}
+[data-look="compact"] .xp{padding:8px 10px 8px 4px;margin-bottom:6px;border-radius:14px;gap:10px}
+[data-look="compact"] .xp .tile{width:38px;height:38px;border-radius:12px;font-size:1.15rem}
+[data-look="compact"] .hero{padding:14px 16px 12px}
+[data-look="compact"] .hero .big{font-size:2.1rem;margin-bottom:10px}
+[data-look="compact"] .hero .bar{height:22px}
+[data-look="compact"] .section-h{margin:16px 2px 8px}
+[data-look="compact"] .btn{min-height:42px;padding:10px 12px}
+[data-look="compact"] .set-item{padding:9px 14px}
+[data-look="compact"] .crow,[data-look="compact"] .pay-cell{padding:6px 0}
+[data-look="compact"] .crow .tile,[data-look="compact"] .pay-cell .pe{width:36px;height:36px;border-radius:11px}
+[data-look="compact"] .set-row{padding:9px 0}
+[data-look="compact"] .topbar{margin-bottom:12px}
+/* comfy: bigger type, icons and touch targets */
+:root[data-look="comfy"]{font-size:18px;--r-card:22px;--r-hero:26px}
+[data-look="comfy"] body{font-size:18px}
+[data-look="comfy"] .card{padding:18px}
+[data-look="comfy"] .xp{padding:14px 16px 14px 8px;gap:14px}
+[data-look="comfy"] .xp .tile{width:56px;height:56px;border-radius:18px;font-size:1.6rem}
+[data-look="comfy"] .btn{min-height:56px}
+[data-look="comfy"] .set-item{padding:14px}
+[data-look="comfy"] .set-item .si{width:40px;height:40px;border-radius:12px}
+[data-look="comfy"] .set-item .si svg{width:22px;height:22px}
+[data-look="comfy"] .crow .tile,[data-look="comfy"] .pay-cell .pe{width:50px;height:50px;border-radius:16px}
+[data-look="comfy"] .switch{transform:scale(1.1)}
+/* soft: round shapes, each expense tinted with its category colour */
+:root[data-look="soft"]{--r-card:28px;--r-hero:32px}
+[data-look="soft"] .xp{border:0;border-radius:24px;background:color-mix(in srgb,var(--cc) 13%,var(--surface))}
+[data-look="soft"] .xp .tile,[data-look="soft"] .crow .tile,[data-look="soft"] .set-item .si,[data-look="soft"] .pay-cell .pe,[data-look="soft"] .back,[data-look="soft"] .fab{border-radius:50%}
+[data-look="soft"] .crow{background:color-mix(in srgb,var(--cc) 10%,transparent);border-radius:20px;border-top:0;padding:9px 10px;margin-top:6px}
+[data-look="soft"] .btn,[data-look="soft"] .seg,[data-look="soft"] .seg button,[data-look="soft"] .chip,[data-look="soft"] .time-chip{border-radius:999px}
+[data-look="soft"] .field{border-radius:22px}
+[data-look="soft"] .cat{border-radius:22px}
+[data-look="soft"] .choice button,[data-look="soft"] .sty{border-radius:22px}
+[data-look="soft"] .sheet{border-radius:32px 32px 0 0}
+[data-look="soft"] .set-item+.set-item::before{inset-inline-start:64px}
+/* the picker in Settings */
+.look-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.look-opt{display:flex;align-items:center;gap:12px;width:100%;padding:10px;border:1.5px solid transparent;border-radius:14px;background:var(--surface-2);color:var(--ink);font:inherit;text-align:start}
+.look-opt[aria-pressed="true"]{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface))}
+.look-opt .lt{flex:1;min-width:0}
+.look-opt .lt b{display:block;font-weight:600}
+.look-opt .lt small{display:block;color:var(--muted);font-size:.82rem;line-height:1.4}
+.look-opt .ok{width:22px;height:22px;border-radius:50%;border:2px solid var(--fl);display:grid;place-items:center;flex:none;font-size:.72rem;font-weight:700;color:transparent}
+.look-opt[aria-pressed="true"] .ok{background:var(--brand);border-color:var(--brand);color:#fff}
+.lk-pv{width:56px;height:44px;border-radius:10px;background:var(--bg);display:flex;flex-direction:column;gap:5px;padding:6px;flex:none}
+.lk-pv i{flex:1;border-radius:5px;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.lk-pv.flat i{box-shadow:none;border:1px solid var(--fl);border-radius:3px;background:transparent}
+.lk-pv.compact{gap:3px;padding:5px}.lk-pv.compact i{border-radius:3px}
+.lk-pv.comfy{padding:7px}.lk-pv.comfy i{border-radius:8px}
+.lk-pv.soft i{border-radius:99px;box-shadow:none;background:color-mix(in srgb,var(--brand) 22%,var(--surface))}
+.lk-pv.soft i+i{background:color-mix(in srgb,var(--gold) 26%,var(--surface))}
+/* Settings: a home list of sections, each section on its own page */
+.set-search{margin:0 0 6px;padding:2px 14px;background:var(--surface);box-shadow:var(--shadow)}
+.set-search svg{width:19px;height:19px;color:var(--muted);flex:none}
+.set-search input{font-size:1rem;font-weight:500;color:var(--ink)}
+.set-search input::-webkit-search-cancel-button{display:none}
+.set-q-x{border:0;background:var(--surface-2);color:var(--muted);width:26px;height:26px;border-radius:50%;font-size:.8rem;flex:none}
+.set-gt{font-size:.82rem;font-weight:700;color:var(--muted);margin:18px 8px 8px}
+.set-list{padding:4px 0;overflow:hidden}
+.set-item{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;padding:12px 14px;text-align:start;color:var(--ink);font:inherit;position:relative}
+.set-item+.set-item::before{content:"";position:absolute;top:0;inset-inline-start:60px;inset-inline-end:14px;border-top:1px solid var(--line)}
+.set-item:active{background:var(--surface-2)}
+.set-item .si{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--c,#64748B);color:#fff;flex:none}
+.set-item .si svg{width:19px;height:19px}
+.set-item .st{flex:1;min-width:0}
+.set-item .st b{display:block;font-weight:600;font-size:.98rem}
+.set-item .st small{display:block;color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-item .chev{width:18px;height:18px;color:var(--muted);flex:none}
+.set-item.danger .st b{color:var(--bad)}
+.set-empty{padding:18px 14px;text-align:center;color:var(--muted)}
+.set-top{justify-content:flex-start;gap:12px}
+.set-page>.card>h3:first-child:not(.look-h),.set-page>.card>.card-h>h3{display:none}
+.set-page>.card>.card-h{justify-content:flex-end}
+.set-flash{animation:setFlash 1.8s ease}
+@keyframes setFlash{0%,45%{background:var(--surface-2);box-shadow:0 0 0 2px var(--brand)}100%{background:transparent;box-shadow:0 0 0 2px transparent}}
 .mb-lab{display:block;font-weight:600;font-size:.9rem;color:var(--muted);margin:16px 2px 0}
 h2 + .mb-lab{margin-top:4px}
 .choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
@@ -483,14 +583,15 @@ button,.socials a,.month-card{transition:transform .15s cubic-bezier(.3,.7,.4,1.
 .time-chip{border:0;background:color-mix(in srgb,var(--brand) 14%,var(--surface));color:var(--brand);font:inherit;font-weight:700;border-radius:12px;padding:8px 15px;direction:ltr;font-variant-numeric:tabular-nums;cursor:pointer;transition:transform .12s,opacity .2s}
 .time-chip:active:not(:disabled){transform:scale(.94)}
 .time-chip:disabled{opacity:.45;cursor:default}
-.pay-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
-#addPay{margin-top:10px}
-.pay-cell{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px 10px;border-radius:16px;background:var(--surface-2);border:1.5px solid transparent;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;transition:transform .12s,border-color .2s,background .2s}
-.pay-cell:active{transform:scale(.95)}
-.pay-cell.def{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface))}
-.pay-cell .pe{font-size:1.6rem;line-height:1}
-.pay-cell .pn{font-size:.78rem;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pay-cell .pd{position:absolute;top:5px;inset-inline-end:7px;font-size:.7rem;font-weight:700;color:var(--brand)}
+.pay-grid{display:flex;flex-direction:column;margin-top:6px}
+.pay-cell{position:relative;display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.pay-cell:first-child{border-top:0}
+.pay-cell .pe{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:none;font-size:1.3rem;line-height:1;background:var(--surface-2)}
+.pay-cell .pn{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.pay-cell .pn small{display:block;color:var(--muted);font-weight:400;font-size:.82rem}
+.pay-cell.def .pn small{color:var(--brand);font-weight:600}
+.pay-cell .pr{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);border-color:color-mix(in srgb,var(--ink) 25%,transparent);display:grid;place-items:center;flex:none;font-size:.72rem;font-weight:700;color:transparent;transition:background .15s,border-color .15s}
+.pay-cell.def .pr{background:var(--brand);border-color:var(--brand);color:#fff}
 .date-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 .dchip{position:relative;overflow:hidden;flex:none;border:0;border-radius:999px;padding:7px 13px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:.84rem;font-weight:600;cursor:pointer;outline:none;transition:background .2s,color .2s}
 .dchip.on{background:var(--brand);color:#fff}
@@ -1010,8 +1111,63 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 
   <!-- الإعدادات -->
   <section class="view" id="v-settings" aria-label="الإعدادات">
-    <div class="topbar"><h1>الإعدادات</h1></div>
 
+    <div id="setHome">
+    <div class="topbar"><h1>الإعدادات</h1></div>
+    <div class="field set-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input id="setQ" type="search" placeholder="دوّر في الإعدادات" autocomplete="off" aria-label="دوّر في الإعدادات"><button type="button" class="set-q-x" id="setQX" aria-label="مسح البحث" hidden>✕</button></div>
+    <div id="setRes" hidden><div class="card set-list" id="setResList"></div></div>
+    <div id="setGroups">
+      <div class="set-gt">الحساب</div>
+      <div class="card set-list"><button type="button" class="set-item" data-set-go="members" id="si-members"><span class="si" style="--c:#2D7FD3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg></span><span class="st"><b>الأعضاء</b><small id="ss-members"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="security" id="si-security"><span class="si" style="--c:#475569"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.3"/></svg></span><span class="st"><b>القفل والحماية</b><small id="ss-security"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+      <div class="set-gt">التخصيص</div>
+      <div class="card set-list"><button type="button" class="set-item" data-set-go="appearance" id="si-appearance"><span class="si" style="--c:#8B5CF6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.8 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.8-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.1"/><circle cx="10.5" cy="7.5" r="1.1"/><circle cx="15" cy="7.8" r="1.1"/></svg></span><span class="st"><b>المظهر</b><small id="ss-appearance"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="cats" id="si-cats"><span class="si" style="--c:#E07A2E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5a1.5 1.5 0 0 1 1.5-1.5h7.2l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-7.1 7.1a1.5 1.5 0 0 1-2.1 0z"/><circle cx="8" cy="8" r="1.4"/></svg></span><span class="st"><b>الفئات</b><small id="ss-cats"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="pays" id="si-pays"><span class="si" style="--c:#16A34A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h3"/></svg></span><span class="st"><b>طرق الدفع</b><small id="ss-pays"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+      <div class="set-gt">التنبيهات والسرعة</div>
+      <div class="card set-list"><button type="button" class="set-item" data-set-go="alerts" id="si-alerts"><span class="si" style="--c:#E11D48"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span><span class="st"><b>التنبيهات والتذكيرات</b><small id="ss-alerts"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="capture" id="si-capture"><span class="si" style="--c:#0EA5A4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5h16v9H8l-4 3.5z"/><path d="M12 8.5v4.5M10 10.8h4"/></svg></span><span class="st"><b>التسجيل من إشعارات البنك</b><small id="ss-capture"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="widget" id="si-widget"><span class="si" style="--c:#4F46E5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><path d="M17 14v6M14 17h6"/></svg></span><span class="st"><b>الويدجت والإعدادات السريعة</b><small id="ss-widget"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+      <div class="set-gt">المشاركة والبيانات</div>
+      <div class="card set-list"><button type="button" class="set-item" data-set-go="space" id="si-space"><span class="si" style="--c:#D9466F"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M7.5 12h9" opacity=".0"/><circle cx="8.5" cy="10" r="1.6"/><circle cx="15.5" cy="10" r="1.6"/><path d="M6.5 16c.8-1.5 2.1-2.2 3.5-2.2M17.5 16c-.8-1.5-2.1-2.2-3.5-2.2"/></svg></span><span class="st"><b>المساحة المشتركة</b><small id="ss-space"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="backup" id="si-backup"><span class="si" style="--c:#0284C7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.8 8.6 4 4 0 0 1 17.5 18"/><path d="M12 11v8M9.2 13.8 12 11l2.8 2.8"/></svg></span><span class="st"><b>النسخ الاحتياطي</b><small id="ss-backup"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item danger" data-set-go="data" id="si-data"><span class="si" style="--c:#C2412D"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 12.5a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-12.5"/><path d="M10.5 11v6M13.5 11v6"/></svg></span><span class="st"><b>مسح البيانات</b><small id="ss-data"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+    </div>
+    <div class="card dev2" style="margin-top:18px">
+      <div class="dv-top">
+        <div class="dv-av" dir="ltr" aria-hidden="true">HT</div>
+        <div class="dv-txt"><div class="dv-name" dir="ltr">Hesham Taha</div><div class="dv-role">مطور مليم</div></div>
+        <span class="dv-ver" dir="ltr">v1.0</span>
+      </div>
+      <div class="socials">
+        <a href="https://www.facebook.com/HeshamTahaOfficial" target="_blank" rel="noopener" aria-label="فيسبوك"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.23 2.68.23v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg></a>
+        <a href="https://www.youtube.com/@heshamtaha1" target="_blank" rel="noopener" aria-label="يوتيوب"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
+        <a href="https://github.com/newmatrix/" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.3 1.9 1.3 3.1 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg></a>
+      </div>
+    </div>
+    </div>
+    <div class="set-page" data-page="members" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الأعضاء</h1></div>
+    <div class="card" id="mbCard">
+      <h3>الأعضاء</h3>
+      <p class="hint">كل عضو ليه مصاريفه والتزاماته وإعداداته وكلمة السر بتاعته. الويدجت والتذكيرات وتسجيل المصاريف من إشعارات البنك بتشتغل للعضو اللي فتح التطبيق آخر مرة.</p>
+      <div id="mbList"></div>
+      <div class="export-grid"><button class="btn" id="mbAdd" type="button">إضافة عضو</button><button class="btn" id="mbSwitch" type="button">تبديل العضو</button></div>
+    </div>
+    </div>
+    <div class="set-page" data-page="security" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>القفل والحماية</h1></div>
+    <div class="card">
+      <h3>الحماية</h3>
+      <div class="set-row">
+        <div class="txt">قفل بكلمة سر<small>رقم سري من 4 أرقام أو كلمة سر عند فتح التطبيق</small></div>
+        <label class="switch"><input type="checkbox" id="pinToggle" aria-label="قفل بكلمة سر"><i></i></label>
+      </div>
+      <div class="set-row" id="lockChangeRow" hidden>
+        <div class="txt">تغيير كلمة السر<small>أو التحويل من رقم سري لكلمة سر والعكس</small></div>
+        <button class="btn" id="lockChange" type="button">تغيير</button>
+      </div>
+      <div class="set-row">
+        <div class="txt">قفل بالبصمة<small id="bioHint">بيشتغل في نسخة أندرويد</small></div>
+        <label class="switch"><input type="checkbox" id="bioToggle" aria-label="قفل بالبصمة" disabled><i></i></label>
+      </div>
+    </div>
+    </div>
+    <div class="set-page" data-page="appearance" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>المظهر</h1></div>
     <div class="card">
       <h3>المظهر</h3>
       <div class="seg" id="themeSeg" role="group" aria-label="المظهر">
@@ -1024,72 +1180,34 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
       <div class="accent-row" id="accentRow" role="group" aria-label="لون التطبيق"></div>
     </div>
 
+    <div class="card" id="lookCard">
+      <h3 class="look-h">شكل الواجهة</h3>
+      <p class="hint">بيغيّر شكل الكروت والمسافات وحجم الخط، وبيشتغل مع أي ثيم ولون فوق.</p>
+      <div class="look-list" id="lookList" role="radiogroup" aria-label="شكل الواجهة"></div>
+    </div>
+    </div>
+    <div class="set-page" data-page="cats" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الفئات</h1></div>
     <div class="card">
       <div class="card-h"><h3>الفئات</h3><span class="hint" id="catCount"></span></div>
       <p class="hint">دي الفئات اللي بتختار منها وانت بتسجل مصروف. اسحب أيقونة ⋮⋮ عشان تغيّر ترتيبها، أو دوس مطولًا على أي فئة وانت بتضيف مصروف وحرّكها.</p>
       <div id="catList"></div>
-      <div class="cat-actions" id="catActions">
-        <button class="btn" id="catMore"></button>
+      <div class="cat-actions solo" id="catActions">
         <button class="btn add-cat" id="addCat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>إضافة فئة جديدة</button>
       </div>
     </div>
-
+    </div>
+    <div class="set-page" data-page="pays" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>طرق الدفع</h1></div>
     <div class="card">
       <div class="card-h"><h3>طرق الدفع</h3><span class="hint" id="payCount"></span></div>
-      <p class="hint">دوس على أي طريقة عشان تخليها الافتراضية في المصاريف الجديدة، ودوسة مطولة عليها عشان تعدلها أو تحذفها.</p>
+      <p class="hint">دوس على أي طريقة عشان تخليها الافتراضية في المصاريف الجديدة، ومن ⋮ تعدلها أو تحذفها.</p>
       <div id="payList" class="pay-grid"></div>
       <button class="btn add-cat" id="addPay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>إضافة طريقة دفع</button>
     </div>
-
-
-    <div class="card" id="spaceCard">
-      <div class="card-h"><h3>مساحة مشتركة</h3><span class="hint" id="spStatus"></span></div>
-      <div id="spOff">
-        <p class="hint">أنشئ مساحة أو انضم بكود. تقدر تختار أنواع البيانات اللي توافق على مشاركتها.</p>
-        <div class="sp-row" style="margin-top:12px"><button class="btn primary" id="spCreate">إنشاء مساحة</button><button class="btn" id="spJoin">انضمام بكود</button></div>
-      </div>
-      <div id="spWait" hidden>
-        <p class="hint" id="spWaitText"></p>
-        <button class="btn" id="spManageWait" style="width:100%;margin-top:8px">اختيارات المشاركة</button>
-        <button class="linkbtn wl-link" id="spCancelRequest">إلغاء الطلب</button>
-      </div>
-      <div id="spOn" hidden>
-        <p class="hint">كود المساحة. ابعته للشخص التاني عشان يرسل طلب انضمام، وموافقتك مطلوبة.</p>
-        <div class="sp-code" id="spCode"></div>
-        <div class="sp-row"><button class="btn" id="spCopy">نسخ الكود</button><div class="sp-auto"><span>مشاركة المصاريف الجديدة تلقائيًا</span><label class="switch"><input type="checkbox" id="spAuto" aria-label="مشاركة المصاريف تلقائيًا"><i></i></label></div></div>
-        <button class="btn" id="spManageBtn" style="width:100%;margin-top:8px">إدارة المساحة</button>
-        <button class="btn" id="spUpload" style="width:100%;margin-top:8px" hidden>مشاركة مصاريفي يدويًا</button>
-        <p class="hint" id="spInfo" style="margin-top:10px"></p>
-        <div id="spReqWrap" hidden style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">
-          <strong>طلبات الانضمام</strong>
-          <div id="spReqList" class="sp-req-list"></div>
-        </div>
-        <div id="spMembersWrap" hidden style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">
-          <strong>الأعضاء</strong>
-          <div id="spMemList"></div>
-        </div>
-        <button class="linkbtn wl-link" id="spLeave">الخروج من المساحة</button>
-      </div>
     </div>
-    <div id="spManage" class="sub-anim">
-    <div class="topbar">
-      <h1 id="spManageTitle">إدارة المساحة</h1>
-      <button class="back" id="spManageBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
-    </div>
-    <div class="card" id="spPrefsCard" hidden>
-      <h3 id="spPrefsTitle">البيانات اللي هشاركها</h3>
-      <p class="hint" id="spPrefsIntro"></p>
-      <div id="spTypeList" class="sp-type-list"></div>
-      <p class="sp-share-note" id="spPrefsNote">تفعيل نوع بيانات يرفع السجلات الموجودة والجديدة. عند إيقافه تظل النسخ التي سبق رفعها ظاهرة، وتتوقف مزامنة التغييرات الجديدة.</p>
-      <button class="btn primary sp-save-prefs" id="spSavePrefs" hidden>حفظ اختيارات المشاركة</button>
-    </div>
-    <div class="card" id="spDataCard" hidden>
-      <h3>البيانات المشتركة</h3>
-      <p class="hint">ملخص المصروفات والتقارير المشتركة. السلف والجمعيات والأهداف والدخل والمصاريف الثابتة بتظهر في شاشاتها العادية، وأي عضو مفعّل نوعها يقدر يعدّلها.</p>
-      <div id="spSharedData" class="sp-shared-data"></div>
-    </div>
-    </div>
-
+    <div class="set-page" data-page="alerts" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>التنبيهات والتذكيرات</h1></div>
     <div class="card">
       <h3>التنبيهات</h3>
       <p class="hint" id="alertsHint"></p>
@@ -1128,7 +1246,9 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
         <button class="linkbtn" id="exactBtn">اسمح بالتذكير في الميعاد بالظبط</button>
       </div>
     </div>
-
+    </div>
+    <div class="set-page" data-page="capture" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>التسجيل من إشعارات البنك</h1></div>
     <div class="card" id="capCard" hidden>
       <h3>تسجيل تلقائي من الإشعارات</h3>
       <div class="set-row" style="border-top:0">
@@ -1143,21 +1263,9 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
         <div id="capBlocked"></div>
       </div>
     </div>
-
-    <div class="card">
-      <h3>النسخ الاحتياطي</h3>
-      <p class="hint" id="backupHint"></p>
-      <div class="export-grid">
-        <button class="btn" id="backupBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 15l3-3 3 3"/></svg>نسخ احتياطي</button>
-        <button class="btn" id="restoreBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 17l3 3 3-3"/></svg>استعادة</button>
-      </div>
-      <div class="set-row" id="autoBkRow" style="margin-top:12px">
-        <div class="txt">نسخ احتياطي تلقائي<small>بيحفظ نسخة على جهازك لوحده كل فترة تختارها</small></div>
-        <button type="button" class="time-chip" id="autoBkChip" aria-label="تغيير مدة النسخ الاحتياطي التلقائي">كل 7 أيام</button>
-      </div>
-      <p class="hint" id="autoBkNote">النسخ التلقائي بيتحفظ على جهازك نفسه في مجلد <b dir="ltr">Download/Maleem</b> (بنحتفظ بآخر 7 نسخ بس)، وبيتعمل لما تفتح التطبيق وتكون المدة عدّت. ولو عايز نسخة على الإيميل أو Google Drive: دوس على «نسخ احتياطي» فوق، واختار Drive أو Gmail من القايمة.</p>
     </div>
-
+    <div class="set-page" data-page="widget" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الويدجت والإعدادات السريعة</h1></div>
     <div class="card" id="wgCard" hidden>
       <h3>الويدجت والإعدادات السريعة</h3>
       <p class="hint">ضيف ويدجت مليم لشاشتك الرئيسية، وبلاطة «مصروف بالصوت» في الإعدادات السريعة.</p>
@@ -1172,47 +1280,80 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
       </div>
       <p class="hint">لو الأزرار ما اشتغلتش على جهازك: اضغط مطولًا على فراغ في الشاشة الرئيسية ← الويدجت ← مليم. وللبلاطة: اسحب الإعدادات السريعة ← أيقونة القلم ← مليم.</p>
     </div>
-
+    </div>
+    <div class="set-page" data-page="space" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>المساحة المشتركة</h1></div>
+    <div class="card" id="spaceCard">
+      <div class="card-h"><h3>مساحة مشتركة</h3><span class="hint" id="spStatus"></span></div>
+      <div id="spOff">
+        <p class="hint">أنشئ مساحة أو انضم بكود. تقدر تختار أنواع البيانات اللي توافق على مشاركتها.</p>
+        <div class="sp-row" style="margin-top:12px"><button class="btn primary" id="spCreate">إنشاء مساحة</button><button class="btn" id="spJoin">انضمام بكود</button></div>
+      </div>
+      <div id="spWait" hidden>
+        <p class="hint" id="spWaitText"></p>
+        <button class="btn" id="spManageWait" style="width:100%;margin-top:8px">اختيارات المشاركة</button>
+        <button class="linkbtn wl-link" id="spCancelRequest">إلغاء الطلب</button>
+      </div>
+      <div id="spOn" hidden>
+        <p class="hint">كود المساحة. ابعته للشخص التاني عشان يرسل طلب انضمام، وموافقتك مطلوبة.</p>
+        <div class="sp-code" id="spCode"></div>
+        <div class="sp-row"><button class="btn" id="spCopy">نسخ الكود</button><div class="sp-auto"><span>مشاركة المصاريف الجديدة تلقائيًا</span><label class="switch"><input type="checkbox" id="spAuto" aria-label="مشاركة المصاريف تلقائيًا"><i></i></label></div></div>
+        <button class="btn" id="spManageBtn" style="width:100%;margin-top:8px">إدارة المساحة</button>
+        <button class="btn" id="spUpload" style="width:100%;margin-top:8px" hidden>مشاركة مصاريفي يدويًا</button>
+        <p class="hint" id="spInfo" style="margin-top:10px"></p>
+        <div id="spReqWrap" hidden style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">
+          <strong>طلبات الانضمام</strong>
+          <div id="spReqList" class="sp-req-list"></div>
+        </div>
+        <div id="spMembersWrap" hidden style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">
+          <strong>الأعضاء</strong>
+          <div id="spMemList"></div>
+        </div>
+        <button class="linkbtn wl-link" id="spLeave">الخروج من المساحة</button>
+      </div>
+    </div>
+    </div>
+    <div class="set-page" data-page="backup" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>النسخ الاحتياطي</h1></div>
     <div class="card">
-      <h3>الحماية</h3>
-      <div class="set-row">
-        <div class="txt">قفل بكلمة سر<small>رقم سري من 4 أرقام أو كلمة سر عند فتح التطبيق</small></div>
-        <label class="switch"><input type="checkbox" id="pinToggle" aria-label="قفل بكلمة سر"><i></i></label>
+      <h3>النسخ الاحتياطي</h3>
+      <p class="hint" id="backupHint"></p>
+      <div class="export-grid">
+        <button class="btn" id="backupBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 15l3-3 3 3"/></svg>نسخ احتياطي</button>
+        <button class="btn" id="restoreBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 17l3 3 3-3"/></svg>استعادة</button>
       </div>
-      <div class="set-row" id="lockChangeRow" hidden>
-        <div class="txt">تغيير كلمة السر<small>أو التحويل من رقم سري لكلمة سر والعكس</small></div>
-        <button class="btn" id="lockChange" type="button">تغيير</button>
+      <div class="set-row" id="autoBkRow" style="margin-top:12px">
+        <div class="txt">نسخ احتياطي تلقائي<small>بيحفظ نسخة على جهازك لوحده كل فترة تختارها</small></div>
+        <button type="button" class="time-chip" id="autoBkChip" aria-label="تغيير مدة النسخ الاحتياطي التلقائي">كل 7 أيام</button>
       </div>
-      <div class="set-row">
-        <div class="txt">قفل بالبصمة<small id="bioHint">بيشتغل في نسخة أندرويد</small></div>
-        <label class="switch"><input type="checkbox" id="bioToggle" aria-label="قفل بالبصمة" disabled><i></i></label>
-      </div>
+      <p class="hint" id="autoBkNote">النسخ التلقائي بيتحفظ على جهازك نفسه في مجلد <b dir="ltr">Download/Maleem</b> (بنحتفظ بآخر 7 نسخ بس)، وبيتعمل لما تفتح التطبيق وتكون المدة عدّت. ولو عايز نسخة على الإيميل أو Google Drive: دوس على «نسخ احتياطي» فوق، واختار Drive أو Gmail من القايمة.</p>
     </div>
-
-    <div class="card" id="mbCard">
-      <h3>الأعضاء</h3>
-      <p class="hint">كل عضو ليه مصاريفه والتزاماته وإعداداته وكلمة السر بتاعته. الويدجت والتذكيرات وتسجيل المصاريف من إشعارات البنك بتشتغل للعضو اللي فتح التطبيق آخر مرة.</p>
-      <div id="mbList"></div>
-      <div class="export-grid"><button class="btn" id="mbAdd" type="button">إضافة عضو</button><button class="btn" id="mbSwitch" type="button">تبديل العضو</button></div>
     </div>
-
+    <div class="set-page" data-page="data" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>مسح البيانات</h1></div>
     <div class="card">
       <h3>البيانات</h3>
       <p class="hint">بيمسح كل المصاريف والسلف والجمعيات. بياناتك في "أنا" والفئات والإعدادات بتفضل زي ما هي.</p>
       <button class="btn danger" id="wipeBtn" style="width:100%;margin-top:10px">مسح كل المصاريف والالتزامات</button>
     </div>
-
-    <div class="card dev2">
-      <div class="dv-top">
-        <div class="dv-av" dir="ltr" aria-hidden="true">HT</div>
-        <div class="dv-txt"><div class="dv-name" dir="ltr">Hesham Taha</div><div class="dv-role">مطور مليم</div></div>
-        <span class="dv-ver" dir="ltr">v1.0</span>
-      </div>
-      <div class="socials">
-        <a href="https://www.facebook.com/HeshamTahaOfficial" target="_blank" rel="noopener" aria-label="فيسبوك"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.23 2.68.23v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg></a>
-        <a href="https://www.youtube.com/@heshamtaha1" target="_blank" rel="noopener" aria-label="يوتيوب"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
-        <a href="https://github.com/newmatrix/" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.3 1.9 1.3 3.1 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg></a>
-      </div>
+    </div>
+    <div id="spManage" class="sub-anim">
+    <div class="topbar">
+      <h1 id="spManageTitle">إدارة المساحة</h1>
+      <button class="back" id="spManageBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+    </div>
+    <div class="card" id="spPrefsCard" hidden>
+      <h3 id="spPrefsTitle">البيانات اللي هشاركها</h3>
+      <p class="hint" id="spPrefsIntro"></p>
+      <div id="spTypeList" class="sp-type-list"></div>
+      <p class="sp-share-note" id="spPrefsNote">تفعيل نوع بيانات يرفع السجلات الموجودة والجديدة. عند إيقافه تظل النسخ التي سبق رفعها ظاهرة، وتتوقف مزامنة التغييرات الجديدة.</p>
+      <button class="btn primary sp-save-prefs" id="spSavePrefs" hidden>حفظ اختيارات المشاركة</button>
+    </div>
+    <div class="card" id="spDataCard" hidden>
+      <h3>البيانات المشتركة</h3>
+      <p class="hint">ملخص المصروفات والتقارير المشتركة. السلف والجمعيات والأهداف والدخل والمصاريف الثابتة بتظهر في شاشاتها العادية، وأي عضو مفعّل نوعها يقدر يعدّلها.</p>
+      <div id="spSharedData" class="sp-shared-data"></div>
+    </div>
     </div>
   </section>
 </div>
@@ -1794,8 +1935,17 @@ const STYLES={
   ocean:   {name:'محيط',        dark:false, ac:'ocean',      pv:{bg:'#EAF3F8',sf:'#FFFFFF',ac:'#0B5C86'}}
 };
 const styleId=()=>STYLES[S.style]?S.style:'calm';
+const LOOKS=[
+  {id:'classic',name:'كلاسيك',d:'الشكل الأصلي لمليم'},
+  {id:'flat',name:'مسطح',d:'حدود رفيعة من غير ظلال، وأيقونات أصغر'},
+  {id:'compact',name:'مضغوط',d:'مسافات أقل وخط أصغر شوية، فتشوف حاجات أكتر'},
+  {id:'comfy',name:'مريح',d:'خط وأيقونات وأزرار أكبر، مريح للعين'},
+  {id:'soft',name:'ناعم',d:'حواف دايرية، وكل مصروف ملوّن بلون فئته'}];
+const lookId=()=>LOOKS.some(x=>x.id===S.look)?S.look:'classic';
 function applyTheme(){
   const r=document.documentElement;
+  {const lk=lookId(); if(lk==='classic') r.removeAttribute('data-look'); else r.setAttribute('data-look',lk);
+    document.querySelectorAll('#lookList [data-look]').forEach(b=>{const on=b.dataset.look===lk; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)})}
   const A=ACCENTS.find(a=>a.id===S.accent)||ACCENTS[0];
   r.style.setProperty('--ac-l',A.l); r.style.setProperty('--ac2-l',A.l2); r.style.setProperty('--ac-d',A.d); r.style.setProperty('--ac2-d',A.d2);
   document.querySelectorAll('#accentRow button').forEach(b=>{const on=b.dataset.accent===A.id; b.setAttribute('aria-pressed',on); b.textContent=on?'✓':''});
@@ -2089,7 +2239,7 @@ function renderSettings(){
   $('#pctChip').disabled=!can||!S.alert80; $('#rowPct').classList.toggle('off',!can||!S.alert80);
   $('#alertsHint').textContent= can? 'هيظهرلك التنبيه مرة واحدة في الشهر لما توصل النسبة دي.' : 'التنبيهات بتشتغل لما تختار “تحديد ميزانية” وتكتب الرقم.';
   $('#pinToggle').checked=!!hasPin(); $('#lockChangeRow').hidden=!hasPin();
-  renderMembers();
+  renderMembers(); renderSetHome();
   $('#wgCard').hidden=!AB; $('#wgHide').checked=!!S.wgHide;
   {const bits=[]; if(S.lastBackup) bits.push('آخر نسخة يدوية: '+shortDate(S.lastBackup)+' '+timeStr(S.lastBackup)); if(AB&&S.lastAutoBk) bits.push('آخر نسخة تلقائية: '+shortDate(S.lastAutoBk)+' '+timeStr(S.lastAutoBk));
     $('#backupHint').textContent=(bits.length?bits.join(' · ')+'. ':'')+(AB?'النسخة اليدوية بتتحفظ كملف، اختار Google Drive من قايمة المشاركة واسترجعها من هناك في أي وقت.':bits.length?'':'احفظ نسخة من مصاريفك على السحابة واسترجعها في أي وقت.')}
@@ -2110,6 +2260,8 @@ let tab='expenses';
 const TABS=['expenses','reports','debts','me','settings'];
 function go(t){
   renderRest(); // a tab tapped in the very first moment
+  if(t==='settings'&&tab==='settings'&&(setPage||spManageOn)){if(spManageOn)spManage(false); setGo(null); return}
+  if(t!=='settings'&&setPage) setGo(null,true);
   if(t===tab && t!=='reports'){window.scrollTo({top:0,behavior:'smooth'});return}
   const dir=TABS.indexOf(t)-TABS.indexOf(tab); tab=t;
   closeMenu();
@@ -2511,6 +2663,9 @@ $('#backBtn').onclick=()=>showDetail(false);
 $('#themeSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.theme=b.dataset.theme;save();applyTheme()};
 $('#accentRow').innerHTML=ACCENTS.map(a=>`<button type="button" data-accent="${a.id}" aria-label="${a.name}" title="${a.name}" aria-pressed="false" style="background:linear-gradient(135deg,${a.l},${a.l2})"></button>`).join('');
 $('#styleGrid').innerHTML=Object.entries(STYLES).map(([id,s])=>`<button type="button" class="sty" data-style="${id}" aria-pressed="false" aria-label="ستايل ${s.name}"><span class="sty-pv" style="background:${s.pv.bg}"><i style="background:${s.pv.sf}"></i><b style="background:${s.pv.ac}"></b></span><span class="sty-n">${s.name}</span></button>`).join('');
+$('#lookList').innerHTML=LOOKS.map(x=>`<button type="button" class="look-opt" role="radio" data-look="${x.id}" aria-pressed="false" aria-checked="false"><span class="lk-pv ${x.id}" aria-hidden="true"><i></i><i></i>${x.id==='compact'?'<i></i>':''}</span><span class="lt"><b>${x.name}</b><small>${x.d}</small></span><span class="ok" aria-hidden="true">✓</span></button>`).join('');
+$('#lookList').onclick=e=>{const b=e.target.closest('[data-look]'); if(!b) return; const id=b.dataset.look; if(id===lookId()) return;
+  S.look=id; save(); applyTheme(); renderCatGrid(true); toast('اتغير شكل الواجهة: '+(LOOKS.find(x=>x.id===id)||{}).name)};
 $('#styleGrid').onclick=e=>{const b=e.target.closest('[data-style]');if(!b)return;const id=b.dataset.style; S.style=id; if(STYLES[id].ac) S.accent=STYLES[id].ac; save(); applyTheme()};
 $('#accentRow').onclick=e=>{const b=e.target.closest('[data-accent]');if(!b)return;S.accent=b.dataset.accent;save();applyTheme()};
 $('#saveBudget').onclick=()=>{
@@ -2938,11 +3093,78 @@ $('#mbGo').onclick=async()=>{
   if(p1!==p2) return err(mbKind==='pin'?'الرقمين مش زي بعض':'كلمتين السر مش زي بعض');
   b.disabled=true; b.textContent='لحظة...';
   try{
-    const id=mbNewId(), ns={onboarded:false,profile:{name,age:null},pinH:await pinMake(p1),lockKind:mbKind,theme:S.theme,accent:S.accent,style:S.style,currency:S.currency};
+    const id=mbNewId(), ns={onboarded:false,profile:{name,age:null},pinH:await pinMake(p1),lockKind:mbKind,theme:S.theme,accent:S.accent,style:S.style,look:S.look,currency:S.currency};
     if(!lsSet(mbKey(id),JSON.stringify(ns))){try{localStorage.removeItem(mbKey(id))}catch(e){} delete mem[mbKey(id)]; err('مساحة التخزين مش كفاية لعضو جديد'); return}
     MB.list.push({id,name}); mbGo(id,true);
   }catch(e){err('حصلت مشكلة، جرب تاني')}
   finally{b.disabled=false; b.textContent='إضافة'}
+};
+
+/* ===== Settings: home list + one page per section, with search ===== */
+var setPage=null, setHomeY=0; // var on purpose: go() may run before this line on a very early tap
+/* the app scrolls inside <body> (html and body are 100% high), not the window: read and set both */
+function pageY(){return Math.max(document.body.scrollTop||0,(document.scrollingElement||document.documentElement).scrollTop||0,window.scrollY||0)}
+function pageTo(y){document.body.scrollTop=y;(document.scrollingElement||document.documentElement).scrollTop=y;if(window.scrollY!==y)window.scrollTo(0,y)}
+const SET_T_NAMES={}; document.querySelectorAll('#setGroups [data-set-go]').forEach(b=>{SET_T_NAMES[b.dataset.setGo]=b.querySelector('b').textContent});
+function setGo(p,quiet){
+  if(p&&!setPage) setHomeY=pageY();
+  setPage=p||null;
+  $('#setHome').hidden=!!setPage;
+  document.querySelectorAll('#v-settings>.set-page').forEach(x=>{x.hidden=x.dataset.page!==setPage});
+  if(setPage){const el=document.querySelector(`#v-settings>.set-page[data-page="${setPage}"]`); if(!quiet){el.classList.remove('sub-anim');void el.offsetWidth;el.classList.add('sub-anim')} pageTo(0)}
+  else{renderSetHome(); if(!quiet){const h=$('#setHome');h.classList.remove('sub-anim');void h.offsetWidth;h.classList.add('sub-anim')} pageTo(quiet?0:setHomeY)}
+}
+document.querySelectorAll('#v-settings [data-set-back]').forEach(b=>b.onclick=()=>setGo(null));
+$('#setGroups').onclick=e=>{const b=e.target.closest('[data-set-go]'); if(b) setGo(b.dataset.setGo)};
+const SET_THEME={light:'فاتح',dark:'داكن',system:'تابع للنظام'};
+function setSub(k,fn){try{const t=fn(); $('#ss-'+k).textContent=t}catch(e){}}
+function renderSetHome(){
+  $('#si-capture').hidden=!(AB&&AB.captureState); $('#si-widget').hidden=!AB;
+  setSub('members',()=>{const n=MB.list.length; return (ME.name||(S.profile&&S.profile.name)||'انت')+' · '+(n===1?'عضو واحد':n===2?'عضوين':n+' أعضاء')});
+  setSub('security',()=>!hasPin()?'من غير قفل':(S.lockKind==='pass'?'كلمة سر':'رقم سري')+(S.bio&&AB?' وبصمة':''));
+  setSub('appearance',()=>(SET_THEME[S.theme]||'تابع للنظام')+(S.style&&STYLES[S.style]?' · ستايل '+STYLES[S.style].name:'')+(lookId()!=='classic'?' · شكل '+LOOKS.find(x=>x.id===lookId()).name:''));
+  setSub('cats',()=>S.cats.length+' فئة');
+  setSub('pays',()=>{const n=S.pays.length; return n===1?'طريقة واحدة':n===2?'طريقتين':n<=10?n+' طرق':n+' طريقة'});
+  setSub('alerts',()=>S.remind?'التذكير اليومي '+fmtRemAt(S.remindAt):'التذكير اليومي مقفول');
+  setSub('capture',()=>capState().on?'شغال':'مقفول');
+  setSub('widget',()=>S.wgHide?'المبالغ مخفية في الويدجت':'ويدجت للشاشة الرئيسية وبلاطة الصوت');
+  setSub('space',()=>S.space?'متصلة · الكود '+spFmt(S.space.code):(S.spaceRequest&&S.spaceRequest.status==='pending')?'طلب انضمام مستني الموافقة':'مش مفعّلة');
+  setSub('backup',()=>S.lastBackup?'آخر نسخة '+shortDate(S.lastBackup):(AB&&S.lastAutoBk)?'آخر نسخة تلقائية '+shortDate(S.lastAutoBk):'لسه معملتش نسخة');
+  setSub('data',()=>'مسح كل المصاريف والالتزامات');
+}
+/* search: every setting with the words people would type for it */
+const SET_IDX=[
+  ['members','الأعضاء','عضو مستخدم اسم'],['members','إضافة عضو','جديد','mbAdd'],['members','تبديل العضو','غير','mbSwitch'],['members','مسح عضو','حذف نسي كلمة السر','mbList'],
+  ['security','قفل بكلمة سر','رقم سري باسورد كلمة مرور pin','pinToggle'],['security','تغيير كلمة السر','رقم سري باسورد','lockChangeRow'],['security','قفل بالبصمة','بصمه fingerprint','bioToggle'],
+  ['appearance','فاتح وداكن','ثيم الوضع الليلي dark light','themeSeg'],['appearance','ستايل التطبيق','ثيمات شكل تصميم','styleGrid'],['appearance','لون التطبيق','الوان','accentRow'],['appearance','شكل الواجهة','تصميم مسطح مضغوط مريح ناعم كلاسيك خط كبير صغير','lookCard'],
+  ['cats','الفئات','فئه تصنيف ترتيب','catList'],['cats','إضافة فئة جديدة','فئه','addCat'],
+  ['pays','طرق الدفع','كاش فيزا محفظه انستاباي الافتراضيه','payList'],['pays','إضافة طريقة دفع','','addPay'],
+  ['alerts','تنبيه قرب نهاية الميزانية','80% ميزانيه','row80'],['alerts','نسبة التنبيه','ميزانيه','rowPct'],['alerts','التذكير اليومي','تذكير','remindToggle'],['alerts','وقت التذكير','ساعه','remindTimeRow'],
+  ['alerts','تذكير بالمواعيد','سلف جمعيات مصاريف ثابته','dueToggle'],['alerts','الملخص الشهري','ملخص','sumToggle'],['alerts','التذكير في الميعاد بالظبط','منبهات بطاريه','exactRow'],
+  ['capture','التسجيل من إشعارات البنك','رسايل بنك محفظه انستاباي لقط تلقائي','capToggle'],['capture','تطبيقات بتتجاهلها','','capBlockedWrap'],
+  ['widget','إضافة ويدجت','شاشه رئيسيه','wgAddS'],['widget','بلاطة مصروف بالصوت','اعدادات سريعه صوت','wgAddTile'],['widget','إخفاء المبالغ في الويدجت','','wgHide'],
+  ['space','المساحة المشتركة','مشاركه اسره كود','spaceCard'],['space','إنشاء مساحة','','spCreate'],['space','الانضمام بكود','انضمام','spJoin'],['space','الخروج من المساحة','','spLeave'],
+  ['backup','نسخ احتياطي','نسخه جوجل درايف backup','backupBtn'],['backup','استعادة نسخة احتياطية','استرجاع','restoreBtn'],['backup','نسخ احتياطي تلقائي','تلقائي','autoBkRow'],
+  ['data','مسح كل المصاريف والالتزامات','حذف تصفير','wipeBtn']
+].map(([p,t,k,el])=>({p,t,el,n:normAr(t+' '+k+' '+(SET_T_NAMES[p]||''))}));
+function setVisiblePage(p){const r=$('#si-'+p); return !(r&&r.hidden)}
+function setSearch(){
+  const q=normAr($('#setQ').value.trim()); $('#setQX').hidden=!q;
+  $('#setRes').hidden=!q; $('#setGroups').hidden=!!q; $('#setHome .dev2').hidden=!!q; if(!q) return;
+  const words=q.split(/\s+/).filter(Boolean);
+  const hits=SET_IDX.filter(x=>setVisiblePage(x.p)&&words.every(w=>x.n.includes(w))).slice(0,12);
+  $('#setResList').innerHTML=hits.length?hits.map((x,i)=>`<button type="button" class="set-item" data-set-hit="${i}"><span class="si" style="--c:${esc($('#si-'+x.p).querySelector('.si').style.getPropertyValue('--c'))}">${$('#si-'+x.p).querySelector('.si').innerHTML}</span><span class="st"><b>${esc(x.t)}</b><small>${esc(SET_T_NAMES[x.p]||'')}</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>`).join('')
+    :'<div class="set-empty">مفيش إعداد بالاسم ده</div>';
+  setHits=hits;
+}
+let setHits=[];
+$('#setQ').addEventListener('input',setSearch);
+$('#setQ').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#setQ').blur();const b=$('#setResList [data-set-hit]');if(b)b.click()}});
+$('#setQX').onclick=()=>{$('#setQ').value='';setSearch();$('#setQ').focus()};
+$('#setResList').onclick=e=>{const b=e.target.closest('[data-set-hit]'); if(!b) return; const x=setHits[+b.dataset.setHit]; if(!x) return;
+  $('#setQ').value=''; $('#setQ').blur(); setSearch(); setGo(x.p);
+  const el=x.el&&document.getElementById(x.el); if(!el) return;
+  const t=el.closest('.set-row')||el; setTimeout(()=>{t.scrollIntoView({behavior:'smooth',block:'center'}); t.classList.remove('set-flash'); void t.offsetWidth; t.classList.add('set-flash')},260);
 };
 
 /* Exports */
@@ -3107,7 +3329,7 @@ $('#expCancel').onclick=closeSheets;
 /* Cloud backup */
 let db=null, myId=null;
 async function backupDoc(){return db.collection('data/users/'+myId).doc(ME.id==='m1'?'backup':'backup-'+ME.id)}
-const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,pays:S.pays,lastPay:S.lastPay,prefs:{theme:S.theme,accent:S.accent,style:S.style,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn}});
+const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,pays:S.pays,lastPay:S.lastPay,prefs:{theme:S.theme,accent:S.accent,style:S.style,look:S.look,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn}});
 function applyBackup(p,at){
   if(S.space) spDetach();
   const old={e:S.expenses,b:S.budget,c:S.cats,m:S.budgetMode,d:S.debts,g:S.gams,pd:S.payday,pr:S.profile,si:S.since,inc:S.incomes,go:S.goals,st:S.saveTarget,cu:S.currency,fx:S.fixed,fl:S.fixedLog,py:S.pays,lp:S.lastPay,pf:{theme:S.theme,accent:S.accent,style:S.style,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays}};
@@ -3126,7 +3348,7 @@ function applyBackup(p,at){
   if(isId(p.lastPay)) S.lastPay=p.lastPay;
   syncPays();
   if(p.prefs&&typeof p.prefs==='object'){const f=p.prefs;
-    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style;
+    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look;
     ['alert80','remind','dueRemind','sumOn'].forEach(k=>{if(typeof f[k]==='boolean') S[k]=f[k]});
     if(Number.isInteger(f.remindAt)&&f.remindAt>=0&&f.remindAt<1440) S.remindAt=f.remindAt;
     if(Number.isInteger(f.autoBkDays)&&f.autoBkDays>=0&&f.autoBkDays<=30) S.autoBkDays=f.autoBkDays;
@@ -3578,23 +3800,16 @@ $('#restoreBtn').onclick=async()=>{
 const EMOJIS=['🍽️','🍔','☕','🛒','🥖','🚌','🚕','⛽','🚇','✈️','🧾','💡','💧','🔥','📱','📶','🌐','📺','🛍️','👕','💊','🏥','🎬','🎮','⚽','🏠','🛋️','🧹','📚','🎓','🎁','👶','🐱','💇','🏋️','💳','🏦','🎉','🚗','📦'];
 const COLORS=['#E07A2E','#2D7FD3','#8B5CF6','#0EA5A4','#D9466F','#C79A2B','#16A34A','#E11D48','#7C6A55','#4F46E5','#DB2777','#64748B'];
 let catEdit=null, catEmoji=EMOJIS[0], catColor=COLORS[0], justAddedCat=null;
-let catsOpen=false, catsJustOpened=false;
 function renderCatList(){
   const counts={}; S.expenses.forEach(x=>{counts[x.cat]=(counts[x.cat]||0)+1});
   $('#catCount').textContent=S.cats.length+' فئة';
-  if(justAddedCat && S.cats.findIndex(c=>c.id===justAddedCat)>=3) catsOpen=true;
-  const list= catsOpen? S.cats : S.cats.slice(0,3), extra=S.cats.length-3;
-  $('#catMore').hidden= extra<=0; $('#catActions').classList.toggle('solo',extra<=0);
-  $('#catMore').textContent= catsOpen? 'أقل' : `المزيد (${extra})`;
-  $('#catMore').setAttribute('aria-expanded',catsOpen);
-  $('#catList').innerHTML=list.map((c,i)=>`<div class="crow${c.id===justAddedCat?' new':''}${catsJustOpened&&i>=3?' reveal':''}" data-cid="${esc(c.id)}" style="--cc:${colr(c.c)};${catsJustOpened&&i>=3?`animation-delay:${(i-3)*35}ms`:''}">
+  $('#catList').innerHTML=S.cats.map(c=>`<div class="crow${c.id===justAddedCat?' new':''}" data-cid="${esc(c.id)}" style="--cc:${colr(c.c)}">
     <div class="tile">${esc(c.e)}</div>
     <div class="n">${esc(c.name)}<small>${counts[c.id]?counts[c.id]+' مصروف':'مفيش مصاريف لسه'}</small></div>
     <span class="grip" role="img" aria-label="اسحب لتغيير ترتيب ${esc(c.name)}"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.7"/><circle cx="15" cy="6" r="1.7"/><circle cx="9" cy="12" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="9" cy="18" r="1.7"/><circle cx="15" cy="18" r="1.7"/></svg></span>
     <button class="more" data-catmore="${esc(c.id)}" aria-label="خيارات ${esc(c.name)}" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button></div>`).join('');
 }
 $('#emojiGrid').innerHTML=EMOJIS.map(e=>`<button type="button" data-emoji="${esc(e)}" aria-pressed="false">${e}</button>`).join('');
-$('#catMore').onclick=()=>{catsOpen=!catsOpen; catsJustOpened=catsOpen; renderCatList(); catsJustOpened=false};
 /* Drag & drop reorder for categories: grip in Settings, long-press in the add-expense sheet */
 let sortSuppress=0;
 function sortable(box,itemSel,o){
@@ -4180,7 +4395,7 @@ const PAY_EMOJIS=['💵','💳','📲','👛','🏦','💰','🪙','📱','🧾'
 function renderPayList(){
   const counts={}; S.expenses.forEach(x=>{const k=payOf(x); counts[k]=(counts[k]||0)+1});
   {const n=S.pays.length; $('#payCount').textContent= n===1?'طريقة واحدة': n===2?'طريقتين': n<=10? n+' طرق' : n+' طريقة';}
-  $('#payList').innerHTML=S.pays.map(x=>`<div class="pay-cell${x.id===S.lastPay?' def':''}" data-defpay="${esc(x.id)}" role="button" tabindex="0" aria-label="${esc(x.name)}${x.id===S.lastPay?' (الافتراضية)':''}، ${counts[x.id]||0} مصروف. دوسة مطولة للتعديل أو الحذف"><span class="pe">${esc(x.e)}</span><span class="pn">${esc(x.name)}</span>${x.id===S.lastPay?'<span class="pd" aria-hidden="true">✓</span>':''}</div>`).join('');
+  $('#payList').innerHTML=S.pays.map(x=>`<div class="pay-cell${x.id===S.lastPay?' def':''}" data-defpay="${esc(x.id)}" role="button" tabindex="0" aria-label="${esc(x.name)}${x.id===S.lastPay?' (الافتراضية)':''}، ${counts[x.id]||0} مصروف. دوسة مطولة للتعديل أو الحذف"><span class="pe">${esc(x.e)}</span><span class="pn">${esc(x.name)}<small>${x.id===S.lastPay?'الافتراضية · ':''}${counts[x.id]?counts[x.id]+' مصروف':'مفيش مصاريف لسه'}</small></span><span class="pr" aria-hidden="true">✓</span><button class="more" type="button" data-obmore="pay:${esc(x.id)}" aria-label="خيارات ${esc(x.name)}" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button></div>`).join('');
 }
 let lpTimer=null, lpFired=false, lpX=0, lpY=0;
 const lpClear=()=>{clearTimeout(lpTimer);lpTimer=null};
@@ -4388,6 +4603,8 @@ window.__onBack=()=>{
   if($('#menu').classList.contains('open')){closeMenu();return true}
   if(document.querySelector('.sheet.open')){closeSheets();return true}
   if(spManageOn){spManage(false);return true}
+  if(tab==='settings'&&setPage){setGo(null);return true}
+  if(tab==='settings'&&$('#setQ').value){$('#setQ').value='';setSearch();return true}
   if($('#notif').classList.contains('show')){$('#notif').classList.remove('show');return true}
   if(tab==='reports'&&$('#reportsMain').hidden){showSub('main');return true}
   if(tab!=='expenses'){go('expenses');return true}
