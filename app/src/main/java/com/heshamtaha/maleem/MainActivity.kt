@@ -9,6 +9,7 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Icon
@@ -47,6 +48,10 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
+import com.google.mlkit.common.MlKitException
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
 import java.security.MessageDigest
 import org.json.JSONArray
@@ -65,7 +70,7 @@ class MainActivity : AppCompatActivity() {
     private var voiceWanted = false
     /** true only while our own page (https://appassets.androidplatform.net) is loaded: the JS bridge refuses anything else */
     @Volatile private var pageOk = false
-    // The splash stays until the page has drawn its first frame (or 3 seconds at most)
+    // Android's splash (background colour only) stays until the page is ready (3 seconds at most), then the page plays its own opening animation
     @Volatile private var splashDone = false
 
     private val pickFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -127,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         web = WebView(this)
         root.addView(web, FrameLayout.LayoutParams(-1, -1))
         setContentView(root)
-        root.postDelayed({ splashDone = true }, 3000)
+        root.postDelayed({ if (!splashDone) { splashDone = true; js("window.__splashGo && window.__splashGo()") } }, 3000)
         if (ui.contains("dark")) {
             val dark = ui.getBoolean("dark", false)
             WindowCompat.getInsetsController(window, root).apply {
@@ -183,7 +188,7 @@ class MainActivity : AppCompatActivity() {
                 super.onPageFinished(view, url)
                 pageOk = Uri.parse(url).host == APP_HOST
                 // let the page paint its first frame, then lift the splash
-                view.postDelayed({ splashDone = true }, 120)
+                view.postDelayed({ splashDone = true; js("window.__splashGo && window.__splashGo()") }, 80)
                 // Opened from the "مصروف جديد" shortcut: show the add sheet once the page is ready
                 if (quickAdd) {
                     quickAdd = false
@@ -451,6 +456,44 @@ class MainActivity : AppCompatActivity() {
 
     /** Methods the web app calls through window.AndroidBridge. Every call is refused unless our own page is loaded. */
     inner class Bridge {
+
+        /**
+         * Reads the text in a receipt photo (JPEG, base64) on the phone with ML Kit (Latin letters and digits).
+         * Answers later with window.__ocrResult(id, json): {ok, lines:[{t,x,y,w,h}], w, h} or {ok:false, err}.
+         * The photo is not sent anywhere.
+         */
+        @JavascriptInterface
+        fun ocrImage(id: String, base64: String): Boolean {
+            if (!pageOk || base64.length > 12_000_000) return false
+            val key = JSONObject.quote(id.filter { it.isLetterOrDigit() }.take(24))
+            fun reply(o: JSONObject) = js("window.__ocrResult && window.__ocrResult($key, ${JSONObject.quote(o.toString())})")
+            Thread {
+                try {
+                    val bytes = Base64.decode(base64, Base64.DEFAULT)
+                    val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    if (bmp == null) { reply(JSONObject().put("ok", false).put("err", "image")); return@Thread }
+                    val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+                    recognizer.process(InputImage.fromBitmap(bmp, 0))
+                        .addOnSuccessListener { text ->
+                            val lines = JSONArray()
+                            for (block in text.textBlocks) for (line in block.lines) {
+                                val o = JSONObject().put("t", line.text)
+                                line.boundingBox?.let { r -> o.put("x", r.left).put("y", r.top).put("w", r.width()).put("h", r.height()) }
+                                lines.put(o)
+                            }
+                            reply(JSONObject().put("ok", true).put("lines", lines).put("w", bmp.width).put("h", bmp.height))
+                        }
+                        .addOnFailureListener { e ->
+                            val model = e is MlKitException && e.errorCode == MlKitException.UNAVAILABLE
+                            reply(JSONObject().put("ok", false).put("err", if (model) "model" else "read"))
+                        }
+                        .addOnCompleteListener { try { recognizer.close() } catch (_: Exception) { } }
+                } catch (_: Throwable) {
+                    reply(JSONObject().put("ok", false).put("err", "read"))
+                }
+            }.start()
+            return true
+        }
 
         /** Returns "ok", "perm" (Android 9-: storage permission requested, try again) or "err". */
         @JavascriptInterface

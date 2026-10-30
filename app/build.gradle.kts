@@ -73,6 +73,8 @@ android {
 dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.core:core-splashscreen:1.0.1")
+    // Reading receipt photos on the phone (Latin text and digits). Unbundled: the model comes with Google Play services, so the APK barely grows
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.activity:activity-ktx:1.9.3")
     implementation("androidx.webkit:webkit:1.12.1")

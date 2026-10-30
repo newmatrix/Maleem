@@ -4,11 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>مليم</title>
-<script>/* hide the page until the app script has decided what to show (lock / welcome); 3s safety net */document.documentElement.classList.add('booting');setTimeout(function(){document.documentElement.classList.remove('booting')},3000)</script>
+<script>/* hide the page until the app script has decided what to show (lock / welcome); 3s safety net.
+   Cold start: the opening animation, once per app session (not after switching member), never with reduced motion. */(function(){var r=document.documentElement;r.classList.add('booting');setTimeout(function(){r.classList.remove('booting')},3000);try{var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;if(!rm&&!sessionStorage.getItem('maleem.splashed')){sessionStorage.setItem('maleem.splashed','1');r.classList.add('splash-on');setTimeout(function(){r.classList.remove('splash-on')},4500)}}catch(e){}})()</script>
 <link rel="icon" href="img/maleem-logo.png">
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
 html.booting body{visibility:hidden}
+/* Opening animation: the logo rises in, "مليم" writes itself under it, then the app shows (about 1s) */
+#splash{display:none}
+html.splash-on #splash{display:flex;visibility:visible;position:fixed;inset:0;z-index:300;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;gap:14px}
+#splash .sp-tile{width:96px;height:96px;border-radius:27px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#12E3D2 0%,#02A5A4 50%,#00535F 100%);box-shadow:0 14px 30px -12px rgba(0,83,95,.55);
+  opacity:0;transform:translateY(46px) scale(.88);animation:spUp .46s cubic-bezier(.2,.9,.25,1.15) forwards paused}
+#splash .sp-tile img{position:absolute;width:150%;height:150%;left:-25%;top:-25%}
+#splash .sp-word{font-family:var(--font);font-weight:700;font-size:2rem;line-height:1.2;color:var(--ink);clip-path:inset(0 0 0 100%);
+  animation:spWrite .42s .28s cubic-bezier(.45,0,.2,1) forwards paused}
+html.splash-go #splash .sp-tile,html.splash-go #splash .sp-word{animation-play-state:running}
+html.splash-out #splash{animation:spOut .22s ease forwards}
+@keyframes spUp{to{opacity:1;transform:none}}
+@keyframes spWrite{to{clip-path:inset(0 0 0 0)}}
+@keyframes spOut{to{opacity:0;transform:scale(1.04)}}
 :root{
   --bg:#EEF6F6; --surface:#FFFFFF; --surface-2:#E0EEEE; --ink:#0E2528; --muted:#53706F;
   --brand:var(--ac-l,#017D84); --brand-2:var(--ac2-l,#00535F); --brand-ink:#FFFFFF; --gold:#0FB3A6;
@@ -333,6 +348,8 @@ button{cursor:pointer}
 .mb-pick-list button{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:1.05rem;font-weight:600;text-align:start}
 .mb-av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-weight:700}
 .mb-row .btn{padding:8px 14px;font-size:.88rem}
+.rc-reading{display:block;color:var(--brand);font-size:.78rem;font-weight:600;animation:rcPulse 1.1s ease-in-out infinite alternate}
+@keyframes rcPulse{from{opacity:.45}to{opacity:1}}
 .sf-bar{display:flex;align-items:center;gap:10px;margin-top:10px}
 .sf-btn{border:1px solid var(--fl);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;font-size:.9rem;font-weight:600}
 .sf-btn.on{border-color:var(--brand);color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface))}
@@ -952,6 +969,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true"><div class="sp-tile"><img src="img/splash-mark.png" alt=""></div><div class="sp-word">مليم</div></div>
 <div class="app">
 
   <!-- المصروفات -->
@@ -1414,7 +1432,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
     <input type="file" id="rcCam" accept="image/*" capture="environment" hidden>
     <input type="file" id="rcGal" accept="image/*" hidden>
     <div class="rc-btns" id="rcEmpty"><button type="button" class="dchip" id="rcCamBtn">📷 صوّر الإيصال</button><button type="button" class="dchip" id="rcGalBtn">🖼️ صورة من المعرض</button></div>
-    <div class="rc-has" id="rcHas" hidden><button type="button" class="rc-thumb" id="rcThumb" aria-label="عرض صورة الإيصال"><img id="rcImg" alt=""></button><span>صورة الإيصال</span><button type="button" class="linkbtn rc-del" id="rcDel">شيل الصورة</button></div>
+    <div class="rc-has" id="rcHas" hidden><button type="button" class="rc-thumb" id="rcThumb" aria-label="عرض صورة الإيصال"><img id="rcImg" alt=""></button><span>صورة الإيصال<small class="rc-reading" id="rcReading" hidden>بقرا الإيصال…</small></span><button type="button" class="linkbtn rc-del" id="rcDel">شيل الصورة</button></div>
   </div>
   <p class="err-msg" id="sheetErr"></p>
   <div class="sheet-actions">
@@ -3068,6 +3086,9 @@ buildPad($('#lockPad'),k=>{
     },120);
   }
 },false);
+/* things that should wait for the opening animation (the fingerprint prompt) */
+var splashQ=[];
+function afterSplash(fn){ if(document.documentElement.classList.contains('splash-on')) splashQ.push(fn); else fn() }
 function lockPaintKind(){const T=lkS(), pass=T.lockKind==='pass', nm=LK?LK.name:ME.name;
   $('#lockDots').hidden=pass; $('#lockPad').hidden=pass; $('#lockPassBox').hidden=!pass;
   $('#lockName').textContent=MB.list.length>1&&nm?nm:'مليم'; $('#lockSwitch').hidden=MB.list.length<2;
@@ -3133,7 +3154,7 @@ window.__quickAdd=()=>{quickAddWanted=true; setTimeout(runQuickAdd,150)};
 window.__quickVoice=()=>{quickVoiceWanted=true; setTimeout(runQuickAdd,150)};
 function askBio(){const T=lkS(); if(AB&&T.bio&&lkHas(T)&&$('#lock').classList.contains('open')&&!$('#mbPick').classList.contains('open')){try{AB.authenticate()}catch(e){}}}
 $('#bioBtn').hidden=!(AB&&S.bio&&hasPin()); $('#bioBtn').onclick=askBio;
-if(hasPin()&&!mbSkipLock&&!$('#mbPick').classList.contains('open')) setTimeout(askBio,450);
+if(hasPin()&&!mbSkipLock&&!$('#mbPick').classList.contains('open')) afterSplash(()=>setTimeout(askBio,250));
 $('#bioToggle').onchange=e=>{S.bio=e.target.checked;save();$('#bioBtn').hidden=!S.bio;toast(S.bio?'اتفعل القفل بالبصمة':'اتقفل القفل بالبصمة')};
 window.__relock=()=>{if(hasPin()&&!$('#lock').classList.contains('open')){LK=null;closeSheets();$('#lock').classList.add('open');lockPaintKind();lockMsgPaint();setTimeout(askBio,300)}};
 
@@ -5351,12 +5372,96 @@ function rcCommit(id){
   if(st==='del'){rcDel(id).then(()=>renderAll()); return}
   if(st.blob) rcPut(id,st.blob).then(()=>renderAll()).catch(()=>toast('المصروف اتحفظ، بس صورة الإيصال ما اتحفظتش. جرب تضيفها تاني'));
 }
+/* ===== Reading a receipt photo (Android, on the phone with Google ML Kit: Latin letters and digits, no Arabic).
+   The photo never leaves the phone. Only empty fields are filled; nothing is saved until "حفظ". ===== */
+const OCR_TOTAL=/\b(grand\s*total|net\s*total|net\s*amount|net\s*payable|total\s*due|amount\s*due|total\s*amount|invoice\s*total|total\s*egp|to\s*pay|balance\s*due|total|net|amount|payable)\b/i;
+const OCR_BEST=/grand|net|due|payable|to\s*pay|invoice\s*total|total\s*amount|total\s*egp/i;
+const OCR_SKIP=/sub\s*-?\s*total|total\s*(items?|qty|quantity|pcs|discount|saving|tax|vat)|\b(tax|vat|discount|change|cash|tender(ed)?|saved?|savings|points?|rounding|tip|service|qty|items?)\b/i;
+const OCR_NOTNAME=/\b(tel|phone|mob|fax|tax|vat|reg|invoice|receipt|bill|date|time|cashier|order|table|welcome|thank|www|http|\.com|street|st\.|road|branch|no\.|cr\b|id\b|pos|terminal|copy|customer|address)\b|@/i;
+const OCR_MERCH=[[/carrefour|spinneys|seoudi|kazyon|metro|hyper|market|gourmet|oscar|bim|lulu|panda|fathalla|kheir\s*zaman|zahran/i,'shop'],
+  [/pharm|seif|el\s*ezaby|ezaby|19011|misr\s*pharmacies|hospital|clinic|lab\b/i,'health'],
+  [/uber|careem|indriver|didi|swvl|taxi|metro\s*ticket/i,'trans'],
+  [/vodafone|orange|etisalat|\bwe\b|telecom/i,'phone'],
+  [/mcdonald|kfc|pizza|burger|starbucks|costa|cafe|coffee|restaurant|cilantro|cook\s*door|hardee|buffalo|domino|talabat|elmenus|bakery|patisserie/i,'food'],
+  [/cinema|vox|imax|bowling|club/i,'fun'],
+  [/ikea|home\s*centre|homebox|hardware|furniture/i,'home'],
+  [/book|library|school|academy|course/i,'edu']];
+function ocrNums(t){ // money-looking numbers on a line: 1,234.50 / 245.5 / 1.234 / 85
+  const s=String(t).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)), out=[];
+  (s.match(/\d+(?:[.,]\d+)*/g)||[]).forEach(tk=>{
+    let v=tk, dec=false; const m=tk.match(/^(.*)[.,](\d{1,2})$/);
+    if(m&&(m[1]===''||/^\d{1,3}(?:[.,]\d{3})*$|^\d+$/.test(m[1]))){v=m[1].replace(/[.,]/g,'')+'.'+m[2];dec=true}
+    else if(/^\d{1,3}(?:[.,]\d{3})+$/.test(tk)) v=tk.replace(/[.,]/g,'');
+    else if(!/^\d+$/.test(tk)) return;
+    if(v.replace('.','').length>=8) return; // phone numbers, ids
+    const n=parseFloat(v); if(n>0&&n<1e7) out.push({n,dec});
+  });
+  return out;
+}
+function ocrParse(res){
+  const L=(res&&Array.isArray(res.lines)?res.lines:[]).filter(l=>l&&typeof l.t==='string').map(l=>({t:l.t.trim(),y:(+l.y||0)+(+l.h||0)/2,h:+l.h||20,x:+l.x||0})).filter(l=>l.t);
+  L.sort((a,b)=>a.y-b.y);
+  const out={amount:null,sure:false,date:null,merchant:'',cat:null};
+  // total: a "total" line, the amount on it or on the same row
+  let best=null;
+  L.forEach((l,i)=>{
+    if(!OCR_TOTAL.test(l.t)||OCR_SKIP.test(l.t)) return;
+    let nums=ocrNums(l.t.replace(OCR_TOTAL,' '));
+    if(!nums.length) L.forEach(o=>{if(o!==l&&Math.abs(o.y-l.y)<Math.max(l.h,o.h)*.7&&!OCR_TOTAL.test(o.t)) nums=nums.concat(ocrNums(o.t))});
+    if(!nums.length&&L[i+1]&&!OCR_TOTAL.test(L[i+1].t)) nums=ocrNums(L[i+1].t);
+    nums=nums.filter(n=>n.n<1e6); if(!nums.length) return;
+    const n=nums.sort((a,b)=>(b.dec-a.dec)||(b.n-a.n))[0].n, score=(OCR_BEST.test(l.t)?2:1)*1e7+l.y;
+    if(!best||score>best.score) best={n,score};
+  });
+  if(best){out.amount=best.n;out.sure=true}
+  else{ // no "total" word: the biggest money-looking number (with decimals), as a guess
+    const all=[]; L.forEach(l=>{if(!/\d{8,}|\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}|\d{1,2}:\d{2}/.test(l.t)) ocrNums(l.t).forEach(n=>{if(n.dec&&n.n<1e6) all.push(n.n)})});
+    if(all.length) out.amount=Math.max(...all);
+  }
+  // date: the first valid one, not in the future, at most 90 days old
+  const now=Date.now();
+  for(const l of L){const m=l.t.match(/\b(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\b|\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})\b/); if(!m) continue;
+    let y,mo,d; if(m[1]){y=+m[1];mo=+m[2];d=+m[3]} else {d=+m[4];mo=+m[5];y=+m[6]; if(y<100) y+=2000; if(mo>12&&d<=12){const t=d;d=mo;mo=t}}
+    const ts=new Date(y,mo-1,d,12).getTime(), dt=new Date(ts);
+    if(dt.getMonth()===mo-1&&dt.getDate()===d&&ts<=now+864e5&&ts>now-90*864e5){out.date=ts;break}}
+  // merchant: the first line near the top with real Latin words
+  for(const l of L.slice(0,6)){const w=l.t.replace(/[^A-Za-z&' -]/g,' ').replace(/\s+/g,' ').trim();
+    if(w.replace(/[^A-Za-z]/g,'').length>=3&&!OCR_NOTNAME.test(l.t)&&!OCR_TOTAL.test(l.t)&&!/\d{3,}/.test(l.t)){out.merchant=(w===w.toUpperCase()?w.toLowerCase():w).slice(0,30).replace(/\b([a-z])/g,c=>c.toUpperCase());break}}
+  if(out.merchant){out.cat=learnedCat(out.merchant); if(!out.cat){const hit=OCR_MERCH.find(([re])=>re.test(L.slice(0,8).map(l=>l.t).join(' '))); if(hit&&CAT[hit[1]]) out.cat=hit[1]}}
+  return out;
+}
+const ocrWait={};
+window.__ocrResult=(id,json)=>{const f=ocrWait[id]; if(!f) return; delete ocrWait[id]; let r=null; try{r=JSON.parse(json)}catch(e){} f(r||{ok:false})};
+function ocrRun(blob){return new Promise(async res=>{
+  const id='o'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  ocrWait[id]=res; setTimeout(()=>{if(ocrWait[id]){delete ocrWait[id];res({ok:false,err:'timeout'})}},25000);
+  try{ if(!AB.ocrImage(id,await toB64(blob))){delete ocrWait[id];res({ok:false})} }catch(e){delete ocrWait[id];res({ok:false})}
+})}
+let ocrTok=0;
+async function rcRead(blob){
+  if(!(AB&&AB.ocrImage)) return;
+  const tok=++ocrTok, wasEdit=editId, row=$('#rcRow');
+  row.classList.add('rc-busy'); $('#rcReading').hidden=false;
+  const r=await ocrRun(blob);
+  if(tok!==ocrTok) return; row.classList.remove('rc-busy'); $('#rcReading').hidden=true;
+  if(!$('#sheet').classList.contains('open')||editId!==wasEdit) return;
+  if(!r.ok){toast(r.err==='model'?'أداة قراءة الإيصالات لسه بتتنزل على الموبايل، جرب كمان شوية':'مقدرتش أقرا الإيصال، الصورة اتحفظت وكمّل بإيدك',null,null,4500);return}
+  const p=ocrParse(r), done=[];
+  if(p.amount&&!String(amtIn.value).trim()){amtIn.value=String(p.amount); amtIn.dispatchEvent(new Event('input',{bubbles:true})); done.push('المبلغ '+fmt(p.amount))}
+  if(p.merchant&&!$('#noteInput').value.trim()){$('#noteInput').value=p.merchant; done.push(p.merchant)}
+  if(p.cat&&!selCat){const b=document.querySelector(`#cats [data-cat="${CSS.escape(p.cat)}"]`); if(b){b.click(); done.push(CAT[p.cat].name)}}
+  if(p.date&&!wasEdit&&selDay===dayKey(Date.now())&&dayKey(p.date)!==selDay){selDay=dayKey(p.date); paintDate(); done.push(dkToDMY(selDay))}
+  if(!done.length){toast(p.amount?'الإيصال اتقري، والخانات كانت مليانة أصلًا':'مقدرتش ألاقي المبلغ في الصورة، اكتبه بإيدك',null,null,4000);return}
+  toast('قريت الإيصال: '+done.join(' · ')+(p.amount&&!p.sure?'. مش متأكد من المبلغ، راجعه':'. راجع وادوس حفظ'),null,null,5500);
+}
 async function rcPicked(e){
   const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
   const row=$('#rcRow'); row.classList.add('rc-busy');
-  try{const b=await rcShrink(f); rcStage={blob:b}; rcPaint()}
+  let b=null;
+  try{b=await rcShrink(f); rcStage={blob:b}; rcPaint()}
   catch(err){toast('الملف ده مش صورة')}
   finally{row.classList.remove('rc-busy')}
+  if(b) rcRead(b);
 }
 $('#rcCam').onchange=rcPicked; $('#rcGal').onchange=rcPicked;
 $('#rcCamBtn').onclick=()=>$('#rcCam').click();
@@ -5636,6 +5741,13 @@ setInterval(()=>{if(!document.hidden&&dayKey(Date.now())!==window.__dk){window._
   if(!db||!myId){$('#backupBtn').disabled=true;$('#restoreBtn').disabled=true;$('#backupHint').textContent='النسخ الاحتياطي محتاج تكون مسجل دخول.'}
 })();
 document.documentElement.classList.remove('booting');
+(function(){const r=document.documentElement; if(!r.classList.contains('splash-on')) return;
+  let started=false;
+  window.__splashGo=()=>{if(started) return; started=true; r.classList.add('splash-go');
+    setTimeout(()=>r.classList.add('splash-out'),760);
+    setTimeout(()=>{r.classList.remove('splash-on','splash-go','splash-out'); splashQ.splice(0).forEach(f=>{try{f()}catch(e){console.error(e)}})},1000)};
+  setTimeout(window.__splashGo, AB?1800:60); // Android calls __splashGo itself as soon as its own splash is gone
+})();
 requestAnimationFrame(()=>setTimeout(renderRest,0));
 })();
 </script>

@@ -7,7 +7,7 @@
         <item name="android:windowBackground">@color/app_bg</item>
     </style>
 
-    <!-- Splash: the round Maleem icon on the app background, kept on screen until the page has drawn -->
+    <!-- Android's splash: just the app background (no icon) until the page is ready; the animated logo is drawn by the page -->
     <style name="Theme.Maleem.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/app_bg</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
