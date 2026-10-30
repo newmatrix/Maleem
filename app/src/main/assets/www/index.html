@@ -564,6 +564,24 @@ html,body{overflow-x:hidden}
 button,.socials a,.month-card{transition:transform .15s cubic-bezier(.3,.7,.4,1.4),background-color .2s,box-shadow .2s,border-color .2s,color .2s}
 @keyframes press{0%{transform:scale(1)}30%{transform:scale(.9)}65%{transform:scale(1.04)}100%{transform:scale(1)}}
 .pressed{animation:press .3s cubic-bezier(.3,.7,.4,1.3)}
+/* Settings ▸ المظهر ▸ الحركة: button press (data-press) and screen change (data-trans). Defaults = no attribute. */
+@keyframes pressSoft{0%{transform:scale(1)}40%{transform:scale(.96)}100%{transform:scale(1)}}
+@keyframes pressGlow{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--brand) 55%,transparent)}100%{box-shadow:0 0 0 12px color-mix(in srgb,var(--brand) 0%,transparent)}}
+@keyframes pressRip{from{transform:scale(0);opacity:.28}to{transform:scale(1);opacity:0}}
+[data-press="soft"] .pressed,[data-press="soft"] .nav button.pressed .pill{animation:pressSoft .22s ease}
+[data-press="glow"] .pressed,[data-press="glow"] .nav button.pressed .pill{animation:pressGlow .45s ease-out}
+[data-press="soft"] .nav button.pressed,[data-press="glow"] .nav button.pressed{animation:none}
+.rp-host{position:relative}
+.rp-clip{overflow:hidden}
+.rip{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;animation:pressRip .45s ease-out forwards;z-index:0}
+@keyframes viewSlide{from{opacity:.15;transform:translate3d(calc(var(--dx,-24px) * 1.7),0,0)}to{opacity:1;transform:none}}
+@keyframes viewZoom{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+@keyframes viewFade{from{opacity:0}to{opacity:1}}
+[data-trans="slide"] .view.active,[data-trans="slide"] .sub-anim{animation:viewSlide .26s cubic-bezier(.2,.8,.2,1) both}
+[data-trans="zoom"] .view.active,[data-trans="zoom"] .sub-anim{animation:viewZoom .24s cubic-bezier(.2,.8,.2,1) both}
+[data-trans="fade"] .view.active,[data-trans="fade"] .sub-anim{animation:viewFade .2s ease both}
+[data-trans="none"] .view.active,[data-trans="none"] .sub-anim{animation:none}
+@media (prefers-reduced-motion: reduce){.view.active,.sub-anim,.pressed,.nav button.pressed .pill{animation:none!important}.rip{display:none}}
 .nav button.pressed{animation:none}
 .nav button.pressed .pill{animation:press .3s cubic-bezier(.3,.7,.4,1.3)}
 .nav button:focus{outline:none}
@@ -1226,6 +1244,19 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
       <h3 class="look-h">شكل الواجهة</h3>
       <p class="hint">بيغيّر شكل الكروت والمسافات وحجم الخط، وبيشتغل مع أي ثيم ولون فوق.</p>
       <div class="look-list" id="lookList" role="radiogroup" aria-label="شكل الواجهة"></div>
+    </div>
+
+    <div class="card" id="motionCard">
+      <h3 class="look-h">الحركة</h3>
+      <p class="hint">إحساس الأزرار لما تدوس عليها، وطريقة ظهور الشاشات لما تنقل بينها.</p>
+      <span class="mb-lab" id="pressLab">نبضة الأزرار</span>
+      <div class="look-list" id="pressList" role="radiogroup" aria-labelledby="pressLab"></div>
+      <span class="mb-lab" id="transLab">حركة التنقل</span>
+      <div class="look-list" id="transList" role="radiogroup" aria-labelledby="transLab"></div>
+      <div class="set-row" id="hapticRow" hidden style="margin-top:10px">
+        <div class="txt">اهتزاز خفيف<small>هزة صغيرة جدًا مع كل دوسة</small></div>
+        <label class="switch"><input type="checkbox" id="hapticToggle" aria-label="اهتزاز خفيف"><i></i></label>
+      </div>
     </div>
     </div>
     <div class="set-page" data-page="cats" hidden>
@@ -1987,8 +2018,28 @@ const LOOKS=[
   {id:'comfy',name:'مريح',d:'خط وأيقونات وأزرار أكبر، مريح للعين'},
   {id:'soft',name:'ناعم',d:'حواف دايرية، وكل مصروف ملوّن بلون فئته'}];
 const lookId=()=>LOOKS.some(x=>x.id===S.look)?S.look:'classic';
+const PRESSES=[
+  {id:'bounce',name:'نابضة',d:'الزرار ينضغط ويرتد سنة'},
+  {id:'soft',name:'هادية',d:'ضغطة خفيفة من غير ارتداد'},
+  {id:'ripple',name:'موجة',d:'دايرة بتتمد من مكان صباعك'},
+  {id:'glow',name:'توهج',d:'حلقة بلون التطبيق حوالين الزرار'},
+  {id:'none',name:'من غير',d:'مفيش أي حركة'}];
+const TRANSES=[
+  {id:'rise',name:'ناعمة',d:'الشاشة تظهر وتطلع سنة لفوق'},
+  {id:'slide',name:'انزلاق',d:'الشاشة تدخل من ناحية التاب اللي رايحله'},
+  {id:'zoom',name:'تكبير',d:'الشاشة تكبر من جوه وهي بتظهر'},
+  {id:'fade',name:'تلاشي',d:'تظهر بهدوء في مكانها'},
+  {id:'none',name:'فورية',d:'من غير حركة خالص'}];
+const pressId=()=>PRESSES.some(x=>x.id===S.press)?S.press:'bounce';
+const transId=()=>TRANSES.some(x=>x.id===S.trans)?S.trans:'rise';
 function applyTheme(){
   const r=document.documentElement;
+  {const pr=pressId(), tr=transId();
+    if(pr==='bounce') r.removeAttribute('data-press'); else r.setAttribute('data-press',pr);
+    if(tr==='rise') r.removeAttribute('data-trans'); else r.setAttribute('data-trans',tr);
+    document.querySelectorAll('#pressList [data-press]').forEach(b=>{const on=b.dataset.press===pr; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)});
+    document.querySelectorAll('#transList [data-trans]').forEach(b=>{const on=b.dataset.trans===tr; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)});
+    const ht=$('#hapticToggle'); if(ht) ht.checked=!!S.haptic; const hr=$('#hapticRow'); if(hr) hr.hidden=!(AB&&AB.haptic)}
   {const lk=lookId(); if(lk==='classic') r.removeAttribute('data-look'); else r.setAttribute('data-look',lk);
     document.querySelectorAll('#lookList [data-look]').forEach(b=>{const on=b.dataset.look===lk; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)})}
   const A=ACCENTS.find(a=>a.id===S.accent)||ACCENTS[0];
@@ -2765,6 +2816,16 @@ $('#styleGrid').innerHTML=Object.entries(STYLES).map(([id,s])=>`<button type="bu
 $('#lookList').innerHTML=LOOKS.map(x=>`<button type="button" class="look-opt" role="radio" data-look="${x.id}" aria-pressed="false" aria-checked="false"><span class="lk-pv ${x.id}" aria-hidden="true"><i></i><i></i>${x.id==='compact'?'<i></i>':''}</span><span class="lt"><b>${x.name}</b><small>${x.d}</small></span><span class="ok" aria-hidden="true">✓</span></button>`).join('');
 $('#lookList').onclick=e=>{const b=e.target.closest('[data-look]'); if(!b) return; const id=b.dataset.look; if(id===lookId()) return;
   S.look=id; save(); applyTheme(); renderCatGrid(true); toast('اتغير شكل الواجهة: '+(LOOKS.find(x=>x.id===id)||{}).name)};
+const motionOpt=(x,attr)=>`<button type="button" class="look-opt" role="radio" data-${attr}="${x.id}" aria-pressed="false" aria-checked="false"><span class="lt"><b>${x.name}</b><small>${x.d}</small></span><span class="ok" aria-hidden="true">✓</span></button>`;
+$('#pressList').innerHTML=PRESSES.map(x=>motionOpt(x,'press')).join('');
+$('#transList').innerHTML=TRANSES.map(x=>motionOpt(x,'trans')).join('');
+$('#pressList').onclick=e=>{const b=e.target.closest('[data-press]'); if(!b||b.dataset.press===pressId()) return;
+  S.press=b.dataset.press; save(); applyTheme(); toast('نبضة الأزرار: '+PRESSES.find(x=>x.id===S.press).name+'. جرّب تدوس على أي زرار')};
+$('#transList').onclick=e=>{const b=e.target.closest('[data-trans]'); if(!b||b.dataset.trans===transId()) return;
+  S.trans=b.dataset.trans; save(); applyTheme();
+  const pg=document.querySelector('#v-settings>.set-page[data-page="appearance"]'); if(pg&&!pg.hidden){pg.style.setProperty('--dx','-24px');pg.classList.remove('sub-anim');void pg.offsetWidth;pg.classList.add('sub-anim')} // a quick taste of it
+  toast('حركة التنقل: '+TRANSES.find(x=>x.id===S.trans).name)};
+$('#hapticToggle').onchange=e=>{S.haptic=e.target.checked; save(); if(S.haptic){try{AB.haptic()}catch(err){}} toast(S.haptic?'اتفعل الاهتزاز الخفيف':'اتقفل الاهتزاز الخفيف')};
 $('#styleGrid').onclick=e=>{const b=e.target.closest('[data-style]');if(!b)return;const id=b.dataset.style; S.style=id; if(STYLES[id].ac) S.accent=STYLES[id].ac; save(); applyTheme()};
 $('#accentRow').onclick=e=>{const b=e.target.closest('[data-accent]');if(!b)return;S.accent=b.dataset.accent;save();applyTheme()};
 $('#saveBudget').onclick=()=>{
@@ -3209,7 +3270,7 @@ $('#mbGo').onclick=async()=>{
   if(p1!==p2) return err(mbKind==='pin'?'الرقمين مش زي بعض':'كلمتين السر مش زي بعض');
   b.disabled=true; b.textContent='لحظة...';
   try{
-    const id=mbNewId(), ns={onboarded:false,profile:{name,age:null},pinH:await pinMake(p1),lockKind:mbKind,theme:S.theme,accent:S.accent,style:S.style,look:S.look,currency:S.currency};
+    const id=mbNewId(), ns={onboarded:false,profile:{name,age:null},pinH:await pinMake(p1),lockKind:mbKind,theme:S.theme,accent:S.accent,style:S.style,look:S.look,press:S.press,trans:S.trans,haptic:S.haptic,currency:S.currency};
     if(!lsSet(mbKey(id),JSON.stringify(ns))){try{localStorage.removeItem(mbKey(id))}catch(e){} delete mem[mbKey(id)]; err('مساحة التخزين مش كفاية لعضو جديد'); return}
     MB.list.push({id,name}); mbGo(id,true);
   }catch(e){err('حصلت مشكلة، جرب تاني')}
@@ -3253,7 +3314,7 @@ function renderSetHome(){
 const SET_IDX=[
   ['members','الأعضاء','عضو مستخدم اسم'],['members','إضافة عضو','جديد','mbAdd'],['members','تبديل العضو','غير','mbSwitch'],['members','مسح عضو','حذف نسي كلمة السر','mbList'],
   ['security','قفل بكلمة سر','رقم سري باسورد كلمة مرور pin','pinToggle'],['security','تغيير كلمة السر','رقم سري باسورد','lockChangeRow'],['security','قفل بالبصمة','بصمه fingerprint','bioToggle'],
-  ['appearance','فاتح وداكن','ثيم الوضع الليلي dark light','themeSeg'],['appearance','ستايل التطبيق','ثيمات شكل تصميم','styleGrid'],['appearance','لون التطبيق','الوان','accentRow'],['appearance','شكل الواجهة','تصميم مسطح مضغوط مريح ناعم كلاسيك خط كبير صغير','lookCard'],
+  ['appearance','فاتح وداكن','ثيم الوضع الليلي dark light','themeSeg'],['appearance','ستايل التطبيق','ثيمات شكل تصميم','styleGrid'],['appearance','لون التطبيق','الوان','accentRow'],['appearance','شكل الواجهة','تصميم مسطح مضغوط مريح ناعم كلاسيك خط كبير صغير','lookCard'],['appearance','نبضة الأزرار','حركه ضغطه زرار موجه توهج نابضه هاديه','pressList'],['appearance','حركة التنقل','انتقال انزلاق تكبير تلاشي انيميشن حركه الشاشات','transList'],['appearance','اهتزاز خفيف','هزاز اهتزاز vibration','hapticRow'],
   ['cats','الفئات','فئه تصنيف ترتيب','catList'],['cats','إضافة فئة جديدة','فئه','addCat'],['cats','حد شهري للفئة','ميزانيه فئه حد اقصي','catList'],
   ['pays','طرق الدفع','كاش فيزا محفظه انستاباي الافتراضيه','payList'],['pays','إضافة طريقة دفع','','addPay'],
   ['alerts','تنبيه قرب نهاية الميزانية','80% ميزانيه','row80'],['alerts','نسبة التنبيه','ميزانيه','rowPct'],['alerts','التذكير اليومي','تذكير','remindToggle'],['alerts','وقت التذكير','ساعه','remindTimeRow'],
@@ -3446,7 +3507,7 @@ $('#expCancel').onclick=closeSheets;
 /* Cloud backup */
 let db=null, myId=null;
 async function backupDoc(){return db.collection('data/users/'+myId).doc(ME.id==='m1'?'backup':'backup-'+ME.id)}
-const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,pays:S.pays,lastPay:S.lastPay,prefs:{theme:S.theme,accent:S.accent,style:S.style,look:S.look,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn}});
+const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,pays:S.pays,lastPay:S.lastPay,prefs:{theme:S.theme,accent:S.accent,style:S.style,look:S.look,press:S.press,trans:S.trans,haptic:S.haptic,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn}});
 function applyBackup(p,at){
   if(S.space) spDetach();
   const old={e:S.expenses,b:S.budget,c:S.cats,m:S.budgetMode,d:S.debts,g:S.gams,pd:S.payday,pr:S.profile,si:S.since,inc:S.incomes,go:S.goals,st:S.saveTarget,cu:S.currency,fx:S.fixed,fl:S.fixedLog,py:S.pays,lp:S.lastPay,pf:{theme:S.theme,accent:S.accent,style:S.style,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays}};
@@ -3465,7 +3526,7 @@ function applyBackup(p,at){
   if(isId(p.lastPay)) S.lastPay=p.lastPay;
   syncPays();
   if(p.prefs&&typeof p.prefs==='object'){const f=p.prefs;
-    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look;
+    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look; if(PRESSES.some(x=>x.id===f.press)) S.press=f.press; if(TRANSES.some(x=>x.id===f.trans)) S.trans=f.trans; if(typeof f.haptic==='boolean') S.haptic=f.haptic;
     ['alert80','remind','dueRemind','sumOn'].forEach(k=>{if(typeof f[k]==='boolean') S[k]=f[k]});
     if(Number.isInteger(f.remindAt)&&f.remindAt>=0&&f.remindAt<1440) S.remindAt=f.remindAt;
     if(Number.isInteger(f.autoBkDays)&&f.autoBkDays>=0&&f.autoBkDays<=30) S.autoBkDays=f.autoBkDays;
@@ -4737,9 +4798,17 @@ window.__onBack=()=>{
 /* Press pulse */
 document.addEventListener('pointerdown',e=>{
   const b=e.target.closest('button,.socials a'); if(!b||b.disabled) return;
+  const pr=pressId(); if(pr==='none'||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  if(pr==='ripple'){ // a circle growing from the finger, clipped to the button
+    const host=b.closest('.nav')?(b.querySelector('.pill')||b):b, r=host.getBoundingClientRect(), d=Math.max(r.width,r.height)*2.2, sp=document.createElement('span');
+    if(getComputedStyle(host).position==='static') host.classList.add('rp-host'); host.classList.add('rp-clip');
+    sp.className='rip'; sp.style.width=sp.style.height=d+'px'; sp.style.left=(e.clientX-r.left-d/2)+'px'; sp.style.top=(e.clientY-r.top-d/2)+'px';
+    host.appendChild(sp); setTimeout(()=>{sp.remove(); if(!host.querySelector('.rip')) host.classList.remove('rp-clip','rp-host')},480); return}
   b.classList.remove('pressed'); void b.offsetWidth; b.classList.add('pressed');
 });
-document.addEventListener('animationend',e=>{if(e.animationName==='press'){const b=e.target.closest('.pressed'); if(b) b.classList.remove('pressed')}});
+/* light vibration on a real tap (click, not the touch that starts a scroll) */
+document.addEventListener('click',e=>{if(!(S.haptic&&AB&&AB.haptic)) return; const b=e.target.closest('button,.socials a'); if(b&&!b.disabled){try{AB.haptic()}catch(err){}}},true);
+document.addEventListener('animationend',e=>{if(/^press/.test(e.animationName)){const b=e.target.closest('.pressed'); if(b) b.classList.remove('pressed')}});
 
 /* Welcome / first run */
 (function(){const sel=$('#wlPayday');for(let i=1;i<=31;i++)sel.insertAdjacentHTML('beforeend',`<option value="${i}">يوم ${i}</option>`)})();
