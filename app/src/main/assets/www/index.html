@@ -979,6 +979,16 @@ details.closed-list[open] summary::before{transform:rotate(-90deg)}
 .dev2 .socials{justify-content:flex-start;gap:8px;margin-top:14px}
 .dev2 .socials a{width:38px;height:38px;border-radius:50%;background:var(--surface-2);color:var(--muted)}
 .dev2 .socials a svg{width:18px;height:18px}
+/* support the developer: InstaPay link + Vodafone Cash number (copied) */
+.support{padding:16px;margin-top:12px}
+.support .sup-h{display:flex;align-items:center;gap:8px;font-weight:700}
+.support .sup-h svg{width:20px;height:20px;color:var(--bad)}
+.support .hint{margin:6px 0 12px}
+.sup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sup-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;text-decoration:none;text-align:center;min-width:0}
+.sup-btn svg{width:22px;height:22px;color:var(--brand)}
+.sup-btn b{font-weight:600;font-size:.95rem}
+.sup-btn small{font-size:.7rem;color:var(--muted);max-width:100%;overflow-wrap:anywhere;line-height:1.35}
 /* note suggestions */
 .note-sug{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:8px;padding-bottom:2px}
 .note-sug::-webkit-scrollbar{display:none}
@@ -1224,6 +1234,14 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
         <a href="https://www.facebook.com/HeshamTahaOfficial" target="_blank" rel="noopener" aria-label="فيسبوك"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.23 2.68.23v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg></a>
         <a href="https://www.youtube.com/@heshamtaha1" target="_blank" rel="noopener" aria-label="يوتيوب"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
         <a href="https://github.com/newmatrix/" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.3 1.9 1.3 3.1 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg></a>
+      </div>
+    </div>
+    <div class="card support" id="supportCard">
+      <div class="sup-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6a5 5 0 1 1 7.5 6.6z"/></svg>ادعم مليم</div>
+      <p class="hint">مليم مجاني ومن غير إعلانات. لو عجبك وحابب تساعد إنه يكمّل، أي مبلغ يفرق معانا.</p>
+      <div class="sup-grid">
+        <a class="sup-btn" id="supIpa" href="https://ipn.eg/S/heshamtaha02/instapay/6qo1sd" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg><b>InstaPay</b><small dir="ltr">heshamtaha02@instapay</small></a>
+        <button type="button" class="sup-btn" id="supVfc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6"/><path d="M20 12v4h-4a2 2 0 0 1 0-4h4"/></svg><b>فودافون كاش</b><small dir="ltr">01001649278</small></button>
       </div>
     </div>
     </div>
@@ -3398,7 +3416,7 @@ const SET_IDX=[
 function setVisiblePage(p){const r=$('#si-'+p); return !(r&&r.hidden)}
 function setSearch(){
   const q=normAr($('#setQ').value.trim()); $('#setQX').hidden=!q;
-  $('#setRes').hidden=!q; $('#setGroups').hidden=!!q; $('#setHome .dev2').hidden=!!q; if(!q) return;
+  $('#setRes').hidden=!q; $('#setGroups').hidden=!!q; $('#setHome .dev2').hidden=!!q; $('#supportCard').hidden=!!q; if(!q) return;
   const words=q.split(/\s+/).filter(Boolean);
   const hits=SET_IDX.filter(x=>setVisiblePage(x.p)&&words.every(w=>x.n.includes(w))).slice(0,12);
   $('#setResList').innerHTML=hits.length?hits.map((x,i)=>`<button type="button" class="set-item" data-set-hit="${i}"><span class="si" style="--c:${esc($('#si-'+x.p).querySelector('.si').style.getPropertyValue('--c'))}">${$('#si-'+x.p).querySelector('.si').innerHTML}</span><span class="st"><b>${esc(x.t)}</b><small>${esc(SET_T_NAMES[x.p]||'')}</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>`).join('')
@@ -5669,6 +5687,9 @@ $('#spCancelRequest').onclick=async()=>{
     S.spaceShareDraft=spNormPrefs(req.sharePrefs,true);spStopJoinWatch();S.spaceRequest=null;save();renderSpace();
   }catch(e){toast(e&&e.code==='permission-denied'?'تعذر إلغاء الطلب. تأكد من نشر قواعد Firestore الجديدة':spErrMsg(e))}
 };
+async function copyText(c){try{await navigator.clipboard.writeText(c);return true}catch(e){const t=document.createElement('textarea');t.value=c;t.setAttribute('readonly','');t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}t.remove();return ok}}
+$('#supVfc').onclick=async()=>{const ok=await copyText('01001649278');
+  toast(ok?'اتنسخ الرقم 01001649278. افتح تطبيق محفظتك واختار «تحويل لمحفظة» والصق الرقم':'رقم فودافون كاش: 01001649278',null,null,6000)};
 $('#spCopy').onclick=async()=>{if(!S.space)return;const c=spFmt(S.space.code);try{await navigator.clipboard.writeText(c)}catch(e){const t=document.createElement('textarea');t.value=c;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(_){}t.remove()}toast('اتنسخ الكود: '+c)};
 window.addEventListener('online',()=>{if(S.space&&!spUnsub)spListen();else if(S.space&&spUnsub&&spReady){spPush();spPushTypes()}});
 
