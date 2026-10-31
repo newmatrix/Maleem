@@ -6,9 +6,9 @@
 
 **البيانات اللي بتدخلها** (المصاريف، الميزانية، الفئات، السلف، الجمعيات، الإعدادات) **بتتخزن على موبايلك بس**. التطبيق مش بيبعت أي بيانات لأي سيرفر **إلا لو فعّلت "المساحة المشتركة" أو "النسخ الاحتياطي على Google Drive" بنفسك، أو استخدمت "التسجيل بالصوت"** (تفاصيلهم تحت)، ومش بيجمع أي معلومات عنك، ومفيهوش إعلانات ولا أدوات تتبع أو تحليلات.
 
-**النسخ الاحتياطي:** لما تختار "نسخ احتياطي"، التطبيق بيعمل ملف وانت اللي بتختار تحفظه فين (زي Google Drive). الملف ده بيتعامل معاه حسب سياسة الخدمة اللي اخترتها.
+**النسخ الاحتياطي (نسخة الويب):** لما تختار "نسخ احتياطي"، النسخة بتتحفظ في حسابك على الخدمة اللي فاتح منها التطبيق، وبيتعامل معاها حسب سياسة الخدمة دي.
 
-**النسخ الاحتياطي التلقائي (أندرويد):** التطبيق بيحفظ ملف نسخة احتياطية على جهازك نفسه في مجلد Download/Maleem كل عدد أيام تختاره (أو تقفله)، ومن غير ما يتبعت لأي سيرفر. الملف بيحتوي بياناتك المالية، فخلي بالك منه ومتشاركوش مع حد مش عايزه يشوفها.
+**النسخ الاحتياطي (أندرويد):** التطبيق بيعمل ملف نسخة احتياطية (فيه بياناتك وصور الإيصالات، ما عدا الصور الكبيرة جدًا) كل عدد أيام تختاره (أو تقفله)، أو لما تدوس «نسخة دلوقتي». لو ربطت Google Drive، الملف بيترفع عليه (والاختيار ليك: Drive بس، أو Drive والموبايل). ولو مربطتش، الملف بيتحفظ على جهازك نفسه في مجلد Download/Maleem ومن غير ما يتبعت لأي سيرفر. الملف بيحتوي بياناتك المالية، فخلي بالك منه ومتشاركوش مع حد مش عايزه يشوفها.
 
 **النسخ الاحتياطي على Google Drive (اختياري، أندرويد):** لو ربطت حساب جوجل من صفحة النسخ الاحتياطي، التطبيق بيرفع ملف النسخة التلقائية على Google Drive بتاعك انت في فولدر اسمه «Maleem»، كل عدد الأيام اللي اخترته، ولما تفتح التطبيق. التطبيق بياخد صلاحية «الملفات اللي مليم عملها بس» (drive.file)، فمش بيقدر يشوف أو يعدّل أي ملف تاني في الـ Drive بتاعك، وبيقرا إيميل الحساب بس عشان يعرضهولك. الملف بيتبعت من موبايلك لجوجل مباشرة ومش بيعدّي على أي سيرفر لينا، وبنحتفظ بآخر 7 نسخ لكل عضو. تقدر تفك الربط من نفس الصفحة في أي وقت، والنسخ اللي اترفعت بتفضل في الـ Drive بتاعك لحد ما تمسحها، وتقدر تشيل صلاحية مليم من حساب جوجل (الأمان ← التطبيقات المتصلة).
 
@@ -30,7 +30,7 @@
 
 **التسجيل التلقائي من الإشعارات (اختياري، مقفول افتراضيًا):** لو فعّلته من الإعدادات وسمحت بإذن «الوصول للإشعارات»، التطبيق بيقرا نص الإشعارات اللي بتوصل على الموبايل عشان يلاقي رسايل الخصم والدفع من البنوك والمحافظ. الإشعارات اللي مش عمليات دفع بتتجاهل فورًا ومش بتتخزن، وبيتجاهل تطبيقات الشات وأكواد التحقق (OTP) والفلوس الداخلة. عمليات الدفع اللي بيلاقيها (المبلغ، اسم المحل، اسم التطبيق اللي بعت الإشعار، ونص الإشعار لحد 300 حرف) بتتحفظ على موبايلك بس، ومش بتتبعت لأي سيرفر، ومفيش منها حاجة بتبقى مصروف غير لما توافق عليها. تقدر تقفل الميزة في أي وقت من الإعدادات، وساعتها التطبيق بيبطّل يستقبل الإشعارات خالص.
 
-**صور الإيصالات (اختيارية):** لو صوّرت إيصال أو اخترت صورة من المعرض، التطبيق بيصغّرها ويحفظها على موبايلك بس. الصور مش بتتشارك في المساحة المشتركة. النسخة الاحتياطية اليدوية بتشمل الصور، فخلي بالك من الملف ده.
+**صور الإيصالات (اختيارية):** لو صوّرت إيصال أو اخترت صورة من المعرض، التطبيق بيصغّرها ويحفظها على موبايلك بس. الصور مش بتتشارك في المساحة المشتركة. النسخة الاحتياطية بتشمل الصور، فخلي بالك من الملف ده.
 
 **قراءة الإيصالات:** على أندرويد، لما تصوّر إيصال، التطبيق بيقرا الكلام والأرقام اللي فيه عشان يملا المبلغ والتاريخ واسم المحل. القراءة بتحصل على موبايلك بالكامل بأداة Google ML Kit اللي بتيجي مع خدمات Google Play، والصورة مش بتتبعت لأي سيرفر، لا لينا ولا لجوجل.
 
@@ -52,9 +52,9 @@ Last updated: October 2026
 
 All data you enter (expenses, budget, categories, loans, savings circles, settings) is **stored only on your device**. The app does not send any data to any server **unless you turn on the optional Shared Space or Google Drive backup, or use Voice Entry** (see below), does not collect any information about you, and contains no ads, trackers or analytics.
 
-**Backup:** When you choose "Backup", the app creates a file and you choose where to save it (for example Google Drive). That file is handled under the policy of the service you choose.
+**Backup (web version):** When you choose "Backup", the copy is saved in your account on the service you opened the app from, under that service's policy.
 
-**Automatic backup (Android):** The app saves a backup file on your device itself, in the Download/Maleem folder, every number of days you choose (or you can turn it off). It is not sent to any server. The file contains your financial data, so keep it private.
+**Backup (Android):** The app makes a backup file (your data and receipt photos, except very large photos) every number of days you choose (or you can turn it off), or when you tap "Back up now". If you linked Google Drive, the file is uploaded there (you choose: Drive only, or Drive and the phone). If you did not, the file is saved on your device itself, in the Download/Maleem folder, and is not sent to any server. The file contains your financial data, so keep it private.
 
 **Google Drive backup (optional, Android):** If you link a Google account on the Backup page, the app uploads its automatic backup file to *your own* Google Drive, in a folder named "Maleem", every number of days you choose, when you open the app. The app asks only for access to "files created by Maleem" (drive.file), so it cannot see or change any other file in your Drive; it reads the account's e-mail only to show it to you. The file goes from your phone straight to Google and never passes through any server of ours; the newest 7 backups of each member are kept. You can unlink at any time on the same page; files already uploaded stay in your Drive until you delete them, and you can remove Maleem's access from your Google Account (Security → Third-party connections).
 
@@ -74,7 +74,7 @@ All data you enter (expenses, budget, categories, loans, savings circles, settin
 
 **Automatic capture from notifications (optional, off by default):** If you turn it on in Settings and grant Android's "Notification access", the app reads the text of incoming notifications to find payment and debit messages from banks and wallets. Notifications that are not payments are ignored immediately and never stored; chat apps, verification codes (OTP) and incoming money are ignored. The payments it finds (amount, merchant name, the name of the app that posted the notification, and up to 300 characters of the notification text) are kept only on your device, are never sent to any server, and none of them becomes an expense until you confirm it. You can turn the feature off at any time in Settings, after which the app stops receiving notifications entirely.
 
-**Receipt photos (optional):** If you take a photo of a receipt or pick one from your gallery, the app shrinks it and keeps it on your device only. Photos are never shared to the Shared Space. Manual backups include the photos, so keep that file private.
+**Receipt photos (optional):** If you take a photo of a receipt or pick one from your gallery, the app shrinks it and keeps it on your device only. Photos are never shared to the Shared Space. Backups include the photos, so keep that file private.
 
 **Monthly summary:** Calculated on your device from your expenses; its notification is scheduled on the device only.
 
