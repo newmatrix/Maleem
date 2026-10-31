@@ -330,6 +330,22 @@ button{cursor:pointer}
 .sheet-actions{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-top:8px}
 .sheet-actions>.btn:only-child{grid-column:1/-1;justify-self:center;width:min(100%,280px)}
 .sheet-del{margin-top:10px;width:100%}
+/* Restore sheet: it can open over the welcome screen (z-index 60), so it and its scrim sit one step higher */
+.scrim.hi{z-index:61}
+#rsSheet{z-index:62}
+.rs-btn{width:100%;margin-top:10px}
+.rs-busy{display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 0 10px}
+.rs-spin{width:30px;height:30px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--brand);animation:rsSpin .8s linear infinite}
+@keyframes rsSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.rs-spin{animation-duration:2.4s}}
+.rs-list{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px}
+.rs-row{display:flex;align-items:center;gap:12px;width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:15px;padding:12px 14px;text-align:start;color:var(--ink)}
+.rs-row .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--brand) 14%,var(--surface));font-size:1.15rem;flex:none}
+.rs-row .t{flex:1;min-width:0;font-weight:600}
+.rs-row small{display:block;color:var(--muted);font-weight:400;font-size:.82rem;margin-top:2px}
+.rs-ask{text-align:center;line-height:1.7;margin:4px 0 6px}
+#rsErr{color:var(--bad)}
+#rsGo[hidden]+#rsCancel{grid-column:1/-1;justify-self:center;width:min(100%,280px)}
 
 /* Lock */
 .welcome{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;display:flex;flex-direction:column;padding:calc(28px + env(safe-area-inset-top,0px)) 22px calc(24px + env(safe-area-inset-bottom,0px))}
@@ -1761,6 +1777,25 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <div class="sheet-actions"><button class="btn primary" id="autoBkSave">حفظ</button><button class="btn" id="autoBkCancel">إلغاء</button></div>
 </div>
 
+<!-- Restore sheet (Android): from Google Drive (finds the newest backup by itself) or from a file -->
+<div class="sheet" id="rsSheet" role="dialog" aria-modal="true" aria-labelledby="rsTitle">
+  <div class="grab"></div>
+  <h2 id="rsTitle">استعادة نسخة احتياطية</h2>
+  <div id="rsHome">
+    <p class="hint center">اختار حساب جوجل اللي نسخك كانت بتترفع عليه، ومليم هيدوّر في فولدر <b dir="ltr">Maleem</b> ويرجّع أحدث نسخة.</p>
+    <button class="btn primary rs-btn" id="rsDrive" type="button">من Google Drive</button>
+    <button class="btn rs-btn" id="rsFile" type="button">من ملف على الموبايل</button>
+  </div>
+  <div id="rsBusy" class="rs-busy" hidden><span class="rs-spin" aria-hidden="true"></span><p class="hint center" id="rsBusyTxt" role="status"></p></div>
+  <div id="rsPick" hidden>
+    <p class="hint center" id="rsPickTxt"></p>
+    <div class="rs-list" id="rsList"></div>
+  </div>
+  <div id="rsAsk" hidden><p class="rs-ask" id="rsAskTxt"></p></div>
+  <p class="hint center" id="rsErr" role="alert" hidden></p>
+  <div class="sheet-actions"><button class="btn primary" id="rsGo" type="button" hidden>استعادة</button><button class="btn" id="rsCancel" type="button">إلغاء</button></div>
+</div>
+
 <!-- Category sheet -->
 <div class="sheet" id="catSheet" role="dialog" aria-modal="true" aria-labelledby="catTitle">
   <div class="grab"></div>
@@ -2663,10 +2698,11 @@ function openSheet(id,pre){
 }
 function closeSheets(){
   if(voiceOn) voiceCancel();
+  $('#scrim').classList.remove('hi'); if(RS){RS.seq++; RS.busy=false; RS.hold=null}
   wpCloseAll();
   rcStage=null; capOpen=null;
   closePayMenu(); closeDateMenu();
-  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet'].forEach(i=>$('#'+i).classList.remove('open'));
+  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet','rsSheet'].forEach(i=>$('#'+i).classList.remove('open'));
   $('#noteInput').blur();$('#catName').blur();amtIn.blur();
   if(pinMode){pinMode=null;$('#pinToggle').checked=!!hasPin()}
 }
@@ -3409,7 +3445,7 @@ const SET_IDX=[
   ['capture','التسجيل من إشعارات البنك','رسايل بنك محفظه انستاباي لقط تلقائي','capToggle'],['capture','تطبيقات بتتجاهلها','','capBlockedWrap'],
   ['widget','إضافة ويدجت','شاشه رئيسيه','wgAddS'],['widget','بلاطة مصروف بالصوت','اعدادات سريعه صوت','wgAddTile'],['widget','إخفاء المبالغ في الويدجت','','wgHide'],
   ['space','المساحة المشتركة','مشاركه اسره كود','spaceCard'],['space','إنشاء مساحة','','spCreate'],['space','الانضمام بكود','انضمام','spJoin'],['space','الخروج من المساحة','','spLeave'],
-  ['backup','اعمل نسخة احتياطية دلوقتي','نسخه جوجل درايف backup','backupBtn'],['backup','استعادة نسخة احتياطية','استرجاع','restoreBtn'],['backup','نسخ احتياطي تلقائي','تلقائي مده كل قد ايه','autoBkRow'],['backup','Google Drive','جوجل درايف ربط حساب رفع سحابه ايميل','bkAuto'],
+  ['backup','اعمل نسخة احتياطية دلوقتي','نسخه جوجل درايف backup','backupBtn'],['backup','استعادة نسخة احتياطية','استرجاع رجوع النسخه من جوجل درايف','restoreBtn'],['backup','نسخ احتياطي تلقائي','تلقائي مده كل قد ايه','autoBkRow'],['backup','Google Drive','جوجل درايف ربط حساب رفع سحابه ايميل','bkAuto'],
   ['update','دوّر على تحديث','تحديث نسخه جديده اصدار ابديت update التحديثات',''],
   ['data','مسح كل المصاريف والالتزامات','حذف تصفير','']
 ].map(([p,t,k,el])=>({p,t,el,n:normAr(t+' '+k+' '+(SET_T_NAMES[p]||''))}));
@@ -3627,13 +3663,17 @@ function applyBackup(p,at){
   save();syncCats();renderAll();
   toast('اترجعت '+S.expenses.length+' مصروف من نسخة '+shortDate(at),'تراجع',()=>{S.expenses=old.e;S.budget=old.b;S.cats=old.c;S.budgetMode=old.m;S.debts=old.d;S.gams=old.g;S.payday=old.pd;S.profile=old.pr;S.since=old.si;S.incomes=old.inc;S.goals=old.go;S.saveTarget=old.st;S.currency=old.cu;S.fixed=old.fx;S.fixedLog=old.fl;S.pays=old.py;S.lastPay=old.lp;Object.assign(S,old.pf);syncPays();save();syncCats();renderAll()},4000);
 }
+/* a backup file's text -> {o, p} (file object and its data), or null when it isn't a Maleem backup */
+function bkParse(txt){try{const o=JSON.parse(txt), p=o&&(o.data||o); return p&&Array.isArray(p.expenses)?{o,p}:null}catch(e){return null}}
+function bkRestore(b,at){
+  applyBackup(b.p,at);
+  if(b.o.receipts) rcImport(b.o.receipts).then(n=>{if(n){renderAll();setTimeout(()=>toast(`ورجعت ${n} صورة إيصال`),3200)}});
+}
 $('#restoreFile').onchange=async e=>{
   const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
-  try{ const o=JSON.parse(await f.text()), p=o.data||o;
-    if(!Array.isArray(p.expenses)) throw new Error('bad');
-    applyBackup(p,o.at||f.lastModified||Date.now());
-    if(o.receipts) rcImport(o.receipts).then(n=>{if(n){renderAll();setTimeout(()=>toast(`ورجعت ${n} صورة إيصال`),3200)}});
-  }catch(err){toast('الملف ده مش نسخة احتياطية من مليم')}
+  let b=null; try{b=bkParse(await f.text())}catch(err){}
+  if(!b){toast('الملف ده مش نسخة احتياطية من مليم');return}
+  bkRestore(b,b.o.at||f.lastModified||Date.now());
 };
 /* ===== Import expenses from a PDF / Excel / CSV / text file =====
    Everything runs on the phone: the file is read here, nothing is uploaded.
@@ -4045,7 +4085,7 @@ $('#backupBtn').onclick=async()=>{
   }catch(e){toast(e&&e.code==='quota_exceeded'?'النسخة كبيرة على المساحة المتاحة':'معرفناش نعمل نسخة احتياطية')}
 };
 $('#restoreBtn').onclick=async()=>{
-  if(AB){$('#restoreFile').click();return}
+  if(AB){openRestore();return}
   if(!db||!myId){toast('الاستعادة محتاجة تكون مسجل دخول');return}
   try{const snap=await (await backupDoc()).get();
     if(!snap.exists){toast('مفيش نسخة احتياطية محفوظة');return}
@@ -4806,6 +4846,89 @@ armBtn($('#driveUnlink'),'فك الربط','دوس تاني للتأكيد',()=>
   S.drive=null; S.autoBkTo='both'; S.driveFails=0; S.driveErr=null; S.lastDriveBk=0; save(); renderSettings();
   toast('اتفك الربط، والنسخ هتتحفظ على الموبايل لحد ما تربط تاني. النسخ اللي على Drive زي ما هي',null,null,8000)});
 
+/* ===== Restore (Android): pick a Google account -> Maleem finds its newest backup on that Drive -> restore.
+   Several members' backups on the same account -> choose whose. With data already on the phone -> one confirmation.
+   Afterwards the same account stays linked, so automatic backups carry on there. ===== */
+var RS={seq:0,busy:false,email:'',hold:null}; // var on purpose: closeSheets() may run before this line
+const RS_ERR={gms:'الموبايل ده مفيهوش خدمات Google Play، فاستعمل «من ملف على الموبايل»',config:DRIVE_ERR.config,api:DRIVE_ERR.api,
+  auth:'جوجل ماسمحش لمليم يوصل للـ Drive بتاع الحساب ده. جرّب تاني',net:'مفيش اتصال بالنت. اتأكد من النت وجرّب تاني',
+  gone:'النسخة دي اتمسحت من Drive. جرّب تاني',big:'النسخة دي كبيرة أوي ومعرفناش نفتحها',bad:'الملف ده مش نسخة سليمة من مليم',
+  http:'حصلت مشكلة في Google Drive. جرّب تاني بعد شوية',other:'حصلت مشكلة في Google Drive. جرّب تاني بعد شوية'};
+const rsOpen=()=>$('#rsSheet').classList.contains('open');
+function rsView(v,err){
+  const id='rs'+v.charAt(0).toUpperCase()+v.slice(1); // 'home' -> #rsHome
+  ['rsHome','rsBusy','rsPick','rsAsk'].forEach(i=>{$('#'+i).hidden=i!==id});
+  const e=$('#rsErr'); e.hidden=!err; e.textContent=err||'';
+  $('#rsGo').hidden=v!=='ask';
+  $('#rsDrive').textContent=RS.email&&err?'جرّب حساب تاني':'من Google Drive';
+}
+function rsBusy(t){$('#rsBusyTxt').textContent=t; rsView('busy')}
+function openRestore(){
+  if(!AB) return;
+  if(!AB.driveList){$('#restoreFile').click();return}
+  closeSheets(); RS.email='';
+  rsView('home'); $('#scrim').classList.add('hi'); openSheetEl('rsSheet');
+}
+/* Maleem-<name>-auto-<yyyy-mm-dd>.json, newest first -> one entry per member name with its newest file */
+function rsGroups(files){
+  const by=new Map();
+  (Array.isArray(files)?files:[]).forEach(f=>{
+    if(!f||typeof f.id!=='string'||typeof f.name!=='string') return;
+    const m=/^Maleem(?:-(.+?))?-auto-\d{4}-\d{2}-\d{2}\.json$/.exec(f.name); if(!m) return;
+    const who=(m[1]||'').slice(0,24), at=+f.at||0, g=by.get(who);
+    if(!g) by.set(who,{who,f:{id:f.id,at},n:1}); else{g.n++; if(at>g.f.at) g.f={id:f.id,at}}
+  });
+  const me=String(ME.name||(S.profile&&S.profile.name)||'');
+  return [...by.values()].sort((a,b)=>(b.who===me)-(a.who===me)||b.f.at-a.f.at);
+}
+$('#rsDrive').onclick=()=>{
+  if(RS.busy||!AB||!AB.driveList) return;
+  RS.busy=true; const seq=++RS.seq; rsBusy('اختار حساب جوجل...');
+  driveCall(id=>AB.driveList(id),r=>{
+    if(seq!==RS.seq||!rsOpen()) return; RS.busy=false;
+    if(!r.ok){rsView('home',r.err==='cancel'?'':(RS_ERR[r.err]||RS_ERR.other)); return}
+    RS.email=String(r.email||'').slice(0,120);
+    const gs=rsGroups(r.files);
+    if(!gs.length){rsView('home',`مفيش نسخ احتياطية من مليم على ${RS.email||'الحساب ده'}`); return}
+    if(gs.length===1){rsFetch(gs[0].f); return}
+    $('#rsPickTxt').textContent=`لقينا نسخ لأكتر من شخص على ${RS.email}. نرجّع نسخة مين؟`;
+    $('#rsList').innerHTML=gs.map((g,i)=>`<button type="button" class="rs-row" data-rs="${i}"><span class="ic" aria-hidden="true">👤</span><span class="t">${esc(g.who||'من غير اسم')}<small>آخر نسخة ${esc(bkWhen(g.f.at))}</small></span></button>`).join('');
+    $('#rsList').onclick=e=>{const b=e.target.closest('[data-rs]'); if(b&&!RS.busy) rsFetch(gs[+b.dataset.rs].f)};
+    rsView('pick');
+  });
+};
+function rsFetch(f){
+  RS.busy=true; const seq=++RS.seq; rsBusy('بننزّل نسخة '+bkWhen(f.at)+'...');
+  driveCall(id=>AB.driveFetch(id,RS.email,f.id),r=>{
+    let txt=''; try{txt=r.ok?String(AB.driveTake()||''):''}catch(e){}
+    if(seq!==RS.seq||!rsOpen()) return; RS.busy=false;
+    if(!r.ok){rsView('home',RS_ERR[r.err]||RS_ERR.other); return}
+    const b=bkParse(txt); if(!b){rsView('home',RS_ERR.bad); return}
+    const at=+b.o.at>0&&+b.o.at<MAXTS?+b.o.at:(f.at||Date.now());
+    RS.hold={b,at,email:RS.email};
+    if(!bkHasData()){rsApply(); return}
+    const n=b.p.expenses.length;
+    $('#rsAskTxt').textContent=`لقينا نسخة من ${bkWhen(at)} فيها ${n} مصروف. هتحل محل بياناتك الحالية (${S.expenses.length} مصروف) على الموبايل ده.`;
+    rsView('ask');
+  });
+}
+function rsApply(){
+  const h=RS.hold; if(!h) return;
+  closeSheets(); bkRestore(h.b,h.at);
+  // keep backing up to the account the backup came from
+  if(h.email&&AB.driveUpload){
+    const same=S.drive&&S.drive.email.toLowerCase()===h.email.toLowerCase();
+    if(!same){ if(S.drive) try{AB.driveForget(S.drive.email)}catch(e){}
+      S.drive={email:h.email}; S.driveFails=0; S.driveErr=null; S.lastDriveBk=h.at }
+    else S.lastDriveBk=Math.max(+S.lastDriveBk||0,h.at);
+    if(S.autoBkTo==='device') S.autoBkTo='both';
+    save(); renderSettings();
+  }
+}
+$('#rsGo').onclick=rsApply;
+$('#rsFile').onclick=()=>{closeSheets(); $('#restoreFile').click()};
+$('#rsCancel').onclick=closeSheets;
+
 function autoBkPaint(v){
   v=Math.min(30,Math.max(0,Math.round(+v)||0)); $('#autoBkRange').value=v; $('#autoBkBig').textContent=autoBkLabel(v);
   document.querySelectorAll('#autoBkPresets button').forEach(b=>b.classList.toggle('on',+b.dataset.d===v)); return v;
@@ -4831,6 +4954,7 @@ const updForced=()=>{const st=UPD.st, L=updLatest(); return !!(L&&st&&+((st.info
 function updLabel(){const st=UPD.st; if(!st) return 'دوس عشان تدوّر على تحديث'; if(!st.enabled) return 'نسخة تجربة، مش بتدوّر على تحديثات';
   if(UPD.manual) return 'بدوّر على تحديث...';
   if(UPD.phase==='down') return 'بيحمّل التحديث... '+UPD.pct+'%';
+  if(UPD.phase==='ready') return 'التحديث جاهز، دوس عشان تثبّته';
   const L=updLatest(); return L?'فيه نسخة جديدة '+(L.name||'')+'، دوس عشان تحدّث':'عندك آخر نسخة'+(st.curName?' ('+st.curName+')':'')+'، دوس عشان تدوّر'}
 const UPD_ERR={net:'التحميل وقف. اتأكد من النت ودوس تاني، وهيكمّل من مكان ما وقف',http:'ملف التحديث مش موجود على GitHub دلوقتي، جرب كمان شوية',
   sha:'الملف اللي نزل مش مطابق للنسخة المنشورة، دوس تاني',sig:'الملف ده مش متوقّع بمفتاح مليم، فمش هنثبّته',pkg:'الملف اللي نزل مش تطبيق مليم',apk:'الملف اللي نزل بايظ، دوس تاني',
@@ -4840,7 +4964,7 @@ function paintUpd(){
   const L=updLatest(), down=UPD.phase==='down';
   const goTxt=down?'بيحمّل... '+UPD.pct+'%':UPD.phase==='ready'?'تثبيت':'تحديث'+(L&&L.name?' لـ '+L.name:'');
   // sheet
-  if($('#updSheet').dataset.mode==='update'&&L){updPaintBar($('#updBar')); $('#updMsg').textContent=UPD.msg; $('#updGo').textContent=goTxt; $('#updGo').disabled=down}
+  if($('#updSheet').dataset.mode==='update'&&L){updPaintBar($('#updBar')); $('#updMsg').textContent=UPD.msg; $('#updGo').textContent=goTxt; $('#updGo').disabled=down; $('#updLater').textContent=down?'إخفاء':'بعدين'}
   // forced screen
   const lk=$('#updLock'); lk.hidden=!updForced();
   if(!lk.hidden&&L){$('#updLockNotes').textContent=L.notes; updPaintBar($('#updLockBar')); $('#updLockMsg').textContent=UPD.msg; $('#updLockGo').textContent=down?'بيحمّل... '+UPD.pct+'%':UPD.phase==='ready'?'تثبيت':'تحديث دلوقتي'; $('#updLockGo').disabled=down}
@@ -4861,7 +4985,11 @@ function updInstall(){
 }
 window.__updProgress=p=>{UPD.pct=Math.max(0,Math.min(100,+p||0)); paintUpd()};
 window.__updDone=err=>{
-  if(!err){UPD.phase='ready'; UPD.pct=100; UPD.msg='التحديث جاهز'; paintUpd(); updInstall(); return}
+  if(!err){UPD.phase='ready'; UPD.pct=100; UPD.msg='التحديث جاهز'; paintUpd();
+    // the sheet (or the "update required" screen) is open: install now. Hidden with «إخفاء»: don't pop up the installer
+    if($('#updSheet').classList.contains('open')||!$('#updLock').hidden) updInstall();
+    else if(!$('#lock').classList.contains('open')) toast('التحديث جاهز','تثبيت',()=>updInstall(),10000);
+    return}
   if(err==='busy') return;
   if(err==='retry'&&!UPD.retried){UPD.retried=true; UPD.phase='idle'; updStart(); return}
   UPD.phase='idle'; UPD.msg=UPD_ERR[err]||'حصلت مشكلة في التحميل، دوس تاني'; paintUpd();
@@ -4890,7 +5018,7 @@ function updOffer(tries){
   if(busy){ if((tries||0)<150) updShowT=setTimeout(()=>updOffer((tries||0)+1),2000); return }
   const L=updLatest(), loc=updLocal(), info=(UPD.st&&UPD.st.info)||{}, m=info.message||{};
   const sh=$('#updSheet');
-  if(L&&+loc.skip!==L.code&&UPD.offered!==L.code){updSheetOpen(L); return}
+  if(L&&UPD.offered!==L.code){updSheetOpen(L); return}
   const mid=String(m.id||'').slice(0,60), mtx=String(m.text||'').slice(0,1500).trim();
   if(mid&&mtx&&loc.seen!==mid){
     sh.dataset.mode='msg'; $('#updIco').textContent='📣'; $('#updTitle').textContent='رسالة من مليم'; $('#updSub').textContent='';
@@ -4911,12 +5039,15 @@ window.__updInfo=json=>{ // (json|null, errorCode): only whether it came matters
   if(json&&!updForced()) afterSplash(()=>updOffer(0));
 };
 $('#updGo').onclick=()=>updStart();
-$('#updLater').onclick=()=>{const sh=$('#updSheet'), L=updLatest(); if(sh.dataset.mode==='update'&&L&&UPD.phase==='idle') updLocalSet('skip',L.code); closeSheets()};
+/* «بعدين» only hides the sheet: nothing is skipped. It comes back the next time the app opens, and the «التحديثات» row in
+   settings opens it any time. While downloading the button says «إخفاء» and the download carries on. */
+$('#updLater').onclick=()=>closeSheets();
 $('#updLockGo').onclick=()=>updStart();
 $('#updLockSave').onclick=()=>{try{$('#backupBtn').click()}catch(e){}};
 /* first look after the first frame (the bridge call is synchronous): the saved copy applies "update required" offline too */
 function updBoot(){
   if(!AB||!AB.updateState) return;
+  {const o=updLocal(); if('skip' in o){delete o.skip; lsSet(UPDK,JSON.stringify(o))}} // the old "skip this version" mark
   try{UPD.st=JSON.parse(AB.updateState())}catch(e){}
   if(UPD.st&&UPD.st.curName){const v=document.querySelector('.dev2 .dv-ver'); if(v) v.textContent='v'+UPD.st.curName}
   paintUpd();
@@ -5070,6 +5201,7 @@ window.__onBack=()=>{
   if($('#lock').classList.contains('open')) return false;
   if(!$('#rcView').hidden){rcViewClose();return true}
   if(voiceOn){voiceCancel();return true}
+  if($('#rsSheet').classList.contains('open')){closeSheets();return true} // may be open over the welcome screen
   if(!$('#welcome').hidden){ if(!$('#wlS2').hidden){wlGo(1);return true} return false }
   if($('#menu').classList.contains('open')){closeMenu();return true}
   if(document.querySelector('.sheet.open')){closeSheets();return true}
