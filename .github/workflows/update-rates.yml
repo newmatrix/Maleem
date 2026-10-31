@@ -1,98 +1,65 @@
-name: Build release
+name: Update rates
 
-# Publishing a GitHub Release (Releases -> Draft a new release -> tag like v1.1 -> Publish) builds the signed APK,
-# attaches it to that Release, and points update.json at it, so the app offers the update by itself.
-# "Run workflow" by hand only builds (APK + AAB as Artifacts) without publishing anything.
+# Refreshes rates.json once a day (and on demand: Actions -> Update rates -> Run workflow).
+# The app reads rates.json from this repo (raw.githubusercontent.com), so phones never call a rates service themselves.
+# Source: open.er-api.com (free, no key, ~160 currencies, updated daily), with the jsDelivr currency-api as a fallback.
+# To support one more currency in the app, add its code to CURRENCIES in index.html and to CODES below.
 on:
+  schedule:
+    - cron: "17 2 * * *"
   workflow_dispatch:
-  release:
-    types: [ published ]
 
 permissions:
-  contents: write   # attach the APK to the Release and commit update.json
+  contents: write
 
 concurrency:
-  group: release
+  group: rates
   cancel-in-progress: false
 
 jobs:
-  release:
+  rates:
     runs-on: ubuntu-latest
+    env:
+      CODES: "USD EGP SAR AED KWD QAR BHD OMR JOD ILS EUR GBP"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Restore upload key
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::error::Add the secret KEYSTORE_BASE64 first (see README)."
-            exit 1
-          fi
-          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
-
-      - name: Build signed AAB and APK
-        env:
-          KEYSTORE_FILE: ${{ runner.temp }}/upload.jks
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: upload
-          VERSION_CODE: ${{ github.run_number }}
-          VERSION_NAME: ${{ github.event.release.tag_name }}
-        run: |
-          chmod +x gradlew
-          ./gradlew bundleRelease assembleRelease --no-daemon
-
-      - name: Upload AAB (only needed for Google Play)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Maleem-release-aab
-          path: app/build/outputs/bundle/release/*.aab
-
-      - name: Upload signed APK (for your phone)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Maleem-release-apk
-          path: app/build/outputs/apk/release/*.apk
-
-      - name: Attach the APK to the Release and update update.json
-        if: github.event_name == 'release'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.release.tag_name }}
-          RUN: ${{ github.run_number }}
-          REPO: ${{ github.repository }}
+      - name: Fetch rates
         run: |
           set -euo pipefail
-          CODE=$((RUN + 100))   # the same versionCode build.gradle.kts gave this APK
-          APK=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
-          OUT="Maleem-${TAG}.apk"
-          cp "$APK" "$OUT"
-          SHA=$(sha256sum "$OUT" | cut -d' ' -f1)
-          gh release upload "$TAG" "$OUT" --clobber --repo "$REPO"
-          URL="https://github.com/${REPO}/releases/download/${TAG}/${OUT}"
-          # what you wrote in the Release description is shown in the app as "what's new"
-          NOTES=$(gh release view "$TAG" --repo "$REPO" --json body -q .body)
+          WANT=$(printf '%s\n' $CODES | jq -R . | jq -s .)
+          NOW=$(date +%s)
+          fetch_primary() {
+            curl -fsS --max-time 30 https://open.er-api.com/v6/latest/USD > primary.json \
+            && jq -e '.result == "success"' primary.json > /dev/null \
+            && jq --argjson want "$WANT" --argjson now "$NOW" '
+              {base:"USD", updated:$now,
+               rates:(.rates | with_entries(select(.key as $k | $want | index($k)))
+                       | map_values(. * 1000000 | round / 1000000))}' primary.json > new.json
+          }  # (chained with && on purpose: set -e does not apply inside a function used before ||)
+          fetch_fallback() {
+            curl -fsS --max-time 30 https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json > fallback.json \
+            && jq --argjson want "$WANT" --argjson now "$NOW" '
+              {base:"USD", updated:$now,
+               rates:(.usd | with_entries(.key |= ascii_upcase)
+                       | with_entries(select(.key as $k | $want | index($k)))
+                       | map_values(. * 1000000 | round / 1000000))}' fallback.json > new.json
+          }
+          fetch_primary || { echo "::warning::primary source failed, using the fallback"; fetch_fallback; }
+          # every currency we ship must be there and be a positive number, otherwise keep the old file
+          jq -e --argjson want "$WANT" '. as $f | $want | all(. as $c | ($f.rates[$c] // 0) > 0)' new.json > /dev/null \
+            || { echo "::error::rates.json would miss a currency, keeping the old one"; exit 1; }
+          jq --sort-keys . new.json > rates.json
+          cat rates.json
 
+      - name: Commit
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git checkout -B main origin/main
-          [ -f update.json ] || echo '{"latest":{},"minCode":0,"message":{"id":"","text":""}}' > update.json
-          jq --argjson code "$CODE" --arg name "${TAG#v}" --arg apk "$URL" --arg sha "$SHA" --arg notes "$NOTES" \
-            '.latest = {code: $code, name: $name, apk: $apk, sha256: $sha, notes: ($notes | .[0:1500])}' update.json > update.tmp
-          mv update.tmp update.json
-          git add update.json
-          git commit -m "update.json: ${TAG} [skip ci]"
+          git add rates.json
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "rates.json: $(date -u +%F) [skip ci]"
+          git pull --rebase origin main
           git push origin main
-          echo "### Published ${TAG} (versionCode ${CODE})" >> "$GITHUB_STEP_SUMMARY"
-          echo "APK: ${URL}" >> "$GITHUB_STEP_SUMMARY"
