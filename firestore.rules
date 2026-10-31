@@ -171,7 +171,7 @@ service cloud.firestore {
             && d.keys().hasAll(['del', 'upd', 'by'])
             && d.del == true
             && d.by is string && d.by.size() <= 128)
-          || (d.keys().hasOnly(['amount', 'cat', 'note', 'pay', 'ts', 'by', 'byName', 'del', 'upd'])
+          || (d.keys().hasOnly(['amount', 'cur', 'cat', 'note', 'pay', 'ts', 'by', 'byName', 'del', 'upd'])
               && d.keys().hasAll(['amount', 'cat', 'note', 'ts', 'by', 'byName', 'del', 'upd'])
               && d.del == false
               && d.amount is number
@@ -183,7 +183,8 @@ service cloud.firestore {
               && d.ts > 0
               && d.by is string && d.by.size() <= 128
               && d.byName is string && d.byName.size() <= 40
-              && (!d.keys().hasAny(['pay']) || (d.pay is string && d.pay.size() <= 32)))
+              && (!d.keys().hasAny(['pay']) || (d.pay is string && d.pay.size() <= 32))
+              && (!d.keys().hasAny(['cur']) || (d.cur is string && d.cur.size() <= 8)))
         );
       }
 

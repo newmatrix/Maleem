@@ -255,6 +255,15 @@ openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -in KEYSTORE_BASE64.txt.enc -ou
 للبناء المحلي بدل GitHub، تقدر تفتح المشروع في **Android Studio** بعد تجهيز بيئة Android المناسبة.
 
 <a id="firebase"></a>
+### `rates.json`: أسعار العملات لتغيير العملة
+
+- لما المستخدم يغيّر العملة، التطبيق بيحوّل كل مبالغه بسعر النهارده، والمصروف المشترك بيظهر عند كل عضو بعملته هو. الأسعار بتتقرا من `rates.json` في الريبو (من `raw.githubusercontent.com`، نفس عنوان `update.json`)، فمفيش موبايل بيكلم خدمة أسعار بنفسه.
+- الملف بيتحدّث لوحده مرة كل يوم من الـ workflow **Update rates** (ويتشغّل يدويًا من Actions ← Update rates ← Run workflow). **شغّله يدويًا مرة بعد أول رفع**، لأن `rates.json` بيتحط فاضي.
+- المصدر: `open.er-api.com` (مجاني، من غير مفتاح)، ولو وقع بيجرّب `cdn.jsdelivr.net/npm/@fawazahmed0/currency-api`. لو أي عملة من العملات اللي في التطبيق ناقصة، الـ workflow بيفشل وبيسيب الملف القديم.
+- لو ضفت عملة جديدة في `CURRENCIES` جوه `index.html`، ضيف كودها كمان في `CODES` جوه `.github/workflows/update-rates.yml`.
+- التطبيق بيحتفظ بآخر نسخة من الأسعار على الموبايل. ولو مفيش أسعار ومفيش نت، تغيير العملة بيترفض بدل ما يتحوّل غلط.
+- **قواعد Firestore لازم تتنشر قبل `v1.0.2`** (Firebase Console ← Firestore ← Rules ← Publish)، لأن المصروف المشترك بقى بيتكتب معاه حقل `cur`.
+
 ## ☁️ إعداد Firebase للمطور
 
 المساحة المشتركة مبنية على **Firebase Authentication (Anonymous)** و**Cloud Firestore**. إعدادات الاتصال الخاصة بتطبيق الويب موجودة في `index.html`، ومكتبة Firebase المستخدمة موجودة داخل `www/libs/fb.js`.
