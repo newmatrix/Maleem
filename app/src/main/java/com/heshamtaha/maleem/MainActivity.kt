@@ -827,6 +827,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        /** The last rates.json we read plus when (synchronous, small). */
+        @JavascriptInterface
+        fun ratesState(): String = if (!pageOk) "{}" else Rates.cached(this@MainActivity)
+
+        /** Reads rates.json (every 3 hours at most unless [force]); answers with window.__ratesInfo(json|null, err). */
+        @JavascriptInterface
+        fun ratesRefresh(force: Boolean) {
+            if (!pageOk) return
+            Rates.refresh(this@MainActivity, force) { json, err ->
+                js("window.__ratesInfo && window.__ratesInfo(${if (json != null) JSONObject.quote(json) else "null"}, ${JSONObject.quote(err ?: "")})")
+            }
+        }
+
         /** Downloads + checks the APK: window.__updProgress(pct), then window.__updDone(err) ("" = ready). */
         @JavascriptInterface
         fun updateDownload(url: String, sha256: String, code: String) {
