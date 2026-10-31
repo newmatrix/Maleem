@@ -62,6 +62,8 @@ html.splash-out #splash{animation:spOut .22s ease forwards}
 .sp-code{font-size:1.7rem;font-weight:700;letter-spacing:.12em;text-align:center;direction:ltr;color:var(--brand);background:var(--surface-2);border-radius:14px;padding:14px 8px;margin:10px 0;user-select:all;-webkit-user-select:all}
 .sp-row{display:flex;gap:8px;margin-top:8px}
 .sp-row .btn{flex:1}
+.sp-panel{margin-top:12px}
+.sp-panel .sp-code-wrap{margin-bottom:12px}
 .sp-req-list{margin-top:8px}
 .sp-req-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
 .sp-req-item:first-child{border-top:0}
@@ -438,6 +440,14 @@ button{cursor:pointer}
 .lk-pv.comfy{padding:7px}.lk-pv.comfy i{border-radius:8px}
 .lk-pv.soft i{border-radius:99px;box-shadow:none;background:color-mix(in srgb,var(--brand) 22%,var(--surface))}
 .lk-pv.soft i+i{background:color-mix(in srgb,var(--gold) 26%,var(--surface))}
+/* the five choices side by side in one row; the chosen one's description shows under the row */
+.look-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:10px}
+.look-row .look-opt{flex-direction:column;justify-content:center;gap:6px;padding:9px 2px;min-height:48px;text-align:center}
+.look-row .look-opt .lt{flex:none}
+.look-row .look-opt .lt b{font-size:.8rem;line-height:1.25;overflow-wrap:anywhere}
+.look-row .look-opt .lt small,.look-row .look-opt .ok{display:none}
+.look-row .lk-pv{width:100%;max-width:46px;height:38px;padding:5px;gap:4px}
+.look-desc{margin:8px 2px 0;font-size:.8rem;line-height:1.45;min-height:1.45em}
 /* Settings: a home list of sections, each section on its own page */
 .set-search{margin:0 0 6px;padding:2px 14px;background:var(--surface);box-shadow:var(--shadow)}
 .set-search svg{width:19px;height:19px;color:var(--muted);flex:none}
@@ -1184,7 +1194,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
       <div class="set-gt">التنبيهات والسرعة</div>
       <div class="card set-list"><button type="button" class="set-item" data-set-go="alerts" id="si-alerts"><span class="si" style="--c:#E11D48"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span><span class="st"><b>التنبيهات والتذكيرات</b><small id="ss-alerts"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="capture" id="si-capture"><span class="si" style="--c:#0EA5A4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5h16v9H8l-4 3.5z"/><path d="M12 8.5v4.5M10 10.8h4"/></svg></span><span class="st"><b>التسجيل من إشعارات البنك</b><small id="ss-capture"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="widget" id="si-widget"><span class="si" style="--c:#4F46E5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><path d="M17 14v6M14 17h6"/></svg></span><span class="st"><b>الويدجت والإعدادات السريعة</b><small id="ss-widget"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
       <div class="set-gt">المشاركة والبيانات</div>
-      <div class="card set-list"><button type="button" class="set-item" data-set-go="space" id="si-space"><span class="si" style="--c:#D9466F"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M7.5 12h9" opacity=".0"/><circle cx="8.5" cy="10" r="1.6"/><circle cx="15.5" cy="10" r="1.6"/><path d="M6.5 16c.8-1.5 2.1-2.2 3.5-2.2M17.5 16c-.8-1.5-2.1-2.2-3.5-2.2"/></svg></span><span class="st"><b>المساحة المشتركة</b><small id="ss-space"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="backup" id="si-backup"><span class="si" style="--c:#0284C7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.8 8.6 4 4 0 0 1 17.5 18"/><path d="M12 11v8M9.2 13.8 12 11l2.8 2.8"/></svg></span><span class="st"><b>النسخ الاحتياطي</b><small id="ss-backup"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item danger" data-set-go="data" id="si-data"><span class="si" style="--c:#C2412D"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 12.5a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-12.5"/><path d="M10.5 11v6M13.5 11v6"/></svg></span><span class="st"><b>مسح البيانات</b><small id="ss-data"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+      <div class="card set-list"><button type="button" class="set-item" data-set-go="space" id="si-space"><span class="si" style="--c:#D9466F"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M7.5 12h9" opacity=".0"/><circle cx="8.5" cy="10" r="1.6"/><circle cx="15.5" cy="10" r="1.6"/><path d="M6.5 16c.8-1.5 2.1-2.2 3.5-2.2M17.5 16c-.8-1.5-2.1-2.2-3.5-2.2"/></svg></span><span class="st"><b>المساحة المشتركة</b><small id="ss-space"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="backup" id="si-backup"><span class="si" style="--c:#0284C7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.8 8.6 4 4 0 0 1 17.5 18"/><path d="M12 11v8M9.2 13.8 12 11l2.8 2.8"/></svg></span><span class="st"><b>النسخ الاحتياطي</b><small id="ss-backup"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item danger" data-set-go="data" id="si-data"><span class="si" style="--c:#C2412D"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 12.5a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-12.5"/><path d="M10.5 11v6M13.5 11v6"/></svg></span><span class="st"><b>مسح البيانات</b><small id="ss-data"></small></span></button></div>
     </div>
     <div class="card dev2" style="margin-top:18px">
       <div class="dv-top">
@@ -1243,16 +1253,19 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
     <div class="card" id="lookCard">
       <h3 class="look-h">شكل الواجهة</h3>
       <p class="hint">بيغيّر شكل الكروت والمسافات وحجم الخط، وبيشتغل مع أي ثيم ولون فوق.</p>
-      <div class="look-list" id="lookList" role="radiogroup" aria-label="شكل الواجهة"></div>
+      <div class="look-list look-row" id="lookList" role="radiogroup" aria-label="شكل الواجهة"></div>
+      <p class="hint look-desc" id="lookDesc" aria-live="polite"></p>
     </div>
 
     <div class="card" id="motionCard">
       <h3 class="look-h">الحركة</h3>
       <p class="hint">إحساس الأزرار لما تدوس عليها، وطريقة ظهور الشاشات لما تنقل بينها.</p>
       <span class="mb-lab" id="pressLab">نبضة الأزرار</span>
-      <div class="look-list" id="pressList" role="radiogroup" aria-labelledby="pressLab"></div>
+      <div class="look-list look-row" id="pressList" role="radiogroup" aria-labelledby="pressLab"></div>
+      <p class="hint look-desc" id="pressDesc" aria-live="polite"></p>
       <span class="mb-lab" id="transLab">حركة التنقل</span>
-      <div class="look-list" id="transList" role="radiogroup" aria-labelledby="transLab"></div>
+      <div class="look-list look-row" id="transList" role="radiogroup" aria-labelledby="transLab"></div>
+      <p class="hint look-desc" id="transDesc" aria-live="polite"></p>
       <div class="set-row" id="hapticRow" hidden style="margin-top:10px">
         <div class="txt">اهتزاز خفيف<small>هزة صغيرة جدًا مع كل دوسة</small></div>
         <label class="switch"><input type="checkbox" id="hapticToggle" aria-label="اهتزاز خفيف"><i></i></label>
@@ -1360,7 +1373,23 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
       <div class="card-h"><h3>مساحة مشتركة</h3><span class="hint" id="spStatus"></span></div>
       <div id="spOff">
         <p class="hint">أنشئ مساحة أو انضم بكود. تقدر تختار أنواع البيانات اللي توافق على مشاركتها.</p>
-        <div class="sp-row" style="margin-top:12px"><button class="btn primary" id="spCreate">إنشاء مساحة</button><button class="btn" id="spJoin">انضمام بكود</button></div>
+        <div class="sp-row" style="margin-top:12px"><button class="btn primary" id="spCreate" aria-expanded="false" aria-controls="spPanel">إنشاء مساحة</button><button class="btn" id="spJoin" aria-expanded="false" aria-controls="spPanel">انضمام بكود</button></div>
+        <div class="sp-panel" id="spPanel" hidden>
+          <div id="spCodeWrap" class="sp-code-wrap" hidden>
+            <label class="wl-lab" for="spCodeIn">كود المساحة</label>
+            <div class="field"><input id="spCodeIn" type="text" dir="ltr" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX" style="text-align:center;letter-spacing:.1em"></div>
+          </div>
+          <div class="sp-setup-prefs" id="spSetupPrefs">
+            <h3 id="spSetupTitle">اختيارات المشاركة</h3>
+            <p class="hint" id="spSetupIntro">حدد أنواع البيانات التي توافق على مشاركتها.</p>
+            <div id="spSetupTypeList" class="sp-type-list"></div>
+            <p class="sp-share-note">الأنواع اللي انت حددتها بس هي اللي هتظهر للطرف التاني. وأي نوع هتعطل مشاركته بعد كده هتفضل البيانات القديمة ظاهرة للطرف التاني.</p>
+          </div>
+          <label class="wl-lab" for="spName" style="margin-top:12px">اسمك في المساحة</label>
+          <div class="field"><input id="spName" type="text" maxlength="24" placeholder="مثلاً محمد"></div>
+          <p class="err-msg" id="spErr"></p>
+          <div class="sheet-actions" style="margin-top:12px"><button class="btn primary" id="spGo">إنشاء</button><button class="btn" id="spCancel">إلغاء</button></div>
+        </div>
       </div>
       <div id="spWait" hidden>
         <p class="hint" id="spWaitText"></p>
@@ -1400,14 +1429,6 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
         <button type="button" class="time-chip" id="autoBkChip" aria-label="تغيير مدة النسخ الاحتياطي التلقائي">كل 7 أيام</button>
       </div>
       <p class="hint" id="autoBkNote">النسخ التلقائي بيتحفظ على جهازك نفسه في مجلد <b dir="ltr">Download/Maleem</b> (بنحتفظ بآخر 7 نسخ بس)، وبيتعمل لما تفتح التطبيق وتكون المدة عدّت. ولو عايز نسخة على الإيميل أو Google Drive: دوس على «نسخ احتياطي» فوق، واختار Drive أو Gmail من القايمة.</p>
-    </div>
-    </div>
-    <div class="set-page" data-page="data" hidden>
-    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>مسح البيانات</h1></div>
-    <div class="card">
-      <h3>البيانات</h3>
-      <p class="hint">بيمسح كل المصاريف والسلف والجمعيات. بياناتك في "أنا" والفئات والإعدادات بتفضل زي ما هي.</p>
-      <button class="btn danger" id="wipeBtn" style="width:100%;margin-top:10px">مسح كل المصاريف والالتزامات</button>
     </div>
     </div>
     <div id="spManage" class="sub-anim">
@@ -1669,26 +1690,6 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <div class="pct-presets" id="autoBkPresets"><button type="button" data-d="0">إيقاف</button><button type="button" data-d="1">كل يوم</button><button type="button" data-d="7">أسبوع</button><button type="button" data-d="14">أسبوعين</button><button type="button" data-d="30">شهر</button></div>
   <p class="hint center">النسخة بتتحفظ على جهازك في مجلد <b dir="ltr">Download/Maleem</b>.</p>
   <div class="sheet-actions"><button class="btn primary" id="autoBkSave">حفظ</button><button class="btn" id="autoBkCancel">إلغاء</button></div>
-</div>
-
-<!-- Shared space sheet -->
-<div class="sheet" id="spSheet" role="dialog" aria-modal="true" aria-labelledby="spTitle">
-  <div class="grab"></div>
-  <h2 id="spTitle">مساحة مشتركة</h2>
-  <div class="sp-setup-prefs" id="spSetupPrefs">
-    <h3 id="spSetupTitle">اختيارات المشاركة</h3>
-    <p class="hint" id="spSetupIntro">حدد أنواع البيانات التي توافق على مشاركتها.</p>
-    <div id="spSetupTypeList" class="sp-type-list"></div>
-    <p class="sp-share-note">الأنواع اللي انت حددتها بس هي اللي هتظهر للطرف التاني. وأي نوع هتعطل مشاركته بعد كده هتفضل البيانات القديمة ظاهرة للطرف التاني.</p>
-  </div>
-  <div id="spCodeWrap" hidden>
-    <label class="wl-lab" for="spCodeIn">كود المساحة</label>
-    <div class="field"><input id="spCodeIn" type="text" dir="ltr" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX" style="text-align:center;letter-spacing:.1em"></div>
-  </div>
-  <label class="wl-lab" for="spName" style="margin-top:12px">اسمك في المساحة</label>
-  <div class="field"><input id="spName" type="text" maxlength="24" placeholder="مثلاً محمد"></div>
-  <p class="err-msg" id="spErr"></p>
-  <div class="sheet-actions"><button class="btn primary" id="spGo">إنشاء</button><button class="btn" id="spCancel">إلغاء</button></div>
 </div>
 
 <!-- Category sheet -->
@@ -2038,10 +2039,13 @@ function applyTheme(){
     if(pr==='bounce') r.removeAttribute('data-press'); else r.setAttribute('data-press',pr);
     if(tr==='rise') r.removeAttribute('data-trans'); else r.setAttribute('data-trans',tr);
     document.querySelectorAll('#pressList [data-press]').forEach(b=>{const on=b.dataset.press===pr; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)});
+    {const d=$('#pressDesc'); if(d) d.textContent=(PRESSES.find(x=>x.id===pr)||{}).d||''}
     document.querySelectorAll('#transList [data-trans]').forEach(b=>{const on=b.dataset.trans===tr; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)});
+    {const d=$('#transDesc'); if(d) d.textContent=(TRANSES.find(x=>x.id===tr)||{}).d||''}
     const ht=$('#hapticToggle'); if(ht) ht.checked=!!S.haptic; const hr=$('#hapticRow'); if(hr) hr.hidden=!(AB&&AB.haptic)}
   {const lk=lookId(); if(lk==='classic') r.removeAttribute('data-look'); else r.setAttribute('data-look',lk);
-    document.querySelectorAll('#lookList [data-look]').forEach(b=>{const on=b.dataset.look===lk; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)})}
+    document.querySelectorAll('#lookList [data-look]').forEach(b=>{const on=b.dataset.look===lk; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)});
+    {const d=$('#lookDesc'); if(d) d.textContent=(LOOKS.find(x=>x.id===lk)||{}).d||''}}
   const A=ACCENTS.find(a=>a.id===S.accent)||ACCENTS[0];
   r.style.setProperty('--ac-l',A.l); r.style.setProperty('--ac2-l',A.l2); r.style.setProperty('--ac-d',A.d); r.style.setProperty('--ac2-d',A.d2);
   document.querySelectorAll('#accentRow button').forEach(b=>{const on=b.dataset.accent===A.id; b.setAttribute('aria-pressed',on); b.textContent=on?'✓':''});
@@ -2588,7 +2592,7 @@ function closeSheets(){
   wpCloseAll();
   rcStage=null; capOpen=null;
   closePayMenu(); closeDateMenu();
-  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','spSheet','capSheet','impSheet','credSheet','mbSheet'].forEach(i=>$('#'+i).classList.remove('open'));
+  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet'].forEach(i=>$('#'+i).classList.remove('open'));
   $('#noteInput').blur();$('#catName').blur();amtIn.blur();
   if(pinMode){pinMode=null;$('#pinToggle').checked=!!hasPin()}
 }
@@ -2959,7 +2963,7 @@ function checkAlerts(){
   if(JSON.stringify(a)!==before) save();
   if(fire) showNotif(fire);
 }
-$('#wipeBtn').onclick=()=>{$('#scrim').classList.add('open');$('#wipeSheet').classList.add('open')};
+function openWipe(){$('#scrim').classList.add('open');$('#wipeSheet').classList.add('open')}
 $('#wipeCancel').onclick=()=>closeSheets();
 $('#wipeConfirm').onclick=()=>{
   if(S.space) spDetach();
@@ -3285,7 +3289,9 @@ function pageTo(y){document.body.scrollTop=y;(document.scrollingElement||documen
 function pageTopSmooth(){[document.body,document.scrollingElement||document.documentElement].forEach(el=>{try{el.scrollTo({top:0,behavior:'smooth'})}catch(e){el.scrollTop=0}})}
 const SET_T_NAMES={}; document.querySelectorAll('#setGroups [data-set-go]').forEach(b=>{SET_T_NAMES[b.dataset.setGo]=b.querySelector('b').textContent});
 function setGo(p,quiet){
+  if(p==='data'){openWipe();return} // one action, no page of its own: the row opens the confirm sheet
   if(p&&!setPage) setHomeY=pageY();
+  if(setPage==='space'&&p!=='space'){try{spPanelClose()}catch(e){}}
   setPage=p||null;
   $('#setHome').hidden=!!setPage;
   document.querySelectorAll('#v-settings>.set-page').forEach(x=>{x.hidden=x.dataset.page!==setPage});
@@ -3308,7 +3314,7 @@ function renderSetHome(){
   setSub('widget',()=>S.wgHide?'المبالغ مخفية في الويدجت':'ويدجت للشاشة الرئيسية وبلاطة الصوت');
   setSub('space',()=>S.space?'متصلة · الكود '+spFmt(S.space.code):(S.spaceRequest&&S.spaceRequest.status==='pending')?'طلب انضمام مستني الموافقة':'مش مفعّلة');
   setSub('backup',()=>S.lastBackup?'آخر نسخة '+shortDate(S.lastBackup):(AB&&S.lastAutoBk)?'آخر نسخة تلقائية '+shortDate(S.lastAutoBk):'لسه معملتش نسخة');
-  setSub('data',()=>'مسح كل المصاريف والالتزامات');
+  setSub('data',()=>'المصاريف والسلف والجمعيات');
 }
 /* search: every setting with the words people would type for it */
 const SET_IDX=[
@@ -3323,7 +3329,7 @@ const SET_IDX=[
   ['widget','إضافة ويدجت','شاشه رئيسيه','wgAddS'],['widget','بلاطة مصروف بالصوت','اعدادات سريعه صوت','wgAddTile'],['widget','إخفاء المبالغ في الويدجت','','wgHide'],
   ['space','المساحة المشتركة','مشاركه اسره كود','spaceCard'],['space','إنشاء مساحة','','spCreate'],['space','الانضمام بكود','انضمام','spJoin'],['space','الخروج من المساحة','','spLeave'],
   ['backup','نسخ احتياطي','نسخه جوجل درايف backup','backupBtn'],['backup','استعادة نسخة احتياطية','استرجاع','restoreBtn'],['backup','نسخ احتياطي تلقائي','تلقائي','autoBkRow'],
-  ['data','مسح كل المصاريف والالتزامات','حذف تصفير','wipeBtn']
+  ['data','مسح كل المصاريف والالتزامات','حذف تصفير','']
 ].map(([p,t,k,el])=>({p,t,el,n:normAr(t+' '+k+' '+(SET_T_NAMES[p]||''))}));
 function setVisiblePage(p){const r=$('#si-'+p); return !(r&&r.hidden)}
 function setSearch(){
@@ -5297,8 +5303,20 @@ async function spListenInner(){
     if(!spOwner&&spUnsubR){spUnsubR();spUnsubR=null;spRequests=[]}renderSpace();
   },err=>{if(err&&err.code==='permission-denied')spCheckRemoved()});
 }
-function openSpSheet(mode){spMode=mode;$('#spTitle').textContent=mode==='create'?'إنشاء مساحة مشتركة':'الانضمام لمساحة';$('#spCodeWrap').hidden=mode!=='join';$('#spGo').textContent=mode==='create'?'إنشاء':'إرسال طلب الانضمام';$('#spName').value=(S.profile&&S.profile.name)||'';$('#spCodeIn').value=mode==='join'&&S.spaceLostCode?spFmt(S.spaceLostCode):'';$('#spErr').textContent='';spRenderSetupTypes();openSheetEl('spSheet')}
-$('#spCreate').onclick=()=>openSpSheet('create');$('#spJoin').onclick=()=>openSpSheet('join');$('#spCancel').onclick=closeSheets;
+/* create / join: the form opens right under the two buttons (no sheet); tapping the same button again closes it */
+function openSpPanel(mode){
+  const pn=$('#spPanel'); if(!pn.hidden&&spMode===mode){spPanelClose();return}
+  spMode=mode;$('#spCodeWrap').hidden=mode!=='join';$('#spGo').textContent=mode==='create'?'إنشاء':'إرسال طلب الانضمام';$('#spName').value=(S.profile&&S.profile.name)||'';$('#spCodeIn').value=mode==='join'&&S.spaceLostCode?spFmt(S.spaceLostCode):'';$('#spErr').textContent='';spRenderSetupTypes();
+  $('#spCreate').classList.toggle('primary',mode==='create');$('#spJoin').classList.toggle('primary',mode==='join');
+  $('#spCreate').setAttribute('aria-expanded',mode==='create');$('#spJoin').setAttribute('aria-expanded',mode==='join');
+  pn.hidden=false;pn.classList.remove('sub-anim');void pn.offsetWidth;pn.classList.add('sub-anim');
+  setTimeout(()=>{try{pn.scrollIntoView({behavior:'smooth',block:'nearest'})}catch(e){}},60);
+}
+function spPanelClose(){const pn=$('#spPanel'); if(!pn) return; pn.hidden=true; $('#spErr').textContent='';
+  $('#spCreate').classList.add('primary');$('#spJoin').classList.remove('primary');
+  $('#spCreate').setAttribute('aria-expanded','false');$('#spJoin').setAttribute('aria-expanded','false');
+  ['spName','spCodeIn'].forEach(i=>{const x=$('#'+i); if(x) x.blur()})}
+$('#spCreate').onclick=()=>openSpPanel('create');$('#spJoin').onclick=()=>openSpPanel('join');$('#spCancel').onclick=spPanelClose;
 $('#spGo').onclick=async()=>{
   const btn=$('#spGo');if(btn.disabled)return;$('#spErr').textContent='';const name=$('#spName').value.trim().replace(/\s+/g,' ').slice(0,24);let code='';
   if(spMode==='join'){if(!name){$('#spErr').textContent='اكتب اسمك عشان صاحب المساحة يعرف مين مقدم الطلب';return}code=spNorm($('#spCodeIn').value);if(!spCodeOk(code)){$('#spErr').textContent='الكود لازم يكون 8 حروف وأرقام (المساحات القديمة كودها 10)';return}}
@@ -5313,22 +5331,22 @@ $('#spGo').onclick=async()=>{
         batch.set(spaceRef,{owner:f.uid,memberIds:[f.uid],createdAt:F.serverTimestamp()});batch.set(memberRef,{uid:f.uid,name,sharePrefs:prefs,updatedAt:F.serverTimestamp()});
         try{await withTimeout(batch.commit(),12000);break}catch(e){if(tries>=2||!e||e.code!=='permission-denied')throw e}
       }
-      S.space={code,uid:f.uid,name,auto:false,old:S.expenses.map(e=>e.id),sharePrefs:prefs,shareDraft:{...prefs}};S.spaceRequest=null;S.spaceShareDraft=null;save();closeSheets();renderSpace();spListen();toast('اتعملت المساحة. ابعت الكود لصاحبك');
+      S.space={code,uid:f.uid,name,auto:false,old:S.expenses.map(e=>e.id),sharePrefs:prefs,shareDraft:{...prefs}};S.spaceRequest=null;S.spaceShareDraft=null;save();spPanelClose();renderSpace();spListen();toast('اتعملت المساحة. ابعت الكود لصاحبك');
     }else{
       if(await spIsClosed(f,code)){$('#spErr').textContent=SP_CLOSED_MSG;return}
       const reqRef=F.doc(db,'spaces',code,'joinRequests',f.uid),snap=await withTimeout(F.getDoc(reqRef),12000);
       if(snap.exists()&&snap.data().status==='pending'){
-        const requested=spNormPrefs(snap.data().sharePrefs||prefs,true);S.spaceRequest={code,uid:f.uid,name,status:'pending',sharePrefs:requested};save();closeSheets();renderSpace();spWatchJoinRequest();toast('طلب الانضمام مستني موافقة صاحب المساحة');
+        const requested=spNormPrefs(snap.data().sharePrefs||prefs,true);S.spaceRequest={code,uid:f.uid,name,status:'pending',sharePrefs:requested};save();spPanelClose();renderSpace();spWatchJoinRequest();toast('طلب الانضمام مستني موافقة صاحب المساحة');
       }else if(snap.exists()&&snap.data().status==='approved'){
         let ids=[];try{const spaceSnap=await withTimeout(F.getDoc(F.doc(db,'spaces',code)),12000);ids=spaceSnap.exists()?(spaceSnap.data().memberIds||[]):[]}catch(e){if(!e||e.code!=='permission-denied')throw e}
         if(ids.includes(f.uid))spActivateJoin(code,f.uid,name,snap.data().sharePrefs||prefs);else{
-          await withTimeout(F.setDoc(reqRef,{uid:f.uid,name,status:'pending',sharePrefs:prefs,requestedAt:F.serverTimestamp()}),12000);S.spaceRequest={code,uid:f.uid,name,status:'pending',sharePrefs:prefs};save();closeSheets();renderSpace();spWatchJoinRequest();toast('طلب الانضمام مستني موافقة صاحب المساحة');
+          await withTimeout(F.setDoc(reqRef,{uid:f.uid,name,status:'pending',sharePrefs:prefs,requestedAt:F.serverTimestamp()}),12000);S.spaceRequest={code,uid:f.uid,name,status:'pending',sharePrefs:prefs};save();spPanelClose();renderSpace();spWatchJoinRequest();toast('طلب الانضمام مستني موافقة صاحب المساحة');
         }
       }else{
         // after a rejection / removal the rules make the requester wait SP_RETRY_MS before asking again
         const od=snap.exists()?snap.data():null, rAt=od&&od.resolvedAt&&od.resolvedAt.toMillis?od.resolvedAt.toMillis():0, wait=od&&['rejected','removed'].includes(od.status)&&rAt?SP_RETRY_MS-(Date.now()-rAt):0;
         if(wait>0){$('#spErr').textContent=`تقدر تبعت طلب انضمام جديد للمساحة دي بعد ${Math.max(1,Math.ceil(wait/60000))} دقيقة`;return}
-        await withTimeout(F.setDoc(reqRef,{uid:f.uid,name,status:'pending',sharePrefs:prefs,requestedAt:F.serverTimestamp()}),12000);S.spaceRequest={code,uid:f.uid,name,status:'pending',sharePrefs:prefs};save();closeSheets();renderSpace();spWatchJoinRequest();toast('طلب الانضمام اتبعت لصاحب المساحة');
+        await withTimeout(F.setDoc(reqRef,{uid:f.uid,name,status:'pending',sharePrefs:prefs,requestedAt:F.serverTimestamp()}),12000);S.spaceRequest={code,uid:f.uid,name,status:'pending',sharePrefs:prefs};save();spPanelClose();renderSpace();spWatchJoinRequest();toast('طلب الانضمام اتبعت لصاحب المساحة');
       }
     }
     if(S.space||S.spaceRequest){S.spaceLostCode=null;save()}
