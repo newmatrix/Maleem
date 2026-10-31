@@ -3,4 +3,6 @@
     <cache-path name="share" path="share/" />
     <!-- receipt photos taken with the camera (deleted before the next photo) -->
     <cache-path name="camera" path="camera/" />
+    <!-- the downloaded update APK, handed to Android's installer -->
+    <cache-path name="updates" path="updates/" />
 </paths>

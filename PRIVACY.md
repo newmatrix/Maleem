@@ -4,11 +4,15 @@
 
 تطبيق **مليم** بيساعدك تسجل مصاريفك وتتابع ميزانيتك والسلف والجمعيات.
 
-**البيانات اللي بتدخلها** (المصاريف، الميزانية، الفئات، السلف، الجمعيات، الإعدادات) **بتتخزن على موبايلك بس**. التطبيق مش بيبعت أي بيانات لأي سيرفر **إلا لو فعّلت "المساحة المشتركة" بنفسك أو استخدمت "التسجيل بالصوت"** (تفاصيلهم تحت)، ومش بيجمع أي معلومات عنك، ومفيهوش إعلانات ولا أدوات تتبع أو تحليلات.
+**البيانات اللي بتدخلها** (المصاريف، الميزانية، الفئات، السلف، الجمعيات، الإعدادات) **بتتخزن على موبايلك بس**. التطبيق مش بيبعت أي بيانات لأي سيرفر **إلا لو فعّلت "المساحة المشتركة" أو "النسخ الاحتياطي على Google Drive" بنفسك، أو استخدمت "التسجيل بالصوت"** (تفاصيلهم تحت)، ومش بيجمع أي معلومات عنك، ومفيهوش إعلانات ولا أدوات تتبع أو تحليلات.
 
 **النسخ الاحتياطي:** لما تختار "نسخ احتياطي"، التطبيق بيعمل ملف وانت اللي بتختار تحفظه فين (زي Google Drive). الملف ده بيتعامل معاه حسب سياسة الخدمة اللي اخترتها.
 
 **النسخ الاحتياطي التلقائي (أندرويد):** التطبيق بيحفظ ملف نسخة احتياطية على جهازك نفسه في مجلد Download/Maleem كل عدد أيام تختاره (أو تقفله)، ومن غير ما يتبعت لأي سيرفر. الملف بيحتوي بياناتك المالية، فخلي بالك منه ومتشاركوش مع حد مش عايزه يشوفها.
+
+**النسخ الاحتياطي على Google Drive (اختياري، أندرويد):** لو ربطت حساب جوجل من صفحة النسخ الاحتياطي، التطبيق بيرفع ملف النسخة التلقائية على Google Drive بتاعك انت في فولدر اسمه «Maleem»، كل عدد الأيام اللي اخترته، ولما تفتح التطبيق. التطبيق بياخد صلاحية «الملفات اللي مليم عملها بس» (drive.file)، فمش بيقدر يشوف أو يعدّل أي ملف تاني في الـ Drive بتاعك، وبيقرا إيميل الحساب بس عشان يعرضهولك. الملف بيتبعت من موبايلك لجوجل مباشرة ومش بيعدّي على أي سيرفر لينا، وبنحتفظ بآخر 7 نسخ لكل عضو. تقدر تفك الربط من نفس الصفحة في أي وقت، والنسخ اللي اترفعت بتفضل في الـ Drive بتاعك لحد ما تمسحها، وتقدر تشيل صلاحية مليم من حساب جوجل (الأمان ← التطبيقات المتصلة).
+
+**التحديثات:** نسخة أندرويد بتدخل على GitHub (raw.githubusercontent.com و github.com) كل كام ساعة وهي مفتوحة، عشان تعرف لو فيه نسخة جديدة أو رسالة من المطوّر. الطلب ده مفيهوش أي بيانات منك غير اللي أي اتصال بالنت بيبعته (زي عنوان الـ IP)، وGitHub بيتعامل معاه حسب سياسته. لو وافقت على التحديث، التطبيق بينزّل النسخة الجديدة من GitHub ويتأكد إنها سليمة وموقّعة بنفس مفتاح مليم، وبعدين أندرويد بيسألك قبل ما يثبّتها.
 
 **النسخ الاحتياطي التلقائي بتاع جوجل:** التطبيق مقفول فيه النسخ الاحتياطي السحابي بتاع أندرويد، يعني بياناتك المالية مش بتترفع على حساب جوجل بتاعك من غير ما تختار. النقل المباشر من موبايل لموبايل (لما تجهز موبايل جديد بنفسك) لسه متاح.
 
@@ -46,11 +50,15 @@ Last updated: October 2026
 
 **Maleem** helps you record your expenses and track your budget, loans and savings circles.
 
-All data you enter (expenses, budget, categories, loans, savings circles, settings) is **stored only on your device**. The app does not send any data to any server **unless you turn on the optional Shared Space or use Voice Entry** (see below), does not collect any information about you, and contains no ads, trackers or analytics.
+All data you enter (expenses, budget, categories, loans, savings circles, settings) is **stored only on your device**. The app does not send any data to any server **unless you turn on the optional Shared Space or Google Drive backup, or use Voice Entry** (see below), does not collect any information about you, and contains no ads, trackers or analytics.
 
 **Backup:** When you choose "Backup", the app creates a file and you choose where to save it (for example Google Drive). That file is handled under the policy of the service you choose.
 
 **Automatic backup (Android):** The app saves a backup file on your device itself, in the Download/Maleem folder, every number of days you choose (or you can turn it off). It is not sent to any server. The file contains your financial data, so keep it private.
+
+**Google Drive backup (optional, Android):** If you link a Google account on the Backup page, the app uploads its automatic backup file to *your own* Google Drive, in a folder named "Maleem", every number of days you choose, when you open the app. The app asks only for access to "files created by Maleem" (drive.file), so it cannot see or change any other file in your Drive; it reads the account's e-mail only to show it to you. The file goes from your phone straight to Google and never passes through any server of ours; the newest 7 backups of each member are kept. You can unlink at any time on the same page; files already uploaded stay in your Drive until you delete them, and you can remove Maleem's access from your Google Account (Security → Third-party connections).
+
+**Updates:** The Android app checks GitHub (raw.githubusercontent.com and github.com) every few hours while it is open, to learn whether a new version or a message from the developer is available. The request carries no data about you beyond what any internet connection sends (such as your IP address), and GitHub handles it under its own policy. If you accept an update, the app downloads the new version from GitHub, checks that it is intact and signed with Maleem's own key, and Android asks you before installing it.
 
 **Google's automatic backup:** Android cloud backup is turned off for this app, so your financial data is not uploaded to your Google account without your choice. A direct phone-to-phone transfer that you start yourself is still possible.
 

@@ -13,7 +13,8 @@ android {
         targetSdk = 36
         // GitHub Actions رقم كل بناء بيزيد لوحده، والمتجر محتاج رقم أكبر في كل تحديث
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt() + 100 // offset keeps the code above anything already uploaded
-        versionName = "1.0"
+        // the release workflow passes the tag ("v1.1" -> "1.1"); local and test builds stay "1.0"
+        versionName = (System.getenv("VERSION_NAME") ?: "").removePrefix("v").ifBlank { "1.0" }
     }
 
     signingConfigs {
@@ -79,4 +80,6 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.3")
     implementation("androidx.webkit:webkit:1.12.1")
     implementation("androidx.biometric:biometric:1.1.0")
+    // Google Drive backup: the user picks his account and allows "files made by Maleem" (drive.file) with Google's own screen
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 }

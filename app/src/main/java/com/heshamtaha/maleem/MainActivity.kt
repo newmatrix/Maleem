@@ -1,6 +1,7 @@
 package com.heshamtaha.maleem
 
 import android.Manifest
+import android.accounts.Account
 import android.annotation.SuppressLint
 import android.app.StatusBarManager
 import android.appwidget.AppWidgetManager
@@ -35,6 +36,7 @@ import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
@@ -48,6 +50,11 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
+import com.google.android.gms.auth.api.identity.AuthorizationRequest
+import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
+import com.google.android.gms.common.api.Scope
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
@@ -89,6 +96,49 @@ class MainActivity : AppCompatActivity() {
     }
     private val askStorage = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
+    /* ---- Google Drive backup: the user picks his Google account once and allows "files made by Maleem" (drive.file) ---- */
+    private var driveCb: ((String?, String?) -> Unit)? = null
+    private val driveAuth = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { res ->
+        val cb = driveCb ?: return@registerForActivityResult
+        driveCb = null
+        try {
+            val r = Identity.getAuthorizationClient(this).getAuthorizationResultFromIntent(res.data)
+            cb(r.accessToken, if (r.accessToken == null) "auth" else null)
+        } catch (e: ApiException) {
+            cb(null, if (e.statusCode == CommonStatusCodes.DEVELOPER_ERROR) "config" else "cancel")
+        } catch (_: Exception) { cb(null, "cancel") }
+    }
+
+    /**
+     * Gets a Drive access token for [account] (null = let the user choose). With [interactive] false nothing is shown:
+     * if Google needs the user (first time, access removed) the answer is the error "auth".
+     */
+    private fun driveToken(account: String?, interactive: Boolean, cb: (String?, String?) -> Unit) {
+        runOnUiThread {
+            try {
+                val b = AuthorizationRequest.builder().setRequestedScopes(listOf(Scope(DriveBackup.SCOPE)))
+                if (!account.isNullOrBlank()) b.setAccount(Account(account, "com.google"))
+                Identity.getAuthorizationClient(this).authorize(b.build())
+                    .addOnSuccessListener { r ->
+                        val pi = r.pendingIntent
+                        if (r.hasResolution() && pi != null) {
+                            if (!interactive) { cb(null, "auth"); return@addOnSuccessListener }
+                            driveCb?.invoke(null, "cancel")
+                            driveCb = cb
+                            try { driveAuth.launch(IntentSenderRequest.Builder(pi.intentSender).build()) }
+                            catch (_: Exception) { driveCb = null; cb(null, "auth") }
+                        } else cb(r.accessToken, if (r.accessToken == null) "auth" else null)
+                    }
+                    .addOnFailureListener { e ->
+                        cb(null, if (e is ApiException && e.statusCode == CommonStatusCodes.DEVELOPER_ERROR) "config" else "gms")
+                    }
+            } catch (_: Exception) { cb(null, "gms") } // no Google Play services on this phone
+        }
+    }
+
+    /** Set when the user was sent to "allow installing apps": the update installs as soon as he comes back with it allowed. */
+    private var installWanted = false
+
     /**
      * Content-Security-Policy for index.html, sent as a response header (Android only, so the web version is untouched).
      * Inline scripts are allowed only by their SHA-256 hash, computed here from the shipped file, so injected
@@ -120,6 +170,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // Faster start: hash the page for the CSP header while the WebView is being created, not when the page is requested
         Thread { csp }.start()
+        // an update APK left in the cache after it was installed is useless: free the space
+        Thread { Updater.cleanup(this) }.start()
 
         // The page's own background (theme / accent the user picked), saved last time, so the screen opens in the
         // right colour instead of flashing the default one until the page has drawn.
@@ -373,6 +425,12 @@ class MainActivity : AppCompatActivity() {
         // payments captured while the app is open appear right away; the ones caught while it was closed are picked up now
         PayCapture.onNew = { js("window.__captures && window.__captures(false)") }
         js("window.__captures && window.__captures(false)")
+        // back from "allow installing apps" for the update
+        if (installWanted) {
+            installWanted = false
+            if (Updater.canInstall(this)) Updater.installIntent(this)?.let { try { startActivity(it) } catch (_: Exception) { } }
+            else js("window.__updPermDenied && window.__updPermDenied()")
+        }
     }
 
     private fun js(code: String) = web.post { web.evaluateJavascript(code, null) }
@@ -726,6 +784,94 @@ class MainActivity : AppCompatActivity() {
         fun captureBlock(pkg: String, name: String, on: Boolean) {
             if (!pageOk) return
             PayCapture.setBlocked(this@MainActivity, pkg, name, on)
+        }
+
+        /* ---------- updates from GitHub (see Updater.kt) ---------- */
+
+        /** The app's version and the last update.json read (synchronous, small: call it after the first frame). */
+        @JavascriptInterface
+        fun updateState(): String = if (!pageOk) "{}" else Updater.cached(this@MainActivity)
+
+        /** Reads update.json (every 6 hours at most unless [force]); answers with window.__updInfo(json|null, err). */
+        @JavascriptInterface
+        fun updateCheck(force: Boolean) {
+            if (!pageOk) return
+            Updater.check(this@MainActivity, force) { json, err ->
+                js("window.__updInfo && window.__updInfo(${if (json != null) JSONObject.quote(json) else "null"}, ${JSONObject.quote(err ?: "")})")
+            }
+        }
+
+        /** Downloads + checks the APK: window.__updProgress(pct), then window.__updDone(err) ("" = ready). */
+        @JavascriptInterface
+        fun updateDownload(url: String, sha256: String, code: String) {
+            if (!pageOk) return
+            val c = code.toLongOrNull() ?: return
+            Updater.download(this@MainActivity, url, sha256, c,
+                { p -> js("window.__updProgress && window.__updProgress($p)") },
+                { err -> js("window.__updDone && window.__updDone(${JSONObject.quote(err ?: "")})") })
+        }
+
+        /** Opens Android's installer ("ok"), or first the "allow installing apps" screen ("perm"). */
+        @JavascriptInterface
+        fun updateInstall(): String {
+            if (!pageOk) return "err"
+            if (!Updater.canInstall(this@MainActivity)) {
+                installWanted = true
+                runOnUiThread { try { startActivity(Updater.installPermissionIntent(this@MainActivity)) } catch (_: Exception) { installWanted = false } }
+                return "perm"
+            }
+            val i = Updater.installIntent(this@MainActivity) ?: return "missing"
+            runOnUiThread { try { startActivity(i) } catch (_: Exception) { } }
+            return "ok"
+        }
+
+        /* ---------- Google Drive backup (see DriveBackup.kt) ---------- */
+
+        private fun driveReply(id: String, o: JSONObject) {
+            val key = JSONObject.quote(id.filter { it.isLetterOrDigit() }.take(24))
+            js("window.__driveRes && window.__driveRes($key, ${JSONObject.quote(o.toString())})")
+        }
+
+        /** Lets the user choose his Google account and allow Drive; answers {ok, email} or {ok:false, err}. */
+        @JavascriptInterface
+        fun driveLink(id: String) {
+            if (!pageOk) return
+            driveToken(null, true) { token, err ->
+                if (token == null) { driveReply(id, JSONObject().put("ok", false).put("err", err ?: "auth")); return@driveToken }
+                Thread {
+                    val o = try { JSONObject().put("ok", true).put("email", DriveBackup.email(token)) }
+                            catch (e: DriveBackup.DriveError) { JSONObject().put("ok", false).put("err", e.code) }
+                    driveReply(id, o)
+                }.start()
+            }
+        }
+
+        /**
+         * Uploads one backup to the linked account's Drive (folder "Maleem") and keeps the newest 7 of that member.
+         * [interactive]: may show Google's screen if access must be given again (only when the user pressed a button).
+         */
+        @JavascriptInterface
+        fun driveUpload(id: String, account: String, name: String, base64: String, interactive: Boolean) {
+            if (!pageOk || account.isBlank() || base64.length > 30_000_000) return
+            val file = safeName(name, "maleem-auto.json")
+            val prefix = Regex("^(.*-auto-)\\d{4}-\\d{2}-\\d{2}\\.json$").find(file)?.groupValues?.get(1) ?: ""
+            val data = try { Base64.decode(base64, Base64.DEFAULT) } catch (_: Exception) { return }
+            driveToken(account, interactive) { token, err ->
+                if (token == null) { driveReply(id, JSONObject().put("ok", false).put("err", err ?: "auth")); return@driveToken }
+                Thread {
+                    val o = try { DriveBackup.backup(this@MainActivity, token, account, file, data, prefix); JSONObject().put("ok", true) }
+                            catch (e: DriveBackup.DriveError) { JSONObject().put("ok", false).put("err", e.code) }
+                            catch (_: Exception) { JSONObject().put("ok", false).put("err", "other") }
+                    driveReply(id, o)
+                }.start()
+            }
+        }
+
+        /** Unlink: forget the remembered Drive folder of that account. */
+        @JavascriptInterface
+        fun driveForget(account: String) {
+            if (!pageOk) return
+            DriveBackup.forget(this@MainActivity, account)
         }
 
         @JavascriptInterface
