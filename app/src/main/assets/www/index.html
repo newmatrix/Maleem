@@ -68,8 +68,6 @@ html.splash-out #splash{animation:spOut .22s ease forwards}
 .upd-notes:empty{display:none}
 .upd-bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin:12px 0 0}
 .upd-bar i{display:block;height:100%;width:0;background:var(--brand);border-radius:inherit;transition:width .2s}
-.upd-ver{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:2px 0 6px}
-.upd-ver b{font-variant-numeric:tabular-nums}
 .upd-lock{position:fixed;inset:0;z-index:75;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));text-align:center;overflow-y:auto}
 .upd-lock[hidden]{display:none}
 .upd-lock .logo{width:64px;height:64px;border-radius:20px;overflow:hidden;margin-bottom:14px}
@@ -1214,7 +1212,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
       <div class="set-gt">المشاركة والبيانات</div>
       <div class="card set-list"><button type="button" class="set-item" data-set-go="space" id="si-space"><span class="si" style="--c:#D9466F"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M7.5 12h9" opacity=".0"/><circle cx="8.5" cy="10" r="1.6"/><circle cx="15.5" cy="10" r="1.6"/><path d="M6.5 16c.8-1.5 2.1-2.2 3.5-2.2M17.5 16c-.8-1.5-2.1-2.2-3.5-2.2"/></svg></span><span class="st"><b>المساحة المشتركة</b><small id="ss-space"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="backup" id="si-backup"><span class="si" style="--c:#0284C7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.8 8.6 4 4 0 0 1 17.5 18"/><path d="M12 11v8M9.2 13.8 12 11l2.8 2.8"/></svg></span><span class="st"><b>النسخ الاحتياطي</b><small id="ss-backup"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item danger" data-set-go="data" id="si-data"><span class="si" style="--c:#C2412D"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 12.5a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-12.5"/><path d="M10.5 11v6M13.5 11v6"/></svg></span><span class="st"><b>مسح البيانات</b><small id="ss-data"></small></span></button></div>
       <div class="set-gt" id="sg-app" hidden>التطبيق</div>
-      <div class="card set-list" id="sg-app-list" hidden><button type="button" class="set-item" data-set-go="update" id="si-update"><span class="si" style="--c:#0F766E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4.5h-4.5"/><path d="M12 8v5l3 2"/></svg></span><span class="st"><b>التحديثات</b><small id="ss-update"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+      <div class="card set-list" id="sg-app-list" hidden><button type="button" class="set-item" data-set-go="update" id="si-update"><span class="si" style="--c:#0F766E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4.5h-4.5"/><path d="M12 8v5l3 2"/></svg></span><span class="st"><b>التحديثات</b><small id="ss-update"></small></span></button></div>
     </div>
     <div class="card dev2" style="margin-top:18px">
       <div class="dv-top">
@@ -1437,45 +1435,28 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
     </div>
     <div class="set-page" data-page="backup" hidden>
     <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>النسخ الاحتياطي</h1></div>
-    <div class="card">
+    <div class="card" id="bkCard">
       <h3>النسخ الاحتياطي</h3>
       <p class="hint" id="backupHint"></p>
+      <div id="bkAuto" hidden>
+        <div id="driveOff"><button class="btn primary" id="driveLink" style="width:100%;margin-top:10px">ربط Google Drive</button></div>
+        <div id="driveOn" hidden>
+          <div class="set-row" style="margin-top:10px"><div class="txt">مربوط بحساب<small id="driveEmail" dir="ltr"></small></div><button type="button" class="linkbtn" id="driveUnlink" style="padding:0">فك الربط</button></div>
+        </div>
+        <div class="set-row" id="autoBkRow" style="margin-top:12px">
+          <div class="txt">نسخة تلقائية<small id="autoBkSub">كل فترة تختارها، لما تفتح التطبيق</small></div>
+          <button type="button" class="time-chip" id="autoBkChip" aria-label="تغيير مدة النسخ الاحتياطي التلقائي">كل 7 أيام</button>
+        </div>
+        <div id="bkToWrap" hidden>
+          <span class="mb-lab" id="bkToLab">النسخة تتحفظ فين</span>
+          <div class="seg" id="bkToSeg" role="group" aria-labelledby="bkToLab"><button type="button" data-to="drive" aria-pressed="false">Drive بس</button><button type="button" data-to="both" aria-pressed="false">Drive والموبايل</button></div>
+        </div>
+        <p class="hint" id="driveStatus"></p>
+      </div>
       <div class="export-grid">
-        <button class="btn" id="backupBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 15l3-3 3 3"/></svg>نسخ احتياطي</button>
+        <button class="btn" id="backupBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 15l3-3 3 3"/></svg><span id="backupBtnTxt">نسخ احتياطي</span></button>
         <button class="btn" id="restoreBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 17l3 3 3-3"/></svg>استعادة</button>
       </div>
-      <div class="set-row" id="autoBkRow" style="margin-top:12px">
-        <div class="txt">نسخ احتياطي تلقائي<small>بيحفظ نسخة على جهازك لوحده كل فترة تختارها</small></div>
-        <button type="button" class="time-chip" id="autoBkChip" aria-label="تغيير مدة النسخ الاحتياطي التلقائي">كل 7 أيام</button>
-      </div>
-      <p class="hint" id="autoBkNote">النسخ التلقائي بيتحفظ على جهازك نفسه في مجلد <b dir="ltr">Download/Maleem</b> (بنحتفظ بآخر 7 نسخ بس)، وبيتعمل لما تفتح التطبيق وتكون المدة عدّت. ولو عايز نسخة على الإيميل أو Google Drive: دوس على «نسخ احتياطي» فوق، واختار Drive أو Gmail من القايمة.</p>
-    </div>
-    <div class="card" id="driveCard" hidden>
-      <h3 class="look-h">Google Drive</h3>
-      <p class="hint">اربط حساب جوجل، والنسخ التلقائي يترفع على الـ Drive بتاعك في فولدر «Maleem». مليم بيشوف الملفات اللي هو عملها بس، ومش بيشوف أي حاجة تانية في الـ Drive.</p>
-      <div id="driveOff"><button class="btn primary" id="driveLink" style="width:100%;margin-top:10px">ربط Google Drive</button></div>
-      <div id="driveOn" hidden>
-        <div class="set-row" style="margin-top:10px"><div class="txt">مربوط بحساب<small id="driveEmail" dir="ltr"></small></div><button type="button" class="linkbtn" id="driveUnlink" style="padding:0">فك الربط</button></div>
-        <span class="mb-lab" id="bkToLab">النسخ التلقائي يتحفظ فين</span>
-        <div class="seg" id="bkToSeg" role="group" aria-labelledby="bkToLab"><button type="button" data-to="device" aria-pressed="false">الموبايل</button><button type="button" data-to="drive" aria-pressed="false">Drive</button><button type="button" data-to="both" aria-pressed="false">الاتنين</button></div>
-        <p class="hint" id="driveStatus"></p>
-        <button class="btn" id="driveNow" style="width:100%;margin-top:8px">ارفع نسخة على Drive دلوقتي</button>
-      </div>
-    </div>
-    </div>
-    <div class="set-page" data-page="update" hidden>
-    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>التحديثات</h1></div>
-    <div class="card" id="updCard">
-      <h3>التحديثات</h3>
-      <div class="upd-ver"><span>النسخة اللي عندك</span><b dir="ltr" id="updCur">—</b></div>
-      <p class="hint" id="updState"></p>
-      <div id="updAvail" hidden>
-        <div class="upd-notes" id="updPageNotes"></div>
-        <div class="upd-bar" id="updPageBar" hidden><i></i></div>
-        <p class="hint" id="updPageMsg"></p>
-        <button class="btn primary" id="updPageGo" style="width:100%;margin-top:10px">تحديث</button>
-      </div>
-      <button class="btn" id="updCheck" style="width:100%;margin-top:10px">دوّر على تحديث</button>
     </div>
     </div>
     <div id="spManage" class="sub-anim">
@@ -1758,7 +1739,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <div class="pct-big" id="autoBkBig">كل 7 أيام</div>
   <input type="range" id="autoBkRange" min="0" max="30" step="1" aria-label="مدة النسخ الاحتياطي التلقائي">
   <div class="pct-presets" id="autoBkPresets"><button type="button" data-d="0">إيقاف</button><button type="button" data-d="1">كل يوم</button><button type="button" data-d="7">أسبوع</button><button type="button" data-d="14">أسبوعين</button><button type="button" data-d="30">شهر</button></div>
-  <p class="hint center">النسخة بتتحفظ على جهازك في مجلد <b dir="ltr">Download/Maleem</b>.</p>
+  <p class="hint center">النسخة بتترفع على Google Drive لو ربطته، وإلا بتتحفظ على الموبايل في <b dir="ltr">Download/Maleem</b>.</p>
   <div class="sheet-actions"><button class="btn primary" id="autoBkSave">حفظ</button><button class="btn" id="autoBkCancel">إلغاء</button></div>
 </div>
 
@@ -1939,7 +1920,7 @@ if(!Array.isArray(S.fixed)) S.fixed=[];
 if(!Number.isInteger(S.autoBkDays)||S.autoBkDays<0||S.autoBkDays>30) S.autoBkDays=7;
 /* Google Drive backup (per member, this phone only: not part of the backup file) */
 if(!(S.drive&&typeof S.drive==='object'&&typeof S.drive.email==='string'&&S.drive.email)) S.drive=null;
-if(!['device','drive','both'].includes(S.autoBkTo)) S.autoBkTo='device';
+if(!['drive','both'].includes(S.autoBkTo)) S.autoBkTo='both';
 if(!Number.isInteger(S.driveFails)||S.driveFails<0) S.driveFails=0;
 if(typeof S.sumOn!=='boolean') S.sumOn=true; // monthly summary (card + notification) // automatic local backup every N days (0 = off)
 delete S.backupRemind; delete S.backupSnooze;
@@ -2454,7 +2435,7 @@ function renderSettings(){
   $('#wgCard').hidden=!AB; $('#wgHide').checked=!!S.wgHide;
   {const bits=[]; if(S.lastBackup) bits.push('آخر نسخة يدوية: '+shortDate(S.lastBackup)+' '+timeStr(S.lastBackup)); if(AB&&S.lastAutoBk) bits.push('آخر نسخة تلقائية: '+shortDate(S.lastAutoBk)+' '+timeStr(S.lastAutoBk));
     $('#backupHint').textContent=(bits.length?bits.join(' · ')+'. ':'')+(AB?'النسخة اليدوية بتتحفظ كملف، اختار Google Drive من قايمة المشاركة واسترجعها من هناك في أي وقت.':bits.length?'':'احفظ نسخة من مصاريفك على السحابة واسترجعها في أي وقت.')}
-  $('#autoBkRow').hidden=!AB; $('#autoBkNote').hidden=!AB; $('#autoBkChip').textContent=autoBkLabel(S.autoBkDays);
+  $('#autoBkChip').textContent=autoBkLabel(S.autoBkDays);
   try{paintDrive()}catch(e){} try{paintUpd()}catch(e){}
   const bioOk=!!(AB&&AB.canBiometric&&AB.canBiometric());
   $('#bioToggle').disabled=!(bioOk&&hasPin()); $('#bioToggle').checked=!!(S.bio&&hasPin()&&bioOk);
@@ -3365,6 +3346,7 @@ function pageTopSmooth(){[document.body,document.scrollingElement||document.docu
 const SET_T_NAMES={}; document.querySelectorAll('#setGroups [data-set-go]').forEach(b=>{SET_T_NAMES[b.dataset.setGo]=b.querySelector('b').textContent});
 function setGo(p,quiet){
   if(p==='data'){openWipe();return} // one action, no page of its own: the row opens the confirm sheet
+  if(p==='update'){updManualCheck();return} // same: the row looks for an update right away
   if(p&&!setPage) setHomeY=pageY();
   if(setPage==='space'&&p!=='space'){try{spPanelClose()}catch(e){}}
   setPage=p||null;
@@ -3388,7 +3370,11 @@ function renderSetHome(){
   setSub('capture',()=>capState().on?'شغال':'مقفول');
   setSub('widget',()=>S.wgHide?'المبالغ مخفية في الويدجت':'ويدجت للشاشة الرئيسية وبلاطة الصوت');
   setSub('space',()=>S.space?'متصلة · الكود '+spFmt(S.space.code):(S.spaceRequest&&S.spaceRequest.status==='pending')?'طلب انضمام مستني الموافقة':'مش مفعّلة');
-  setSub('backup',()=>(S.lastBackup?'آخر نسخة '+shortDate(S.lastBackup):(AB&&S.lastAutoBk)?'آخر نسخة تلقائية '+shortDate(S.lastAutoBk):'لسه معملتش نسخة')+(S.drive&&AB?' · Drive '+(S.driveFails?'⚠️':'✓'):''));
+  setSub('backup',()=>{
+    if(!AB) return S.lastBackup?'آخر نسخة '+shortDate(S.lastBackup):'لسه معملتش نسخة';
+    if(S.drive) return S.driveFails?'⚠️ آخر رفع على Drive فشل':S.lastDriveBk?'Drive ✓ · آخر نسخة '+shortDate(S.lastDriveBk):'Drive مربوط';
+    return !(+S.autoBkDays>0)?'النسخ التلقائي مقفول':S.lastAutoBk?'على الموبايل · آخر نسخة '+shortDate(S.lastAutoBk):'لسه معملتش نسخة';
+  });
   {const on=!!(AB&&AB.updateState); $('#sg-app').hidden=!on; $('#sg-app-list').hidden=!on; $('#si-update').hidden=!on}
   setSub('update',()=>updLabel());
   setSub('data',()=>'المصاريف والسلف والجمعيات');
@@ -3405,8 +3391,8 @@ const SET_IDX=[
   ['capture','التسجيل من إشعارات البنك','رسايل بنك محفظه انستاباي لقط تلقائي','capToggle'],['capture','تطبيقات بتتجاهلها','','capBlockedWrap'],
   ['widget','إضافة ويدجت','شاشه رئيسيه','wgAddS'],['widget','بلاطة مصروف بالصوت','اعدادات سريعه صوت','wgAddTile'],['widget','إخفاء المبالغ في الويدجت','','wgHide'],
   ['space','المساحة المشتركة','مشاركه اسره كود','spaceCard'],['space','إنشاء مساحة','','spCreate'],['space','الانضمام بكود','انضمام','spJoin'],['space','الخروج من المساحة','','spLeave'],
-  ['backup','نسخ احتياطي','نسخه جوجل درايف backup','backupBtn'],['backup','استعادة نسخة احتياطية','استرجاع','restoreBtn'],['backup','نسخ احتياطي تلقائي','تلقائي','autoBkRow'],['backup','Google Drive','جوجل درايف ربط حساب رفع سحابه','driveCard'],
-  ['update','التحديثات','تحديث نسخه جديده اصدار ابديت update','updCard'],
+  ['backup','اعمل نسخة احتياطية دلوقتي','نسخه جوجل درايف backup','backupBtn'],['backup','استعادة نسخة احتياطية','استرجاع','restoreBtn'],['backup','نسخ احتياطي تلقائي','تلقائي مده كل قد ايه','autoBkRow'],['backup','Google Drive','جوجل درايف ربط حساب رفع سحابه ايميل','bkAuto'],
+  ['update','دوّر على تحديث','تحديث نسخه جديده اصدار ابديت update التحديثات',''],
   ['data','مسح كل المصاريف والالتزامات','حذف تصفير','']
 ].map(([p,t,k,el])=>({p,t,el,n:normAr(t+' '+k+' '+(SET_T_NAMES[p]||''))}));
 function setVisiblePage(p){const r=$('#si-'+p); return !(r&&r.hidden)}
@@ -3622,15 +3608,6 @@ function applyBackup(p,at){
   S.onboarded=true; hideWelcome();
   save();syncCats();renderAll();
   toast('اترجعت '+S.expenses.length+' مصروف من نسخة '+shortDate(at),'تراجع',()=>{S.expenses=old.e;S.budget=old.b;S.cats=old.c;S.budgetMode=old.m;S.debts=old.d;S.gams=old.g;S.payday=old.pd;S.profile=old.pr;S.since=old.si;S.incomes=old.inc;S.goals=old.go;S.saveTarget=old.st;S.currency=old.cu;S.fixed=old.fx;S.fixedLog=old.fl;S.pays=old.py;S.lastPay=old.lp;Object.assign(S,old.pf);syncPays();save();syncCats();renderAll()},4000);
-}
-async function androidBackup(){
-  let rc={out:null,skipped:0}; try{rc=await rcExport()}catch(e){}
-  const at=Date.now(), file={app:'maleem',version:1,at,data:backupData()}; if(rc.out) file.receipts=rc.out;
-  const json=JSON.stringify(file);
-  if(rc.skipped) setTimeout(()=>toast(`${rc.skipped} صورة إيصال مدخلتش النسخة عشان حجمها كبير`,null,null,4000),2600);
-  try{ const ok=AB.shareFile(`${fileTag()}-${dayKey(at)}.json`, await toB64(new Blob([json])), 'application/json');
-    if(ok){S.lastBackup=at;save();renderHome();renderSettings();toast('اختار Google Drive عشان تحفظ النسخة')} else toast('معرفناش نعمل نسخة احتياطية');
-  }catch(e){toast('معرفناش نعمل نسخة احتياطية')}
 }
 $('#restoreFile').onchange=async e=>{
   const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
@@ -4042,7 +4019,7 @@ $('#impFile').onchange=async e=>{
   finally{ b.disabled=false; b.textContent=t0 }
 };
 $('#backupBtn').onclick=async()=>{
-  if(AB){androidBackup();return}
+  if(AB){backupNow(true);return}
   if(!db||!myId){toast('النسخ الاحتياطي محتاج تكون مسجل دخول');return}
   try{const at=Date.now();
     await (await backupDoc()).set({payload:JSON.stringify(backupData()),at,count:S.expenses.length});
@@ -4696,13 +4673,20 @@ $('#addPay').onclick=()=>openPayForm();
    It runs when the app opens or comes back to the front and the chosen number of days has passed. */
 function autoBkLabel(n){n=+n||0; return n<1?'إيقاف':n===1?'كل يوم':n===2?'كل يومين':n<=10?`كل ${n} أيام`:`كل ${n} يوم`}
 let autoBkBusy=false;
-/* where the automatic backup goes: the phone, the linked Google Drive, or both (Drive only once it is linked) */
-const bkTo=()=>S.drive&&AB&&AB.driveUpload?S.autoBkTo:'device';
+/* Android: one backup. It goes to the linked Google Drive (Drive only, or Drive + phone); until a Google account is
+   linked it is kept on the phone (Download/Maleem). Automatic every N days when the app opens, or now with the button. */
+const bkTo=()=>S.drive&&AB&&AB.driveUpload?(S.autoBkTo==='drive'?'drive':'both'):'device';
 function bkDue(last,n){if(!last) return true; const d0=new Date(last).setHours(0,0,0,0), d1=new Date().setHours(0,0,0,0); return Math.round((d1-d0)/864e5)>=n}
+/* the backup file: data + receipt photos (the big ones are left out), named so each member's newest 7 are kept */
+async function bkMake(now){
+  let rc={out:null,skipped:0}; try{rc=await rcExport()}catch(e){}
+  const file={app:'maleem',version:1,at:now,auto:true,data:backupData()}; if(rc.out) file.receipts=rc.out;
+  return {name:`${fileTag()}-auto-${dayKey(now)}.json`, b64:await toB64(new Blob([JSON.stringify(file)])), skipped:rc.skipped||0};
+}
+const bkHasData=()=>S.expenses.length||S.debts.length||S.gams.length||S.incomes.length||S.goals.length||S.fixed.length;
 async function maybeAutoBackup(){
   if(!AB||!AB.autoBackup||autoBkBusy) return;
-  const n=+S.autoBkDays||0; if(n<1) return;
-  if(!S.expenses.length&&!S.debts.length&&!S.gams.length&&!S.incomes.length&&!S.goals.length&&!S.fixed.length) return;
+  const n=+S.autoBkDays||0; if(n<1||!bkHasData()) return;
   const now=Date.now(), to=bkTo();
   const wantDev=to!=='drive'&&bkDue(S.lastAutoBk,n);
   // Drive: after a failed try wait 30 minutes (no internet = don't retry every time the app comes to the front)
@@ -4710,22 +4694,37 @@ async function maybeAutoBackup(){
   if(!wantDev&&!wantDrive) return;
   autoBkBusy=true;
   try{
-    const name=`${fileTag()}-auto-${dayKey(now)}.json`;
-    const b64=await toB64(new Blob([JSON.stringify({app:'maleem',version:1,at:now,auto:true,data:backupData()})]));
+    const f=await bkMake(now);
     let devOk=false;
-    if(wantDev){devOk=!!AB.autoBackup(name,b64); if(devOk){S.lastAutoBk=now; save(); renderSettings()}}
+    if(wantDev){devOk=!!AB.autoBackup(f.name,f.b64); if(devOk){S.lastAutoBk=now; save(); renderSettings()}}
     const quiet=()=>$('#lock').classList.contains('open');
-    if(wantDrive) driveSend(name,b64,false,(ok,err,warned)=>{ if(quiet()||warned) return;
-      if(ok) toast(devOk?'اتعملت نسخة احتياطية تلقائية على الموبايل وGoogle Drive':'اتعملت نسخة احتياطية تلقائية على Google Drive',null,null,3200);
-      else if(devOk) toast('اتعملت نسخة احتياطية تلقائية في Download/Maleem',null,null,3200)});
-    else if(devOk&&!quiet()) toast('اتعملت نسخة احتياطية تلقائية في Download/Maleem',null,null,3200);
+    if(wantDrive) driveSend(f.name,f.b64,false,(ok,err,warned)=>{ if(quiet()||warned) return;
+      if(ok) toast(devOk?'اتعملت نسخة احتياطية على Google Drive والموبايل':'اتعملت نسخة احتياطية على Google Drive',null,null,3200);
+      else if(devOk) toast('اتعملت نسخة احتياطية على الموبايل',null,null,3200)});
+    else if(devOk&&!quiet()) toast('اتعملت نسخة احتياطية على الموبايل',null,null,3200);
   }catch(e){}
   autoBkBusy=false;
 }
+/* the button: a copy right now, to the same place(s) as the automatic one */
+async function backupNow(interactive){
+  const b=$('#backupBtn'); if(!AB||!AB.autoBackup||b.disabled||driveBusy) return;
+  if(!bkHasData()){toast('مفيش بيانات لسه عشان نعمل منها نسخة');return}
+  b.disabled=true; const t0=$('#backupBtnTxt').textContent; $('#backupBtnTxt').textContent='لحظة...';
+  const done=()=>{b.disabled=false; $('#backupBtnTxt').textContent=t0};
+  try{
+    const now=Date.now(), to=bkTo(), f=await bkMake(now);
+    if(f.skipped) setTimeout(()=>toast(`${f.skipped} صورة إيصال مدخلتش النسخة عشان حجمها كبير`,null,null,4000),3200);
+    let devOk=false;
+    if(to!=='drive'){devOk=!!AB.autoBackup(f.name,f.b64); if(devOk){S.lastAutoBk=now; save(); renderSettings()}}
+    if(to==='device'){done(); toast(devOk?'اتحفظت نسخة على الموبايل في Download/Maleem':'معرفناش نعمل نسخة احتياطية'); return}
+    driveSend(f.name,f.b64,!!interactive,(ok,err)=>{done();
+      toast(ok?(devOk?'اترفعت نسخة على Google Drive واتحفظت على الموبايل':'اترفعت نسخة على Google Drive'):driveErrMsg(err)+(devOk?'. النسخة اتحفظت على الموبايل بس':''),null,null,ok?3000:6000)});
+  }catch(e){done(); toast('معرفناش نعمل نسخة احتياطية')}
+}
 
-/* ===== Google Drive (Android): link a Google account once, then the automatic backup also goes to its Drive ===== */
+/* ===== Google Drive (Android): link a Google account once ===== */
 const DRIVE_ERR={cancel:'اتلغى الربط',config:'ربط Google Drive لسه مش متجهّز من ناحية المطوّر (Google Cloud)',api:'Google Drive API مش متفعّل في مشروع المطوّر',
-  gms:'الموبايل ده مفيهوش خدمات Google Play، فمش هينفع يربط Drive',auth:'جوجل محتاج توافق تاني: دوس «ارفع نسخة على Drive دلوقتي»',
+  gms:'الموبايل ده مفيهوش خدمات Google Play، فمش هينفع يربط Drive',auth:'جوجل محتاج توافق تاني: دوس «نسخة دلوقتي»',
   net:'مفيش اتصال بالنت',full:'مساحة Google Drive بتاعتك اتملت',gone:'فولدر Maleem مش موجود',http:'حصلت مشكلة في Google Drive',other:'حصلت مشكلة في Google Drive'};
 const driveErrMsg=c=>DRIVE_ERR[c]||DRIVE_ERR.other;
 const driveCbs={}; let driveBusy=false;
@@ -4747,21 +4746,28 @@ function driveSend(name,b64,interactive,done){
     save(); renderSettings(); if(done) done(!!r.ok,r.err,warned);
   });
 }
+const bkWhen=x=>shortDate(x)+' '+timeStr(x);
 function paintDrive(){
-  const on=!!(AB&&AB.driveLink); $('#driveCard').hidden=!on; if(!on) return;
-  $('#driveOff').hidden=!!S.drive; $('#driveOn').hidden=!S.drive; if(!S.drive) return;
-  $('#driveEmail').textContent=S.drive.email;
-  document.querySelectorAll('#bkToSeg [data-to]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.to===S.autoBkTo));
+  const on=!!(AB&&AB.driveLink&&AB.autoBackup); $('#bkAuto').hidden=!on; if(!on) return;
+  const linked=!!S.drive;
+  $('#driveOff').hidden=linked; $('#driveOn').hidden=!linked; $('#bkToWrap').hidden=!linked;
+  $('#backupBtnTxt').textContent='نسخة دلوقتي';
+  $('#backupHint').textContent=linked
+    ?'نسخك بتترفع على Google Drive بتاعك في فولدر «Maleem». مليم بيشوف الملفات اللي هو عملها بس، وبنحتفظ بآخر 7 نسخ.'
+    :'اربط حساب جوجل، ونسخك هتترفع على Google Drive لوحدها كل فترة تختارها. مليم بيشوف الملفات اللي هو عملها بس، ومش بيشوف أي حاجة تانية في الـ Drive. ولحد ما تربط، النسخ بتتحفظ على الموبايل في Download/Maleem.';
+  if(linked){ $('#driveEmail').textContent=S.drive.email;
+    document.querySelectorAll('#bkToSeg [data-to]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.to===bkTo())) }
   const st=$('#driveStatus'), bits=[];
   if(driveBusy) bits.push('بنرفع نسخة دلوقتي...');
   else{
-    if(S.lastDriveBk) bits.push('آخر رفع على Drive: '+shortDate(S.lastDriveBk)+' '+timeStr(S.lastDriveBk)); else bits.push('لسه مترفعش نسخ على Drive');
-    if(S.driveFails&&S.driveErr) bits.push('آخر محاولة فشلت: '+driveErrMsg(S.driveErr));
-    if(!(+S.autoBkDays>0)) bits.push('النسخ التلقائي مقفول، شغّله من فوق عشان الرفع يحصل لوحده');
-    else if(S.autoBkTo==='device') bits.push('النسخ التلقائي بيتحفظ على الموبايل بس');
+    if(!(+S.autoBkDays>0)) bits.push('النسخ التلقائي مقفول، والنسخ بتتعمل بس لما تدوس «نسخة دلوقتي»');
+    if(linked){
+      bits.push(S.lastDriveBk?'آخر رفع على Drive: '+bkWhen(S.lastDriveBk):'لسه مترفعش نسخ على Drive');
+      if(bkTo()==='both'&&S.lastAutoBk) bits.push('آخر نسخة على الموبايل: '+bkWhen(S.lastAutoBk));
+      if(S.driveFails&&S.driveErr) bits.push('آخر محاولة فشلت: '+driveErrMsg(S.driveErr));
+    } else bits.push(S.lastAutoBk?'آخر نسخة على الموبايل: '+bkWhen(S.lastAutoBk):'لسه معملتش نسخة');
   }
-  st.textContent=bits.join('. ')+(bits.length?'.':''); st.classList.toggle('err',!driveBusy&&!!S.driveFails);
-  $('#driveNow').disabled=driveBusy;
+  st.textContent=bits.join('. ')+(bits.length?'.':''); st.classList.toggle('err',linked&&!driveBusy&&!!S.driveFails);
 }
 $('#driveLink').onclick=()=>{
   if(!AB||!AB.driveLink) return; const b=$('#driveLink'); if(b.disabled) return; b.disabled=true; b.textContent='لحظة...';
@@ -4771,23 +4777,16 @@ $('#driveLink').onclick=()=>{
     S.drive={email:String(r.email||'حساب جوجل').slice(0,120)}; S.driveFails=0; S.driveErr=null; S.lastDriveBk=0;
     if(S.autoBkTo==='device') S.autoBkTo='both';
     save(); renderSettings(); toast('اتربط Google Drive. بنرفع أول نسخة...');
-    driveNow(false);
+    setTimeout(()=>backupNow(false),400);
   });
 };
-function driveNow(interactive){
-  if(!S.drive) return;
-  const now=Date.now(), name=`${fileTag()}-auto-${dayKey(now)}.json`;
-  toB64(new Blob([JSON.stringify({app:'maleem',version:1,at:now,auto:true,data:backupData()})])).then(b64=>
-    driveSend(name,b64,interactive,(ok,err)=>toast(ok?'اترفعت نسخة على Google Drive':driveErrMsg(err),null,null,ok?3000:6000)));
-}
-$('#driveNow').onclick=()=>driveNow(true);
 $('#bkToSeg').onclick=e=>{const b=e.target.closest('[data-to]'); if(!b||b.dataset.to===S.autoBkTo) return;
   S.autoBkTo=b.dataset.to; save(); renderSettings();
-  toast(S.autoBkTo==='device'?'النسخ التلقائي هيتحفظ على الموبايل بس':S.autoBkTo==='drive'?'النسخ التلقائي هيترفع على Google Drive بس':'النسخ التلقائي هيتحفظ على الموبايل ويترفع على Drive'); setTimeout(maybeAutoBackup,500)};
+  toast(S.autoBkTo==='drive'?'النسخ هتترفع على Google Drive بس':'النسخ هتترفع على Google Drive وتتحفظ على الموبايل كمان'); setTimeout(maybeAutoBackup,500)};
 armBtn($('#driveUnlink'),'فك الربط','دوس تاني للتأكيد',()=>{
   if(!S.drive) return; try{AB.driveForget(S.drive.email)}catch(e){}
-  S.drive=null; S.autoBkTo='device'; S.driveFails=0; S.driveErr=null; S.lastDriveBk=0; save(); renderSettings();
-  toast('اتفك الربط. النسخ اللي على Drive زي ما هي، ولو عايز تشيل صلاحية مليم من حسابك: حساب جوجل ← الأمان ← التطبيقات المتصلة',null,null,8000)});
+  S.drive=null; S.autoBkTo='both'; S.driveFails=0; S.driveErr=null; S.lastDriveBk=0; save(); renderSettings();
+  toast('اتفك الربط، والنسخ هتتحفظ على الموبايل لحد ما تربط تاني. النسخ اللي على Drive زي ما هي',null,null,8000)});
 
 function autoBkPaint(v){
   v=Math.min(30,Math.max(0,Math.round(+v)||0)); $('#autoBkRange').value=v; $('#autoBkBig').textContent=autoBkLabel(v);
@@ -4808,26 +4807,20 @@ let UPD={st:null,phase:'idle',pct:0,msg:'',manual:false,retried:false,offered:0}
 function updLocal(){try{return JSON.parse(lsGet(UPDK)||'{}')||{}}catch(e){return {}}}
 function updLocalSet(k,v){const o=updLocal(); o[k]=v; lsSet(UPDK,JSON.stringify(o))}
 function updLatest(){const st=UPD.st; if(!st||!st.enabled) return null; const L=(st.info&&st.info.latest)||{};
-  const code=Math.floor(+L.code||0); return code>(+st.cur||0)&&typeof L.apk==='string'&&/^https:\/\//.test(L.apk)?{code,name:String(L.name||'').slice(0,20),apk:L.apk,sha:String(L.sha256||''),notes:String(L.notes||'').slice(0,1500)}:null}
+  const code=Math.floor(+L.code||0); return code>(+st.cur||0)&&typeof L.apk==='string'&&/^https:\/\//.test(L.apk)?{code,name:String(L.name||'').slice(0,20),apk:L.apk,sha:String(L.sha256||''),notes:String(L.notes||'').split(/\r?\n/).map(s=>s.trim()).join('\n').trim().slice(0,1500)}:null}
 /* "update required" only when there is a newer APK to install: a wrong minCode never locks people out */
 const updForced=()=>{const st=UPD.st, L=updLatest(); return !!(L&&st&&+((st.info||{}).minCode)>(+st.cur||0))};
-function updLabel(){const st=UPD.st; if(!st) return ''; if(!st.enabled) return 'نسخة تجربة';
-  const L=updLatest(); return L?'فيه نسخة جديدة '+(L.name||''):'عندك آخر نسخة'+(st.curName?' ('+st.curName+')':'')}
+function updLabel(){const st=UPD.st; if(!st) return 'دوس عشان تدوّر على تحديث'; if(!st.enabled) return 'نسخة تجربة، مش بتدوّر على تحديثات';
+  if(UPD.manual) return 'بدوّر على تحديث...';
+  if(UPD.phase==='down') return 'بيحمّل التحديث... '+UPD.pct+'%';
+  const L=updLatest(); return L?'فيه نسخة جديدة '+(L.name||'')+'، دوس عشان تحدّث':'عندك آخر نسخة'+(st.curName?' ('+st.curName+')':'')+'، دوس عشان تدوّر'}
 const UPD_ERR={net:'التحميل وقف. اتأكد من النت ودوس تاني، وهيكمّل من مكان ما وقف',http:'ملف التحديث مش موجود على GitHub دلوقتي، جرب كمان شوية',
   sha:'الملف اللي نزل مش مطابق للنسخة المنشورة، دوس تاني',sig:'الملف ده مش متوقّع بمفتاح مليم، فمش هنثبّته',pkg:'الملف اللي نزل مش تطبيق مليم',apk:'الملف اللي نزل بايظ، دوس تاني',
   old:'النسخة دي مش أحدث من اللي عندك',url:'رابط التحديث مش من GitHub، فمش هنحمّله',big:'ملف التحديث كبير بشكل غريب، مش هنحمّله',io:'مفيش مساحة كفاية على الموبايل',busy:'التحميل شغال فعلًا'};
 function updPaintBar(bar){bar.hidden=UPD.phase!=='down'; bar.firstChild.style.width=UPD.pct+'%'}
 function paintUpd(){
-  const L=updLatest(), st=UPD.st, down=UPD.phase==='down';
+  const L=updLatest(), down=UPD.phase==='down';
   const goTxt=down?'بيحمّل... '+UPD.pct+'%':UPD.phase==='ready'?'تثبيت':'تحديث'+(L&&L.name?' لـ '+L.name:'');
-  // settings page
-  if($('#updCard')){
-    $('#updCur').textContent=st&&st.curName?st.curName:'—';
-    $('#updState').textContent=!st?'':!st.enabled?'نسخة التجربة مش بتدوّر على تحديثات.':
-      (L?'فيه نسخة جديدة '+(L.name||'')+'.':'عندك آخر نسخة.')+(st.checkedAt?' آخر تحقق: '+shortDate(st.checkedAt)+' '+timeStr(st.checkedAt):'');
-    $('#updAvail').hidden=!L; $('#updCheck').hidden=!!(st&&!st.enabled); $('#updCheck').disabled=UPD.manual;
-    if(L){$('#updPageNotes').textContent=L.notes; updPaintBar($('#updPageBar')); $('#updPageMsg').textContent=UPD.msg; $('#updPageGo').textContent=goTxt; $('#updPageGo').disabled=down}
-  }
   // sheet
   if($('#updSheet').dataset.mode==='update'&&L){updPaintBar($('#updBar')); $('#updMsg').textContent=UPD.msg; $('#updGo').textContent=goTxt; $('#updGo').disabled=down}
   // forced screen
@@ -4856,6 +4849,21 @@ window.__updDone=err=>{
   UPD.phase='idle'; UPD.msg=UPD_ERR[err]||'حصلت مشكلة في التحميل، دوس تاني'; paintUpd();
 };
 window.__updPermDenied=()=>{UPD.msg='لازم تسمح لمليم بتثبيت التطبيقات عشان التحديث يتثبت. دوس «تثبيت» تاني'; paintUpd()};
+function updSheetOpen(L){
+  UPD.offered=L.code; const sh=$('#updSheet');
+  sh.dataset.mode='update'; $('#updIco').textContent='✨'; $('#updTitle').textContent='فيه نسخة جديدة من مليم';
+  $('#updSub').textContent=(L.name?'النسخة '+L.name:'')+(UPD.st.curName?' · عندك '+UPD.st.curName:'');
+  $('#updNotes').textContent=L.notes; $('#updLater').textContent='بعدين'; $('#updGo').hidden=false;
+  paintUpd(); openSheetEl('updSheet');
+}
+/* the "التحديثات" row in settings: look now (or show the update already found / downloading) */
+function updManualCheck(){
+  if(!AB||!AB.updateCheck) return;
+  if(UPD.st&&!UPD.st.enabled){toast('دي نسخة التجربة، ومش بتدوّر على تحديثات');return}
+  const L=updLatest(); if(L&&UPD.phase!=='idle'){updSheetOpen(L);return}
+  if(UPD.manual) return;
+  UPD.manual=true; paintUpd(); AB.updateCheck(true);
+}
 /* the sheet waits until nothing else is on screen (lock, welcome, another sheet) */
 let updShowT=null;
 function updOffer(tries){
@@ -4864,13 +4872,7 @@ function updOffer(tries){
   if(busy){ if((tries||0)<150) updShowT=setTimeout(()=>updOffer((tries||0)+1),2000); return }
   const L=updLatest(), loc=updLocal(), info=(UPD.st&&UPD.st.info)||{}, m=info.message||{};
   const sh=$('#updSheet');
-  if(L&&+loc.skip!==L.code&&UPD.offered!==L.code){
-    UPD.offered=L.code;
-    sh.dataset.mode='update'; $('#updIco').textContent='✨'; $('#updTitle').textContent='فيه نسخة جديدة من مليم';
-    $('#updSub').textContent=(L.name?'النسخة '+L.name:'')+(UPD.st.curName?' · عندك '+UPD.st.curName:'');
-    $('#updNotes').textContent=L.notes; $('#updLater').textContent='بعدين'; $('#updGo').hidden=false;
-    paintUpd(); openSheetEl('updSheet'); return;
-  }
+  if(L&&+loc.skip!==L.code&&UPD.offered!==L.code){updSheetOpen(L); return}
   const mid=String(m.id||'').slice(0,60), mtx=String(m.text||'').slice(0,1500).trim();
   if(mid&&mtx&&loc.seen!==mid){
     sh.dataset.mode='msg'; $('#updIco').textContent='📣'; $('#updTitle').textContent='رسالة من مليم'; $('#updSub').textContent='';
@@ -4882,15 +4884,18 @@ window.__updInfo=json=>{ // (json|null, errorCode): only whether it came matters
   const manual=UPD.manual; UPD.manual=false;
   if(json){try{UPD.st=JSON.parse(json)}catch(e){}}
   paintUpd();
-  if(manual){ if(!json) toast('مقدرتش أوصل لـ GitHub، اتأكد من النت',null,null,4000); else if(!updLatest()) toast('عندك آخر نسخة من مليم') }
+  if(manual){
+    if(!json){toast('مقدرتش أوصل لـ GitHub، اتأكد من النت',null,null,4000);return}
+    const L=updLatest(); if(!L){toast('عندك آخر نسخة من مليم');return}
+    if(!updForced()){closeSheets(); updSheetOpen(L)} // asked for it: show it even if "بعدين" was pressed before
+    return;
+  }
   if(json&&!updForced()) afterSplash(()=>updOffer(0));
 };
 $('#updGo').onclick=()=>updStart();
 $('#updLater').onclick=()=>{const sh=$('#updSheet'), L=updLatest(); if(sh.dataset.mode==='update'&&L&&UPD.phase==='idle') updLocalSet('skip',L.code); closeSheets()};
-$('#updPageGo').onclick=()=>updStart();
 $('#updLockGo').onclick=()=>updStart();
 $('#updLockSave').onclick=()=>{try{$('#backupBtn').click()}catch(e){}};
-$('#updCheck').onclick=()=>{if(!AB||!AB.updateCheck||UPD.manual) return; UPD.manual=true; paintUpd(); AB.updateCheck(true)};
 /* first look after the first frame (the bridge call is synchronous): the saved copy applies "update required" offline too */
 function updBoot(){
   if(!AB||!AB.updateState) return;
