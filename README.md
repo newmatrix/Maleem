@@ -1,5 +1,6 @@
 <div align="center">
-<img width="856" height="483" alt="مليم_ سيطرتك على ميزانيتك copy" src="https://github.com/user-attachments/assets/65dbb8dd-a982-4fb7-9401-324638eb3664" />
+<img width="998" height="561" alt="مليم_ نظّم مصاريفك بسهولة copy" src="https://github.com/user-attachments/assets/5930afc6-aa79-462d-84e4-b7201a7d2acb" />
+
 
 
 
