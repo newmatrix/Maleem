@@ -1,0 +1,46 @@
+name: Show signing fingerprints
+
+# Prints the SHA-1 / SHA-256 of the release key and of the test (debug) key.
+# Google Cloud asks for the SHA-1 when you create the Android OAuth clients for Google Drive backup.
+# Fingerprints are public information (anyone can read them from the APK): printing them is safe.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  show:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Print fingerprints
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          {
+            echo "## Release key (package com.heshamtaha.maleem)"
+            if [ -z "$KEYSTORE_BASE64" ]; then
+              echo "The secret KEYSTORE_BASE64 is missing."
+            else
+              echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/k.jks"
+              echo '```'
+              keytool -list -v -keystore "$RUNNER_TEMP/k.jks" -storepass "$KEYSTORE_PASSWORD" -alias upload | grep -E 'SHA1:|SHA256:' | sed 's/^[[:space:]]*//'
+              echo '```'
+              rm -f "$RUNNER_TEMP/k.jks"
+            fi
+            echo
+            echo "## Test key (package com.heshamtaha.maleem.debug)"
+            echo '```'
+            keytool -list -v -keystore app/debug.keystore -storepass android -alias androiddebugkey | grep -E 'SHA1:|SHA256:' | sed 's/^[[:space:]]*//'
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
