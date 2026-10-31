@@ -1,10 +1,10 @@
 {
   "latest": {
-    "code": 117,
-    "name": "1.0",
-    "apk": "https://github.com/newmatrix/Maleem/releases/download/v1.0/Maleem-v1.0.apk",
-    "sha256": "bfe34ecf8154e83814074cc03a19b0e877bb12f73e38b10fa1260b69d51336a2",
-    "notes": "أول نسخة من مليم 🎉"
+    "code": 118,
+    "name": "1.1",
+    "apk": "https://github.com/newmatrix/Maleem/releases/download/v1.1/Maleem-v1.1.apk",
+    "sha256": "c533d1eea8b442ffc7546d9784a1b1dc73e98ab6384ecb14162d76e1e11a5da4",
+    "notes": "• استعادة نسخك من Google Drive بسهولة: اختار الإيميل، ومليم هيلاقي أحدث نسخة ويرجّعها لوحده\r\n• لو موبايلك جديد، تقدر ترجّع بياناتك من أول شاشة من غير ما تبدأ من الصفر\r\n• زرار «بعدين» في التحديثات بقى بيأجّل بس، وتقدر تحدّث في أي وقت من الإعدادات"
   },
   "minCode": 0,
   "message": {
