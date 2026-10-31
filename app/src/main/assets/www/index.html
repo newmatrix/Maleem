@@ -1713,6 +1713,15 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <p class="hint" id="wipeSpNote" hidden>إنت في مساحة مشتركة: هتخرج منها، ومصاريف الطرف التاني مش هتتمسح.</p>
   <div class="sheet-actions" style="margin-top:18px"><button class="btn danger-solid" id="wipeConfirm">امسح</button><button class="btn" id="wipeCancel">إلغاء</button></div>
 </div>
+<div class="sheet" id="curSheet" role="dialog" aria-modal="true" aria-labelledby="curTitle">
+  <div class="grab"></div>
+  <h2 id="curTitle">تغيير العملة</h2>
+  <p class="hint center" id="curTxt"></p>
+  <p class="hint center" id="curRate" dir="auto" style="font-weight:700"></p>
+  <p class="hint center" id="curEx"></p>
+  <p class="hint center" id="curOld" hidden></p>
+  <div class="sheet-actions" style="margin-top:18px"><button class="btn primary" id="curGo">حوّل كل مبالغي</button><button class="btn" id="curCancel">إلغاء</button></div>
+</div>
 
 <!-- Daily reminder time sheet -->
 <div class="sheet" id="timeSheet" role="dialog" aria-modal="true" aria-labelledby="timeTitle">
@@ -1984,7 +1993,7 @@ let PAY={}; const syncPays=()=>{PAY=Object.fromEntries(S.pays.map(x=>[x.id,x]));
 const payOf=x=>PAY[x.pay]?x.pay:'cash';
 if(!S.fixedLog||typeof S.fixedLog!=='object') S.fixedLog={};
 if(!S.currency) S.currency='EGP';
-const CURRENCIES=[{id:'EGP',s:'ج.م',n:'جنيه مصري'},{id:'SAR',s:'ر.س',n:'ريال سعودي'},{id:'AED',s:'د.إ',n:'درهم إماراتي'},{id:'KWD',s:'د.ك',n:'دينار كويتي'},{id:'QAR',s:'ر.ق',n:'ريال قطري'},{id:'BHD',s:'د.ب',n:'دينار بحريني'},{id:'OMR',s:'ر.ع',n:'ريال عماني'},{id:'JOD',s:'د.أ',n:'دينار أردني'},{id:'USD',s:'$',n:'دولار أمريكي'},{id:'EUR',s:'€',n:'يورو'},{id:'GBP',s:'£',n:'جنيه إسترليني'}];
+const CURRENCIES=[{id:'EGP',s:'ج.م',n:'جنيه مصري'},{id:'SAR',s:'ر.س',n:'ريال سعودي'},{id:'AED',s:'د.إ',n:'درهم إماراتي'},{id:'KWD',s:'د.ك',n:'دينار كويتي'},{id:'QAR',s:'ر.ق',n:'ريال قطري'},{id:'BHD',s:'د.ب',n:'دينار بحريني'},{id:'OMR',s:'ر.ع',n:'ريال عماني'},{id:'JOD',s:'د.أ',n:'دينار أردني'},{id:'ILS',s:'₪',n:'شيكل'},{id:'USD',s:'$',n:'دولار أمريكي'},{id:'EUR',s:'€',n:'يورو'},{id:'GBP',s:'£',n:'جنيه إسترليني'}];
 const CS=()=>(CURRENCIES.find(c=>c.id===S.currency)||CURRENCIES[0]).s;
 if(!S.since) S.since=Date.now();
 
@@ -2031,6 +2040,9 @@ function cleanExpense(x,keepSpace){
   const amount=+x.amount, ts=+x.ts; if(!(amount>0&&amount<MAXAMT)||!(ts>=0&&ts<MAXTS)) return null;
   const e={id:idOr(x.id),amount:r2(amount),cat:isId(x.cat)?x.cat:'other',note:str(x.note,200),ts};
   if(isId(x.pay)) e.pay=x.pay; if(isId(x.fx)) e.fx=x.fx;
+  /* o = the amount and currency this expense was first written in (kept when the currency is changed, so a shared
+     expense keeps showing the same value to the other members; p = still waiting for an exchange rate) */
+  if(x.o&&typeof x.o==='object'){const oa=+x.o.a; if(oa>0&&oa<MAXAMT&&typeof x.o.c==='string'&&CURRENCIES.some(c=>c.id===x.o.c)){e.o={a:oa,c:x.o.c}; if(x.o.p===true) e.o.p=true}}
   cleanOwner(e,x);
   if(keepSpace){ if(isId(x.sp)) e.sp=x.sp; if(x.legacyReadOnly===true) e.legacyReadOnly=true }
   return e;
@@ -2080,6 +2092,35 @@ function cleanCap(x){
     source:str(x.source,40).trim(),pkg:typeof x.pkg==='string'&&/^[A-Za-z0-9_.]{1,200}$/.test(x.pkg)?x.pkg:'',text:str(x.text,300)};
 }
 function cleanProfile(p){p=p&&typeof p==='object'?p:{}; return {name:str(p.name,60),age:intIn(p.age,5,120,null),photo:isPhoto(p.photo)?p.photo:null}}
+/* ===== Exchange rates =====
+   rates.json (base USD) is refreshed daily by a GitHub workflow and read by Kotlin (Rates.kt), which keeps the last good copy.
+   rateFor(a,b) = how many b one a is worth (0 = no rate yet). */
+const RT={data:null,at:0,tried:false,busy:false,waiters:[]};
+function ratesLoad(j){
+  try{const o=typeof j==='string'?JSON.parse(j):j, d=o&&o.data;
+    if(d&&d.base==='USD'&&d.rates&&typeof d.rates==='object'&&+d.updated>0){RT.data={updated:+d.updated,rates:d.rates};RT.at=+o.checkedAt||0;return true}}catch(e){}
+  return false;
+}
+function rateFor(from,to){
+  if(from===to) return 1;
+  if(!RT.tried){RT.tried=true; if(AB&&AB.ratesState){try{ratesLoad(AB.ratesState())}catch(e){}}}
+  const r=RT.data&&RT.data.rates; if(!r) return 0;
+  const a=+r[from], b=+r[to]; return a>0&&b>0&&Number.isFinite(a)&&Number.isFinite(b)?b/a:0;
+}
+function ratesDone(){RT.busy=false; RT.waiters.splice(0).forEach(f=>{try{f()}catch(e){}})}
+window.__ratesInfo=json=>{ if(json&&ratesLoad(json)) setTimeout(()=>{try{curFixPending()}catch(e){}},0); ratesDone() };
+/* asks for fresh rates (Android: through Kotlin, which throttles to once every 3 hours unless [force]); [cb] runs when done or after 9 seconds */
+function ratesRefresh(force,cb){
+  if(cb) RT.waiters.push(cb);
+  if(RT.busy) return;
+  RT.busy=true; setTimeout(()=>{if(RT.busy) ratesDone()},9000);
+  if(AB&&AB.ratesRefresh){AB.ratesRefresh(!!force); return}
+  /* the web version has no CSP in the way, so it can read the file itself */
+  try{ const ctl=new AbortController(); setTimeout(()=>ctl.abort(),8000);
+    fetch('https://raw.githubusercontent.com/newmatrix/Maleem/main/rates.json?t='+Math.floor(Date.now()/60000),{cache:'no-store',signal:ctl.signal})
+      .then(r=>r.ok?r.json():null).then(j=>{ if(j&&ratesLoad({data:j,checkedAt:Date.now()})) setTimeout(()=>{try{curFixPending()}catch(e){}},0); ratesDone() }).catch(()=>ratesDone());
+  }catch(e){ratesDone()}
+}
 const CLEAN={debts:cleanDebt,gams:cleanGam,incomes:cleanIncome,goals:cleanGoal,fixed:cleanFixed};
 /* clean whatever is already stored on the phone (older versions, old backups) */
 (function(){
@@ -2698,11 +2739,12 @@ function openSheet(id,pre){
 }
 function closeSheets(){
   if(voiceOn) voiceCancel();
+  if(CURX){CURX=null; $('#currencySel').value=S.currency} // a currency change nobody confirmed
   $('#scrim').classList.remove('hi'); if(RS){RS.seq++; RS.busy=false; RS.hold=null}
   wpCloseAll();
   rcStage=null; capOpen=null;
   closePayMenu(); closeDateMenu();
-  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet','rsSheet'].forEach(i=>$('#'+i).classList.remove('open'));
+  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','curSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet','rsSheet'].forEach(i=>$('#'+i).classList.remove('open'));
   $('#noteInput').blur();$('#catName').blur();amtIn.blur();
   if(pinMode){pinMode=null;$('#pinToggle').checked=!!hasPin()}
 }
@@ -2715,7 +2757,7 @@ $('#saveBtn').onclick=()=>{
   if(!selCat){$('#cats').classList.add('err');$('#sheetErr').textContent='اختار الفئة';return}
   const note=$('#noteInput').value.trim();
   let savedId=editId;
-  if(editId){const x=S.expenses.find(e=>e.id===editId); if(x&&!expenseCanManage(x)){closeSheets();toast('مصروفات الأعضاء الآخرين للقراءة فقط');return} if(x){x.amount=v;x.cat=selCat;x.note=note;x.pay=selPay;x.ts=tsForDay(selDay,x.ts)}}
+  if(editId){const x=S.expenses.find(e=>e.id===editId); if(x&&!expenseCanManage(x)){closeSheets();toast('مصروفات الأعضاء الآخرين للقراءة فقط');return} if(x){x.amount=v;delete x.o;x.cat=selCat;x.note=note;x.pay=selPay;x.ts=tsForDay(selDay,x.ts)}}
   else {const id=uid();justAdded=id;savedId=id;
     const ts= capOpen&&capOpen.ts&&dayKey(capOpen.ts)===selDay? capOpen.ts : tsForDay(selDay); // a captured payment keeps its real time
     const e={id,amount:v,cat:selCat,note,pay:selPay,ts}; S.lastPay=selPay;
@@ -4642,7 +4684,80 @@ function renderMe(){
 }
 function applyCurrency(){document.querySelectorAll('.cur').forEach(e=>e.textContent=CS())}
 $('#currencySel').innerHTML=CURRENCIES.map(c=>`<option value="${c.id}">${c.n} (${c.s})</option>`).join('');
-$('#currencySel').onchange=e=>{S.currency=e.target.value;save();applyCurrency();renderAll();toast('العملة بقت '+CURRENCIES.find(c=>c.id===S.currency).n)};
+/* ===== Changing the currency: every amount is converted with today's rate =====
+   A 50 EGP cheese is not 50 USD. The rate comes from rates.json (see Rates.kt); with no rate the change is refused rather than done wrong. */
+var CURX=null; // the change waiting for the person to confirm: {from,to,k,at}
+const CUR_NAME=id=>(CURRENCIES.find(c=>c.id===id)||{n:id}).n;
+const CUR_SHARED_TYPES={debts:'السلف',gams:'الجمعيات',goals:'أهداف الادخار',incomes:'الدخل',fixed:'المصاريف الثابتة'};
+const curHasMoney=()=>!!(S.expenses.length||S.budget>0||S.saveTarget>0||S.incomes.length||S.goals.length||S.debts.length||S.gams.length||S.fixed.length||S.cats.some(c=>c.lim>0));
+function curSharedBlock(){
+  if(!S.space) return [];
+  let p; try{p=spNormPrefs(S.space.sharePrefs,true)}catch(e){return []}
+  return Object.keys(CUR_SHARED_TYPES).filter(t=>p&&p[t]).map(t=>CUR_SHARED_TYPES[t]);
+}
+const curFmtRate=v=>(Math.round(v*10000)/10000).toLocaleString('en-US',{maximumFractionDigits:4});
+function curAsk(to){
+  const from=S.currency; if(!to||to===from) return;
+  const back=()=>{$('#currencySel').value=S.currency};
+  if(!curHasMoney()){S.currency=to;save();applyCurrency();renderAll();toast('العملة بقت '+CUR_NAME(to));return} // nothing to convert yet
+  const bl=curSharedBlock();
+  if(bl.length){back();toast('مينفعش تغيّر العملة وانت بتشارك '+bl.join(' و')+' في المساحة المشتركة، لأن أرقامهم هتتلخبط عند الباقيين. اقفل مشاركتهم الأول وبعدين غيّر العملة',null,null,9000);return}
+  toast('بجيب سعر العملة...',null,null,3000);
+  ratesRefresh(true,()=>{
+    const k=rateFor(from,to);
+    if(!k){back();toast('محتاج نت عشان أجيب سعر العملة. جرّب تاني لما النت يشتغل',null,null,6000);return}
+    CURX={from,to,k,at:RT.data?RT.data.updated*1000:0};
+    const strong=rateFor(to,from)>=1;
+    $('#curTxt').textContent='هتتحول كل مبالغك من '+CUR_NAME(from)+' إلى '+CUR_NAME(to)+': المصروفات والميزانية والدخل والمصاريف الثابتة والأهداف والسلف والجمعيات.';
+    $('#curRate').textContent=strong?('1 '+to+' = '+curFmtRate(rateFor(to,from))+' '+from):('1 '+from+' = '+curFmtRate(k)+' '+to);
+    const sym=id=>(CURRENCIES.find(c=>c.id===id)||{s:id}).s;
+    const iso=t=>'\u2068'+t+'\u2069'; // keeps the symbols and the date in their own direction inside the Arabic sentence
+    $('#curEx').textContent='يعني مثلًا '+iso('100 '+sym(from))+' هتبقى '+iso(fmt(100*k)+' '+sym(to))+(CURX.at?'، بسعر يوم '+iso(shortDate(CURX.at)):'');
+    const days=CURX.at?Math.floor((Date.now()-CURX.at)/864e5):0;
+    $('#curOld').hidden=!(days>=3); $('#curOld').textContent=days>=3?('السعر ده عمره '+days+' أيام، لأن مفيش نت دلوقتي. لو عايز سعر النهارده جرّب تاني بعد ما النت يشتغل.'):'';
+    clearTimeout(toastT); $('#toast').classList.remove('show'); // the "getting the rate" message is done
+    $('#scrim').classList.add('open'); $('#curSheet').classList.add('open');
+  });
+}
+/* multiplies every amount by [k]; [keepO] remembers the original amount/currency of each expense (needed while in a shared space) */
+function curScaleAll(k,from,keepO){
+  const sc=v=>{v=+v; if(!(v>0)) return 0; const n=r2(v*k); return n>0?n:0.01};
+  const exp=e=>{ if(!e) return; if(e.o&&e.o.p) return; /* still waiting for its own rate: it is converted from its original later */
+    if(keepO&&!e.o) e.o={a:e.amount,c:from}; e.amount=sc(e.amount) };
+  S.expenses.forEach(exp); Object.values(spCloudExpenses||{}).forEach(exp);
+  S.budget=sc(S.budget); S.saveTarget=sc(S.saveTarget);
+  S.incomes.forEach(x=>{x.amount=sc(x.amount)});
+  S.goals.forEach(g=>{g.target=sc(g.target)||0.01; g.saved=sc(g.saved)});
+  S.debts.forEach(d=>{
+    const wasPaid=debtRem(d)<=0;
+    d.amount=sc(d.amount)||0.01; d.payments.forEach(p=>{p.amount=sc(p.amount)||0.01});
+    if(wasPaid&&d.payments.length){const tot=r2(d.payments.reduce((a,p)=>a+p.amount,0)); if(tot>0) d.amount=tot} // rounding must not re-open a settled debt
+  });
+  S.gams.forEach(g=>{g.inst=sc(g.inst)||0.01});
+  S.fixed.forEach(f=>{f.amount=sc(f.amount)});
+  S.cats.forEach(c=>{if(c.lim>0) c.lim=sc(c.lim)}); syncCats();
+}
+function curApply(x){
+  const snap=JSON.parse(JSON.stringify({currency:S.currency,expenses:S.expenses,budget:S.budget,saveTarget:S.saveTarget,incomes:S.incomes,goals:S.goals,debts:S.debts,gams:S.gams,fixed:S.fixed,cats:S.cats,cloud:spCloudExpenses}));
+  curScaleAll(x.k,x.from,!!S.space);
+  S.currency=x.to; save(); applyCurrency(); $('#currencySel').value=x.to; closeSheets(); renderAll();
+  toast('اتحوّلت كل المبالغ من '+CUR_NAME(x.from)+' لـ '+CUR_NAME(x.to),'تراجع',()=>curRestore(snap),10000);
+}
+function curRestore(snap){
+  Object.assign(S,{currency:snap.currency,expenses:snap.expenses,budget:snap.budget,saveTarget:snap.saveTarget,incomes:snap.incomes,goals:snap.goals,debts:snap.debts,gams:snap.gams,fixed:snap.fixed,cats:snap.cats});
+  spCloudExpenses=snap.cloud||{}; syncCats(); save(); applyCurrency(); $('#currencySel').value=S.currency; renderAll();
+  toast('رجّعنا العملة والمبالغ زي ما كانت');
+}
+/* shared expenses that arrived before there was a rate: convert them now */
+function curFixPending(){
+  let ch=false;
+  const fix=e=>{ if(!(e&&e.o&&e.o.p)) return; const k=rateFor(e.o.c,S.currency); if(!k) return; e.amount=Math.max(0.01,r2(e.o.a*k)); e.o={a:e.o.a,c:e.o.c}; ch=true };
+  S.expenses.forEach(fix); Object.values(spCloudExpenses||{}).forEach(fix);
+  if(ch){save();renderAll()}
+}
+$('#currencySel').onchange=e=>curAsk(e.target.value);
+$('#curGo').onclick=()=>{const x=CURX; if(!x) return; CURX=null; curApply(x)};
+$('#curCancel').onclick=()=>closeSheets();
 bindMoney($('#saveTargetIn'));
 $('#saveTargetIn').addEventListener('change',()=>{S.saveTarget=parseFloat($('#saveTargetIn').value)||0;save();renderMe();toast(S.saveTarget?`هدفك تحوش ${fmt(S.saveTarget)} ${CS()} كل شهر`:'اتشال هدف الادخار الشهري')});
 
@@ -5292,7 +5407,8 @@ function expenseCanManage(e){
   return !!owner&&owner===spMe();
 }
 function expenseReadOnly(e){return !expenseCanManage(e)}
-const hashE=e=>JSON.stringify([+e.amount,e.cat,e.note||'',e.pay||'',+e.ts]);
+const cloudAmt=e=>e.o?+e.o.a:+e.amount, cloudCur=e=>e.o?e.o.c:S.currency;
+const hashE=e=>JSON.stringify([cloudAmt(e),cloudCur(e),e.cat,e.note||'',e.pay||'',+e.ts]);
 const SP_CODE_LEN=8; // new spaces get 8 characters; spaces made before keep their 10-character codes
 const spFmt=c=>String(c||'').replace(/^(.{4})(.{4})$/,'$1-$2').replace(/^(.{5})(.{5})$/,'$1-$2');
 const spCodeOk=c=>/^[A-HJ-NP-Z2-9]{8}(?:[A-HJ-NP-Z2-9]{2})?$/.test(c);
@@ -5363,7 +5479,7 @@ function spRenderSharedData(){
   ['reports'].forEach(type=>{
     const rows=(spExtraData[type]||[]).slice().sort((a,b)=>String(b.localId||'').localeCompare(String(a.localId||'')));
     if(!rows.length)return;
-    const body=rows.map(r=>{const d=r.payload||{};const cat=Object.entries(d.categories||{}).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>`${esc((CAT[k]||CAT.other).name)} ${money(v)}`).join(' · ');return `<div class="sp-share-record"><div class="main"><b>${esc(r.ownerName||'عضو')} · ${esc(d.periodLabel||d.periodKey||'تقرير شهري')}</b><small>${+d.count||0} عملية${cat?' · '+cat:''}</small></div><span class="amt">${money(d.total||0)} ${esc(d.currency||CS())}</span></div>`}).join('');
+    const body=rows.map(r=>{const d=r.payload||{};const cat=Object.entries(d.categories||{}).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>`${esc((CAT[k]||CAT.other).name)} ${money(v*rpK(d))}`).join(' · ');return `<div class="sp-share-record"><div class="main"><b>${esc(r.ownerName||'عضو')} · ${esc(d.periodLabel||d.periodKey||'تقرير شهري')}</b><small>${+d.count||0} عملية${cat?' · '+cat:''}</small></div><span class="amt">${money((d.total||0)*rpK(d))} ${esc(rpK(d)===1?(d.currency||CS()):CS())}</span></div>`}).join('');
     groups.push(`<details class="sp-share-group"><summary>${titleBy[type]} <span class="n">${rows.length} ${type==='reports'?'فترة':'سجل'}</span></summary>${body}</details>`);
   });
   out.innerHTML=groups.length?groups.join(''):'<div class="sp-empty">لسه مفيش بيانات اتشاركت في المساحة. لما أي عضو يفعّل نوع بيانات، هتظهر هنا.</div>';
@@ -5534,13 +5650,25 @@ function spApply(snap){
       stateChanged=spClearOldId(id)||stateChanged;return
     }
     if(!(+d.amount>0&&+d.amount<MAXAMT)||!(+d.ts>0&&+d.ts<MAXTS)) return;
-    const e={id,amount:r2(+d.amount),cat:CAT[d.cat]?d.cat:'other',note:str(d.note,200),ts:+d.ts,sp:code,by:d.by,byName:d.byName};if(isId(d.pay))e.pay=d.pay;
+    const inc=spIncoming(d,i>=0?S.expenses[i]:null);
+    const e={id,amount:inc.amount,cat:CAT[d.cat]?d.cat:'other',note:str(d.note,200),ts:+d.ts,sp:code,by:d.by,byName:d.byName};if(isId(d.pay))e.pay=d.pay;if(inc.o)e.o=inc.o;
     spOwners[id]=d.by||'';spCloudExpenses[id]={...e};
     const h=hashE(e);
     if(i>=0&&hashE(S.expenses[i])===h){spHash[id]=h;if(S.expenses[i].by!==d.by||S.expenses[i].byName!==d.byName||S.expenses[i].sp!==code||S.expenses[i].legacyReadOnly){S.expenses[i].by=d.by;S.expenses[i].byName=d.byName;S.expenses[i].sp=code;delete S.expenses[i].legacyReadOnly;changed=true}stateChanged=spClearOldId(id)||stateChanged;return}
     if(i>=0)S.expenses[i]=e;else S.expenses.push(e);spHash[id]=h;changed=true;stateChanged=spClearOldId(id)||stateChanged;
   });
   if(changed||stateChanged)save();if(changed){renderAll();setTimeout(checkAlerts,500)}else if(stateChanged)renderSpace();
+}
+/* The amount of a shared expense is written in the author's currency (d.cur). Here it is converted ONCE, with the rate of the day it arrives,
+   and then kept: the same expense never changes its value because the rate moved tomorrow (it changes only if the author edits it).
+   A record without d.cur (older app versions) is taken as already being in this member's currency. */
+function spIncoming(d,local){
+  const a=r2(+d.amount), c=(typeof d.cur==='string'&&CURRENCIES.some(x=>x.id===d.cur))?d.cur:'';
+  if(local&&local.o&&!local.o.p&&r2(local.o.a)===a&&(!c||local.o.c===c)) return {amount:local.amount,o:local.o};
+  if(!c||c===S.currency) return {amount:a};
+  const k=rateFor(c,S.currency);
+  if(!k){ratesRefresh(false);return {amount:a,o:{a,c,p:true}}}
+  return {amount:Math.max(0.01,r2(a*k)),o:{a,c}};
 }
 let spPushBusy=false,spPushAgain=false;
 function spRestoreReadOnlyExpenses(uid,code){
@@ -5569,10 +5697,10 @@ async function spPush(){
         if(e.sp===code&&!serverKnown&&!manual.has(String(e.id)))return;
         const author=(e.sp===code?(spOwners[e.id]||e.by||uid):uid);if(author!==uid)return;
         const authorName=e.sp===code?String(e.byName||nm).slice(0,40):String(nm).slice(0,40);
-        cur.add(e.id);const h=hashE(e);if(spHash[e.id]!==h)writes.push([e.id,{amount:+e.amount,cat:e.cat,note:String(e.note||'').slice(0,200),pay:e.pay||'',ts:+e.ts,by:author,byName:authorName,del:false,upd:F.serverTimestamp()},h]);
+        cur.add(e.id);const h=hashE(e);if(spHash[e.id]!==h)writes.push([e.id,{amount:cloudAmt(e),cur:cloudCur(e),cat:e.cat,note:String(e.note||'').slice(0,200),pay:e.pay||'',ts:+e.ts,by:author,byName:authorName,del:false,upd:F.serverTimestamp()},h]);
       });
       Object.keys(spHash).forEach(id=>{if(!cur.has(id)&&spOwners[id]===uid)writes.push([id,{del:true,by:uid,upd:F.serverTimestamp()},null])});
-      for(let i=0;i<writes.length;i+=400){const chunk=writes.slice(i,i+400),b=F.writeBatch(db);chunk.forEach(([id,data])=>b.set(F.doc(db,'spaces',code,'expenses',id),data));await b.commit();let localChanged=false;chunk.forEach(([id,data,h])=>{if(h===null){delete spHash[id];spOwners[id]=uid;return}spHash[id]=h;spOwners[id]=data.by;const cloud={id,amount:+data.amount,cat:data.cat,note:data.note||'',ts:+data.ts,sp:code,by:data.by,byName:data.byName};if(data.pay)cloud.pay=data.pay;spCloudExpenses[id]=cloud;const e=S.expenses.find(x=>String(x.id)===String(id));if(e&&S.space&&S.space.code===code){if(e.sp!==code){e.sp=code;localChanged=true}if(e.by!==data.by){e.by=data.by;localChanged=true}if(e.byName!==data.byName){e.byName=data.byName;localChanged=true}if(spClearOldId(id))localChanged=true}});if(localChanged&&S.space&&S.space.code===code)persist()}
+      for(let i=0;i<writes.length;i+=400){const chunk=writes.slice(i,i+400),b=F.writeBatch(db);chunk.forEach(([id,data])=>b.set(F.doc(db,'spaces',code,'expenses',id),data));await b.commit();let localChanged=false;chunk.forEach(([id,data,h])=>{if(h===null){delete spHash[id];spOwners[id]=uid;return}spHash[id]=h;spOwners[id]=data.by;const e=S.expenses.find(x=>String(x.id)===String(id));const cloud={id,amount:e?+e.amount:+data.amount,cat:data.cat,note:data.note||'',ts:+data.ts,sp:code,by:data.by,byName:data.byName};if(data.pay)cloud.pay=data.pay;if(e&&e.o)cloud.o={...e.o};spCloudExpenses[id]=cloud;if(e&&S.space&&S.space.code===code){if(e.sp!==code){e.sp=code;localChanged=true}if(e.by!==data.by){e.by=data.by;localChanged=true}if(e.byName!==data.byName){e.byName=data.byName;localChanged=true}if(spClearOldId(id))localChanged=true}});if(localChanged&&S.space&&S.space.code===code)persist()}
     }
     await spPushTypes();renderSpace();
   }catch(e){spSetStatus(e&&e.code==='permission-denied'?'denied':'err')}
@@ -5582,6 +5710,8 @@ function spStable(v){return Array.isArray(v)?'['+v.map(spStable).join(',')+']':(
 function spByTag(x){return (x&&x.byName&&x.by&&x.by!==spMe())?` <span class="xby">· ${esc(x.byName)}</span>`:''}
 function spItemClean(x){const c=spClone(x);delete c.by;delete c.byName;return c}
 function spClone(x){try{return JSON.parse(JSON.stringify(x))}catch(e){return {}}}
+/* a member's monthly summary is written in his currency (d.currency): show it in mine with today's rate (1 = same currency or no rate yet) */
+function rpK(d){const c=d&&typeof d.currency==='string'?d.currency:''; if(!c||c===S.currency||!CURRENCIES.some(x=>x.id===c)) return 1; const k=rateFor(c,S.currency); return k>0?k:1}
 function spReportRows(uid){
   const groups={};spLocalExpenses().filter(e=>Number.isFinite(+e.ts)).forEach(e=>{
     const P=periodAt(+e.ts,repPd()),g=groups[P.key]||(groups[P.key]={periodKey:P.key,periodLabel:repName(P),total:0,count:0,categories:{},currency:String(S.currency||'EGP')});
@@ -6253,6 +6383,7 @@ document.documentElement.classList.remove('booting');
 })();
 requestAnimationFrame(()=>setTimeout(renderRest,0));
 setTimeout(()=>{try{updBoot()}catch(e){}},2500);
+setTimeout(()=>{try{curFixPending(); if(S.space) ratesRefresh(false)}catch(e){}},3500);
 })();
 </script>
 </body>
