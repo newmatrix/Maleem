@@ -2,6 +2,7 @@ package com.heshamtaha.maleem
 
 import android.Manifest
 import android.accounts.Account
+import android.accounts.AccountManager
 import android.annotation.SuppressLint
 import android.app.StatusBarManager
 import android.appwidget.AppWidgetManager
@@ -135,6 +136,31 @@ class MainActivity : AppCompatActivity() {
             } catch (_: Exception) { cb(null, "gms") } // no Google Play services on this phone
         }
     }
+
+    /* ---- Restore from Drive: the user picks one of the phone's Google accounts with Android's own chooser ---- */
+    private var pickCb: ((String?, String?) -> Unit)? = null
+    private val pickAccount = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
+        val cb = pickCb ?: return@registerForActivityResult
+        pickCb = null
+        val name = if (res.resultCode == RESULT_OK) res.data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME) else null
+        if (name.isNullOrBlank()) cb(null, "cancel") else cb(name, null)
+    }
+
+    /** Always shows the list of Google accounts on the phone (and "add account"), so any of them can be chosen. */
+    private fun chooseAccount(cb: (String?, String?) -> Unit) {
+        runOnUiThread {
+            try {
+                @Suppress("DEPRECATION") // the newer overload has no "always ask": with one account it would pick it silently
+                val i = AccountManager.newChooseAccountIntent(null, null, arrayOf("com.google"), true, null, null, null, null)
+                pickCb?.invoke(null, "cancel")
+                pickCb = cb
+                pickAccount.launch(i)
+            } catch (_: Exception) { pickCb = null; cb(null, "gms") }
+        }
+    }
+
+    /** A downloaded backup waits here until the page takes it (driveTake): big text doesn't go through evaluateJavascript. */
+    @Volatile private var driveHeld: String? = null
 
     /** Set when the user was sent to "allow installing apps": the update installs as soon as he comes back with it allowed. */
     private var installWanted = false
@@ -865,6 +891,52 @@ class MainActivity : AppCompatActivity() {
                     driveReply(id, o)
                 }.start()
             }
+        }
+
+        /**
+         * Restore, step 1: the user picks a Google account and allows Drive; answers
+         * {ok, email, files:[{id, name, at, size}]} (newest first: every backup Maleem uploaded there) or {ok:false, err}.
+         */
+        @JavascriptInterface
+        fun driveList(id: String) {
+            if (!pageOk) return
+            chooseAccount { account, perr ->
+                if (account == null) { driveReply(id, JSONObject().put("ok", false).put("err", perr ?: "cancel")); return@chooseAccount }
+                driveToken(account, true) { token, err ->
+                    if (token == null) { driveReply(id, JSONObject().put("ok", false).put("err", err ?: "auth")); return@driveToken }
+                    Thread {
+                        val o = try { JSONObject().put("ok", true).put("email", account).put("files", DriveBackup.list(token)) }
+                                catch (e: DriveBackup.DriveError) { JSONObject().put("ok", false).put("err", e.code) }
+                                catch (_: Exception) { JSONObject().put("ok", false).put("err", "other") }
+                        driveReply(id, o)
+                    }.start()
+                }
+            }
+        }
+
+        /** Restore, step 2: downloads one backup file; answers {ok} and the page then takes the text with driveTake(). */
+        @JavascriptInterface
+        fun driveFetch(id: String, account: String, fileId: String) {
+            if (!pageOk || account.isBlank() || fileId.isBlank() || fileId.length > 200) return
+            driveHeld = null
+            driveToken(account, true) { token, err ->
+                if (token == null) { driveReply(id, JSONObject().put("ok", false).put("err", err ?: "auth")); return@driveToken }
+                Thread {
+                    val o = try { driveHeld = DriveBackup.download(token, fileId, 40_000_000); JSONObject().put("ok", true) }
+                            catch (e: DriveBackup.DriveError) { JSONObject().put("ok", false).put("err", e.code) }
+                            catch (_: Throwable) { JSONObject().put("ok", false).put("err", "other") } // OutOfMemoryError included
+                    driveReply(id, o)
+                }.start()
+            }
+        }
+
+        /** Hands the downloaded backup to the page once, then forgets it. */
+        @JavascriptInterface
+        fun driveTake(): String {
+            if (!pageOk) return ""
+            val t = driveHeld ?: ""
+            driveHeld = null
+            return t
         }
 
         /** Unlink: forget the remembered Drive folder of that account. */
