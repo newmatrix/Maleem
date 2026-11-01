@@ -14,6 +14,10 @@
 
 **أسعار العملات (لما تغيّر العملة أو تشارك مصاريف بعملات مختلفة):** التطبيق بيقرا ملف `rates.json` من GitHub (نفس العنوان اللي بيقرا منه التحديثات) عشان يحوّل مبالغك لما تغيّر العملة، وعشان يعرض المصروف المشترك بعملتك لو صاحبه بيستخدم عملة تانية. الملف فيه أسعار عامة بس، ومفيش حاجة من بياناتك بتتبعت، وآخر نسخة منه بتتحفظ على موبايلك. الأسعار بتتحدّث مرة في اليوم من مصدر عام مجاني (open.er-api.com).
 
+**الحسابات والأرصدة والتحويلات:** لو ضفت حسابات بنكية أو محافظ أو كاش، بيانتها (الاسم، واسم البنك أو المحفظة، والعملة، والرصيد، وآخر 4 أرقام من الكارت، ورقم المحفظة لو كتبته) والتحويلات بينها بتتحفظ على موبايلك بس، زي باقي بياناتك، وبتدخل في النسخة الاحتياطية اللي إنت بتعملها. مليم **مش** بيطلب ولا بيحفظ رقم الكارت كامل ولا الـ CVV، ومبيتصلش بأي بنك أو محفظة، والأرصدة بتتحسب من اللي بتسجله إنت بس. والحسابات مبتتشاركش في المساحة المشتركة.
+
+**التقسيط والدخل المستلم:** خطط التقسيط (الجهة، والأقساط، والمدفوع) والدخل اللي بتسجّله (المبلغ، والمصدر، والتوزيع لو وزّعته) بتتحفظ على موبايلك بس زي باقي بياناتك، وبتدخل في النسخة الاحتياطية اللي إنت بتعملها، ومش بتتشارك في المساحة المشتركة.
+
 **التحديثات:** نسخة أندرويد بتدخل على GitHub (raw.githubusercontent.com و github.com) كل كام ساعة وهي مفتوحة، عشان تعرف لو فيه نسخة جديدة أو رسالة من المطوّر. الطلب ده مفيهوش أي بيانات منك غير اللي أي اتصال بالنت بيبعته (زي عنوان الـ IP)، وGitHub بيتعامل معاه حسب سياسته. لو وافقت على التحديث، التطبيق بينزّل النسخة الجديدة من GitHub ويتأكد إنها سليمة وموقّعة بنفس مفتاح مليم، وبعدين أندرويد بيسألك قبل ما يثبّتها.
 
 **النسخ الاحتياطي التلقائي بتاع جوجل:** التطبيق مقفول فيه النسخ الاحتياطي السحابي بتاع أندرويد، يعني بياناتك المالية مش بتترفع على حساب جوجل بتاعك من غير ما تختار. النقل المباشر من موبايل لموبايل (لما تجهز موبايل جديد بنفسك) لسه متاح.
@@ -30,7 +34,7 @@
 
 **الإشعارات:** بتستخدم عشان تفكرك بتسجيل المصاريف ومواعيد السلف والجمعيات، وكلها بتتعمل على الموبايل نفسه.
 
-**التسجيل التلقائي من الإشعارات (اختياري، مقفول افتراضيًا):** لو فعّلته من الإعدادات وسمحت بإذن «الوصول للإشعارات»، التطبيق بيقرا نص الإشعارات اللي بتوصل على الموبايل عشان يلاقي رسايل الخصم والدفع من البنوك والمحافظ. الإشعارات اللي مش عمليات دفع بتتجاهل فورًا ومش بتتخزن، وبيتجاهل تطبيقات الشات وأكواد التحقق (OTP) والفلوس الداخلة. عمليات الدفع اللي بيلاقيها (المبلغ، اسم المحل، اسم التطبيق اللي بعت الإشعار، ونص الإشعار لحد 300 حرف) بتتحفظ على موبايلك بس، ومش بتتبعت لأي سيرفر، ومفيش منها حاجة بتبقى مصروف غير لما توافق عليها. تقدر تقفل الميزة في أي وقت من الإعدادات، وساعتها التطبيق بيبطّل يستقبل الإشعارات خالص.
+**التسجيل التلقائي من الإشعارات (اختياري، مقفول افتراضيًا):** لو فعّلته من الإعدادات وسمحت بإذن «الوصول للإشعارات»، التطبيق بيقرا نص الإشعارات اللي بتوصل على الموبايل عشان يلاقي رسايل الخصم والدفع من البنوك والمحافظ. الإشعارات اللي مش عمليات دفع بتتجاهل فورًا ومش بتتخزن، وبيتجاهل تطبيقات الشات وأكواد التحقق (OTP). والفلوس الداخلة بيقراها بس لو ضفت حسابات في مليم، عشان يربطها بالحساب ويقترح عليك تسجيل دخل أو تحويل بين حساباتك. عمليات الدفع والفلوس الداخلة اللي بيلاقيها (المبلغ، اسم المحل، اسم التطبيق اللي بعت الإشعار، ونص الإشعار لحد 300 حرف) بتتحفظ على موبايلك بس، ومش بتتبعت لأي سيرفر، ومفيش منها حاجة بتبقى مصروف غير لما توافق عليها. تقدر تقفل الميزة في أي وقت من الإعدادات، وساعتها التطبيق بيبطّل يستقبل الإشعارات خالص.
 
 **صور الإيصالات (اختيارية):** لو صوّرت إيصال أو اخترت صورة من المعرض، التطبيق بيصغّرها ويحفظها على موبايلك بس. الصور مش بتتشارك في المساحة المشتركة. النسخة الاحتياطية بتشمل الصور، فخلي بالك من الملف ده.
 
@@ -62,6 +66,10 @@ All data you enter (expenses, budget, categories, loans, savings circles, settin
 
 **Exchange rates (when you change the currency or share expenses in different currencies):** The app reads a file called `rates.json` from GitHub (the same address the updates come from) to convert your amounts when you change the currency, and to show a shared expense in your currency when its author uses another one. The file holds public rates only; nothing from your data is sent, and the last copy is kept on your phone. The rates are refreshed once a day from a free public source (open.er-api.com).
 
+**Accounts, balances and transfers:** If you add bank accounts, wallets or cash, their details (name, bank or wallet name, currency, balance, the last 4 digits of a card, and a wallet number if you type one) and the transfers between them are kept on your phone only, like the rest of your data, and are included in the backups you make. Maleem never asks for or stores a full card number or a CVV, never connects to a bank or wallet, and calculates balances only from what you record. Accounts are not shared in the shared space.
+
+**Installments and received income:** Installment plans (the company, the installments and what was paid) and the income you record (amount, source, and the split if you made one) are kept on your phone only, like the rest of your data, are included in the backups you make, and are not shared in the shared space.
+
 **Updates:** The Android app checks GitHub (raw.githubusercontent.com and github.com) every few hours while it is open, to learn whether a new version or a message from the developer is available. The request carries no data about you beyond what any internet connection sends (such as your IP address), and GitHub handles it under its own policy. If you accept an update, the app downloads the new version from GitHub, checks that it is intact and signed with Maleem's own key, and Android asks you before installing it.
 
 **Google's automatic backup:** Android cloud backup is turned off for this app, so your financial data is not uploaded to your Google account without your choice. A direct phone-to-phone transfer that you start yourself is still possible.
@@ -76,7 +84,7 @@ All data you enter (expenses, budget, categories, loans, savings circles, settin
 
 **Notifications:** Used for reminders to log expenses and for loan and savings-circle due dates. They are scheduled on the device only.
 
-**Automatic capture from notifications (optional, off by default):** If you turn it on in Settings and grant Android's "Notification access", the app reads the text of incoming notifications to find payment and debit messages from banks and wallets. Notifications that are not payments are ignored immediately and never stored; chat apps, verification codes (OTP) and incoming money are ignored. The payments it finds (amount, merchant name, the name of the app that posted the notification, and up to 300 characters of the notification text) are kept only on your device, are never sent to any server, and none of them becomes an expense until you confirm it. You can turn the feature off at any time in Settings, after which the app stops receiving notifications entirely.
+**Automatic capture from notifications (optional, off by default):** If you turn it on in Settings and grant Android's "Notification access", the app reads the text of incoming notifications to find payment and debit messages from banks and wallets. Notifications that are not payments are ignored immediately and never stored; chat apps and verification codes (OTP) are ignored. Money coming in is read only if you have added accounts in the app, so it can match them to an account and suggest recording income or a transfer between your accounts. The payments and incoming money it finds (amount, merchant name, the name of the app that posted the notification, and up to 300 characters of the notification text) are kept only on your device, are never sent to any server, and none of them becomes an expense until you confirm it. You can turn the feature off at any time in Settings, after which the app stops receiving notifications entirely.
 
 **Receipt photos (optional):** If you take a photo of a receipt or pick one from your gallery, the app shrinks it and keeps it on your device only. Photos are never shared to the Shared Space. Backups include the photos, so keep that file private.
 
