@@ -467,6 +467,23 @@ button{cursor:pointer}
 [data-look="soft"] .sheet{border-radius:32px 32px 0 0}
 [data-look="soft"] .set-item+.set-item::before{inset-inline-start:64px}
 /* the picker in Settings */
+
+/* ===== Fonts (Settings ▸ المظهر ▸ الخط): only changes --font; "عريض" thickens the normal text ===== */
+:root[data-font="cairo"]{--font:"Cairo","IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif}
+:root[data-font="tajawal"]{--font:"Tajawal","IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif}
+:root[data-font="almarai"]{--font:"Almarai","IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif}
+:root[data-font="alexandria"]{--font:"Alexandria","IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif}
+:root[data-font="readex"]{--font:"Readex Pro","IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif}
+:root[data-fw="bold"] body{font-weight:600}
+.font-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.font-opt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:12px 4px 10px;border:1.5px solid transparent;border-radius:14px;background:var(--surface-2);color:var(--ink);font:inherit;text-align:center;min-width:0}
+.font-opt[aria-pressed="true"]{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface))}
+.font-opt .fo-s{font-size:1.5rem;font-weight:800;line-height:1.35;white-space:nowrap}
+.font-opt .fo-n{font-size:.8rem;font-weight:700;line-height:1.3}
+.font-sample{margin:12px 2px 0;padding:12px 14px;border-radius:14px;background:var(--surface-2);font-size:1rem;line-height:1.7}
+.fw-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.fw-pill{flex:none;min-width:84px;padding:9px 22px;border:1.5px solid var(--fl);border-radius:999px;background:transparent;color:var(--ink);font:inherit;font-size:1rem;line-height:1.3;transition:background .15s,color .15s,border-color .15s}
+.fw-pill[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink,#fff)}
 .look-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .look-opt{display:flex;align-items:center;gap:12px;width:100%;padding:10px;border:1.5px solid transparent;border-radius:14px;background:var(--surface-2);color:var(--ink);font:inherit;text-align:start}
 .look-opt[aria-pressed="true"]{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface))}
@@ -1451,6 +1468,15 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
       <div class="style-grid" id="styleGrid" role="group" aria-label="ستايل التطبيق"></div>
       <p class="hint" id="styleHint" hidden>الستايل ده داكن دايمًا، بغض النظر عن اختيار فاتح أو داكن.</p>
       <div class="accent-row" id="accentRow" role="group" aria-label="لون التطبيق"></div>
+    </div>
+
+    <div class="card" id="fontCard">
+      <h3 class="look-h">الخط</h3>
+      <p class="hint">اختار الخط اللي مريح لعينك، وبيتطبّق على التطبيق كله. وتقدر تخلّي الكتابة أعرض.</p>
+      <div class="font-grid" id="fontList" role="radiogroup" aria-label="الخط"></div>
+      <div class="font-sample" id="fontSample" aria-live="polite">ميزانية الشهر ٥,٠٠٠ ج.م، فاضل ٣,٢٤٠ ج.م</div>
+      <span class="mb-lab" id="fwLab" style="display:block;margin-top:12px">سمك الخط</span>
+      <div class="fw-pills" id="fwSeg" role="group" aria-labelledby="fwLab"><button type="button" class="fw-pill" data-fw="normal" style="font-weight:400">عادي</button><button type="button" class="fw-pill" data-fw="bold" style="font-weight:800">عريض</button></div>
     </div>
 
     <div class="card" id="lookCard">
@@ -2530,6 +2556,8 @@ const LOOKS=[
   {id:'comfy',name:'مريح',d:'خط وأيقونات وأزرار أكبر، مريح للعين'},
   {id:'soft',name:'ناعم',d:'حواف دايرية، وكل مصروف ملوّن بلون فئته'}];
 const lookId=()=>LOOKS.some(x=>x.id===S.look)?S.look:'classic';
+const FONTS=[{id:'plex',name:'الأصلي',f:"'IBM Plex Sans Arabic'"},{id:'cairo',name:'كايرو',f:"'Cairo'"},{id:'tajawal',name:'تجوال',f:"'Tajawal'"},{id:'almarai',name:'المراعي',f:"'Almarai'"},{id:'alexandria',name:'الإسكندرية',f:"'Alexandria'"},{id:'readex',name:'ريدكس',f:"'Readex Pro'"}];
+const fontId=()=>FONTS.some(x=>x.id===S.font)?S.font:'plex';
 const PRESSES=[
   {id:'bounce',name:'نابضة',d:'الزرار ينضغط ويرتد سنة'},
   {id:'soft',name:'هادية',d:'ضغطة خفيفة من غير ارتداد'},
@@ -2554,6 +2582,11 @@ function applyTheme(){
     document.querySelectorAll('#transList [data-trans]').forEach(b=>{const on=b.dataset.trans===tr; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)});
     {const d=$('#transDesc'); if(d) d.textContent=(TRANSES.find(x=>x.id===tr)||{}).d||''}
     const ht=$('#hapticToggle'); if(ht) ht.checked=!!S.haptic; const hr=$('#hapticRow'); if(hr) hr.hidden=!(AB&&AB.haptic)}
+  {const fn=fontId(), fw=S.fontW==='bold'?'bold':'normal';
+    if(fn==='plex') r.removeAttribute('data-font'); else r.setAttribute('data-font',fn);
+    if(fw==='bold') r.setAttribute('data-fw','bold'); else r.removeAttribute('data-fw');
+    document.querySelectorAll('#fontList [data-fid]').forEach(b=>{const on=b.dataset.fid===fn; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)});
+    document.querySelectorAll('#fwSeg [data-fw]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.fw===fw?'true':'false'))}
   {const lk=lookId(); if(lk==='classic') r.removeAttribute('data-look'); else r.setAttribute('data-look',lk);
     document.querySelectorAll('#lookList [data-look]').forEach(b=>{const on=b.dataset.look===lk; b.setAttribute('aria-pressed',on); b.setAttribute('aria-checked',on)});
     {const d=$('#lookDesc'); if(d) d.textContent=(LOOKS.find(x=>x.id===lk)||{}).d||''}}
@@ -4202,6 +4235,9 @@ $('#backBtn').onclick=()=>showDetail(false);
 $('#themeSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.theme=b.dataset.theme;save();applyTheme()};
 $('#accentRow').innerHTML=ACCENTS.map(a=>`<button type="button" data-accent="${a.id}" aria-label="${a.name}" title="${a.name}" aria-pressed="false" style="background:linear-gradient(135deg,${a.l},${a.l2})"></button>`).join('');
 $('#styleGrid').innerHTML=Object.entries(STYLES).map(([id,s])=>`<button type="button" class="sty" data-style="${id}" aria-pressed="false" aria-label="ستايل ${s.name}"><span class="sty-pv" style="background:${s.pv.bg}"><i style="background:${s.pv.sf}"></i><b style="background:${s.pv.ac}"></b></span><span class="sty-n">${s.name}</span></button>`).join('');
+$('#fontList').innerHTML=FONTS.map(x=>`<button type="button" class="font-opt" role="radio" data-fid="${x.id}" aria-pressed="false" aria-checked="false" aria-label="خط ${x.name}"><span class="fo-s" style="font-family:${x.f},sans-serif" aria-hidden="true">أبجد ١٢٣</span><span class="fo-n">${x.name}</span></button>`).join('');
+$('#fontList').onclick=e=>{const b=e.target.closest('[data-fid]'); if(!b||b.dataset.fid===fontId()) return; S.font=b.dataset.fid; save(); applyTheme(); toast('اتغير الخط: '+(FONTS.find(x=>x.id===S.font)||{}).name)};
+$('#fwSeg').onclick=e=>{const b=e.target.closest('[data-fw]'); if(!b) return; const v=b.dataset.fw==='bold'?'bold':'normal'; if(v===(S.fontW==='bold'?'bold':'normal')) return; S.fontW=v; save(); applyTheme()};
 $('#lookList').innerHTML=LOOKS.map(x=>`<button type="button" class="look-opt" role="radio" data-look="${x.id}" aria-pressed="false" aria-checked="false"><span class="lk-pv ${x.id}" aria-hidden="true"><i></i><i></i>${x.id==='compact'?'<i></i>':''}</span><span class="lt"><b>${x.name}</b><small>${x.d}</small></span><span class="ok" aria-hidden="true">✓</span></button>`).join('');
 $('#lookList').onclick=e=>{const b=e.target.closest('[data-look]'); if(!b) return; const id=b.dataset.look; if(id===lookId()) return;
   S.look=id; save(); applyTheme(); renderCatGrid(true); toast('اتغير شكل الواجهة: '+(LOOKS.find(x=>x.id===id)||{}).name)};
@@ -4687,7 +4723,7 @@ $('#mbGo').onclick=async()=>{
   if(p1!==p2) return err(mbKind==='pin'?'الرقمين مش زي بعض':'كلمتين السر مش زي بعض');
   b.disabled=true; b.textContent='لحظة...';
   try{
-    const id=mbNewId(), ns={onboarded:false,profile:{name,age:null},pinH:await pinMake(p1),lockKind:mbKind,theme:S.theme,accent:S.accent,style:S.style,look:S.look,press:S.press,trans:S.trans,haptic:S.haptic,currency:S.currency};
+    const id=mbNewId(), ns={onboarded:false,profile:{name,age:null},pinH:await pinMake(p1),lockKind:mbKind,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,press:S.press,trans:S.trans,haptic:S.haptic,currency:S.currency};
     if(!lsSet(mbKey(id),JSON.stringify(ns))){try{localStorage.removeItem(mbKey(id))}catch(e){} delete mem[mbKey(id)]; err('مساحة التخزين مش كفاية لعضو جديد'); return}
     MB.list.push({id,name}); mbGo(id,true);
   }catch(e){err('حصلت مشكلة، جرب تاني')}
@@ -4740,7 +4776,7 @@ function renderSetHome(){
 const SET_IDX=[
   ['members','الأعضاء','عضو مستخدم اسم'],['members','إضافة عضو','جديد','mbAdd'],['members','تبديل العضو','غير','mbSwitch'],['members','مسح عضو','حذف نسي كلمة السر','mbList'],
   ['security','قفل بكلمة سر','رقم سري باسورد كلمة مرور pin','pinToggle'],['security','تغيير كلمة السر','رقم سري باسورد','lockChangeRow'],['security','قفل بالبصمة','بصمه fingerprint','bioToggle'],
-  ['appearance','فاتح وداكن','ثيم الوضع الليلي dark light','themeSeg'],['appearance','ستايل التطبيق','ثيمات شكل تصميم','styleGrid'],['appearance','لون التطبيق','الوان','accentRow'],['appearance','شكل الواجهة','تصميم مسطح مضغوط مريح ناعم كلاسيك خط كبير صغير','lookCard'],['appearance','نبضة الأزرار','حركه ضغطه زرار موجه توهج نابضه هاديه','pressList'],['appearance','حركة التنقل','انتقال انزلاق تكبير تلاشي انيميشن حركه الشاشات','transList'],['appearance','اهتزاز خفيف','هزاز اهتزاز vibration','hapticRow'],
+  ['appearance','فاتح وداكن','ثيم الوضع الليلي dark light','themeSeg'],['appearance','ستايل التطبيق','ثيمات شكل تصميم','styleGrid'],['appearance','لون التطبيق','الوان','accentRow'],['appearance','الخط','خطوط خط عريض غامق سمك bold كايرو تجوال المراعي الاسكندريه ريدكس','fontCard'],['appearance','شكل الواجهة','تصميم مسطح مضغوط مريح ناعم كلاسيك خط كبير صغير','lookCard'],['appearance','نبضة الأزرار','حركه ضغطه زرار موجه توهج نابضه هاديه','pressList'],['appearance','حركة التنقل','انتقال انزلاق تكبير تلاشي انيميشن حركه الشاشات','transList'],['appearance','اهتزاز خفيف','هزاز اهتزاز vibration','hapticRow'],
   ['cats','الفئات','فئه تصنيف ترتيب','catList'],['cats','إضافة فئة جديدة','فئه','addCat'],['cats','حد شهري للفئة','ميزانيه فئه حد اقصي','catList'],
   ['pays','طرق الدفع','كاش فيزا محفظه انستاباي الافتراضيه','payList'],['pays','إضافة طريقة دفع','','addPay'],
   ['alerts','تنبيه قرب نهاية الميزانية','80% ميزانيه','row80'],['alerts','نسبة التنبيه','ميزانيه','rowPct'],['alerts','التذكير اليومي','تذكير','remindToggle'],['alerts','وقت التذكير','ساعه','remindTimeRow'],
@@ -4961,7 +4997,7 @@ $('#expCancel').onclick=closeSheets;
 /* Cloud backup */
 let db=null, myId=null;
 async function backupDoc(){return db.collection('data/users/'+myId).doc(ME.id==='m1'?'backup':'backup-'+ME.id)}
-const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,insts:S.insts,instPays:S.instPays,inflows:S.inflows,payType:S.payType,payAnchor:S.payAnchor,prefs:{moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,press:S.press,trans:S.trans,haptic:S.haptic,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide}});
+const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,insts:S.insts,instPays:S.instPays,inflows:S.inflows,payType:S.payType,payAnchor:S.payAnchor,prefs:{moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,press:S.press,trans:S.trans,haptic:S.haptic,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide}});
 function applyBackup(p,at){
   if(S.space) spDetach();
   const old={ac:S.accounts,tr:S.transfers,ins:S.insts,ip:S.instPays,inf:S.inflows,pt:S.payType,pa:S.payAnchor,mv:S.moneyView,e:S.expenses,b:S.budget,c:S.cats,m:S.budgetMode,d:S.debts,g:S.gams,pd:S.payday,pr:S.profile,si:S.since,inc:S.incomes,go:S.goals,st:S.saveTarget,cu:S.currency,fx:S.fixed,fl:S.fixedLog,py:S.pays,lp:S.lastPay,pf:{theme:S.theme,accent:S.accent,style:S.style,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays}};
@@ -4985,7 +5021,7 @@ function applyBackup(p,at){
   if(isId(p.lastPay)) S.lastPay=p.lastPay;
   syncPays();
   if(p.prefs&&typeof p.prefs==='object'){const f=p.prefs;
-    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look; if(PRESSES.some(x=>x.id===f.press)) S.press=f.press; if(TRANSES.some(x=>x.id===f.trans)) S.trans=f.trans; if(typeof f.haptic==='boolean') S.haptic=f.haptic;
+    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look; if(FONTS.some(x=>x.id===f.font)) S.font=f.font; if(f.fontW==='bold'||f.fontW==='normal') S.fontW=f.fontW; if(PRESSES.some(x=>x.id===f.press)) S.press=f.press; if(TRANSES.some(x=>x.id===f.trans)) S.trans=f.trans; if(typeof f.haptic==='boolean') S.haptic=f.haptic;
     if(['off','sum','split'].includes(f.moneyView)) S.moneyView=f.moneyView;
     S.homeHide=f.homeHide&&typeof f.homeHide==='object'?Object.fromEntries(['upcoming','caps','summary','today'].filter(k=>f.homeHide[k]===true).map(k=>[k,true])):{};
     ['alert80','remind','dueRemind','sumOn'].forEach(k=>{if(typeof f[k]==='boolean') S[k]=f[k]});
