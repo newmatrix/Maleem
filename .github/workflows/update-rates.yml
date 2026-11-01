@@ -3,7 +3,10 @@ name: Update rates
 # Refreshes rates.json once a day (and on demand: Actions -> Update rates -> Run workflow).
 # The app reads rates.json from this repo (raw.githubusercontent.com), so phones never call a rates service themselves.
 # Source: open.er-api.com (free, no key, ~160 currencies, updated daily), with the jsDelivr currency-api as a fallback.
-# To support one more currency in the app, add its code to CURRENCIES in index.html and to CODES below.
+# rates.json carries EVERY currency the source gives us (about 160), because the app lets a person pick any other currency
+# (Settings > بياناتي > عملة تانية) and only offers the ones that have a real rate here. CODES below is the list of currencies the app
+# ships with: each of them must be present and positive, otherwise the old file is kept.
+# To ship one more built-in currency, add it to CURRENCIES in index.html and to CODES below.
 on:
   schedule:
     - cron: "17 2 * * *"
@@ -20,7 +23,7 @@ jobs:
   rates:
     runs-on: ubuntu-latest
     env:
-      CODES: "USD EGP SAR AED KWD QAR BHD OMR JOD ILS EUR GBP DZD"
+      CODES: "USD EGP SAR AED KWD QAR BHD OMR JOD ILS EUR GBP DZD SDG"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,7 +38,7 @@ jobs:
             && jq -e '.result == "success"' primary.json > /dev/null \
             && jq --argjson want "$WANT" --argjson now "$NOW" '
               {base:"USD", updated:$now,
-               rates:(.rates | with_entries(select(.key as $k | $want | index($k)))
+               rates:(.rates | with_entries(select((.key | test("^[A-Z]{3}$")) and (.value | type == "number") and .value >= 0.01))
                        | map_values(. * 1000000 | round / 1000000))}' primary.json > new.json
           }  # (chained with && on purpose: set -e does not apply inside a function used before ||)
           fetch_fallback() {
@@ -43,7 +46,7 @@ jobs:
             && jq --argjson want "$WANT" --argjson now "$NOW" '
               {base:"USD", updated:$now,
                rates:(.usd | with_entries(.key |= ascii_upcase)
-                       | with_entries(select(.key as $k | $want | index($k)))
+                       | with_entries(select((.key | test("^[A-Z]{3}$")) and (.value | type == "number") and .value >= 0.01))
                        | map_values(. * 1000000 | round / 1000000))}' fallback.json > new.json
           }
           fetch_primary || { echo "::warning::primary source failed, using the fallback"; fetch_fallback; }
@@ -51,6 +54,8 @@ jobs:
           jq -e --argjson want "$WANT" '. as $f | $want | all(. as $c | ($f.rates[$c] // 0) > 0)' new.json > /dev/null \
             || { echo "::error::rates.json would miss a currency, keeping the old one"; exit 1; }
           jq --sort-keys . new.json > rates.json
+          # the app's reader (Rates.kt) refuses a file above 16 KB
+          [ "$(wc -c < rates.json)" -lt 15000 ] || { echo "::error::rates.json is too big for the app (16 KB limit)"; exit 1; }
           cat rates.json
 
       - name: Commit
