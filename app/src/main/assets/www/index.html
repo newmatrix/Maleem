@@ -484,6 +484,9 @@ button{cursor:pointer}
 .fw-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .fw-pill{flex:none;min-width:84px;padding:9px 22px;border:1.5px solid var(--fl);border-radius:999px;background:transparent;color:var(--ink);font:inherit;font-size:1rem;line-height:1.3;transition:background .15s,color .15s,border-color .15s}
 .fw-pill[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink,#fff)}
+.cur-list{display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:40vh;overflow-y:auto}
+.cur-item{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-height:46px;padding:10px 14px;border:0;border-radius:12px;background:var(--surface-2);color:var(--ink);font:inherit;text-align:start}
+.cur-item b{font-weight:700;color:var(--muted);font-size:.9rem;flex:none}
 .look-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .look-opt{display:flex;align-items:center;gap:12px;width:100%;padding:10px;border:1.5px solid transparent;border-radius:14px;background:var(--surface-2);color:var(--ink);font:inherit;text-align:start}
 .look-opt[aria-pressed="true"]{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface))}
@@ -1842,6 +1845,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <h2 id="trTitle">تحويل بين حساباتي</h2>
   <p class="hint center">بتسجّل تحويل عملته فعلاً. مش مصروف ومش دخل.</p>
   <div class="pay-row"><div class="txt">من</div><select id="trFrom" aria-label="من حساب"></select></div>
+  <p class="hint" id="trAvail" style="margin:2px 4px 6px"></p>
   <div class="pay-row"><div class="txt">إلى</div><select id="trTo" aria-label="إلى حساب"></select></div>
   <label class="amount-box" id="trOutBox" style="margin-top:12px"><input id="trOut" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ المحوّل" dir="ltr" autocomplete="off"><span class="c cur" id="trOutCur"></span></label>
   <div id="trRateRow" hidden>
@@ -2035,6 +2039,16 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <p class="hint" id="wipeSpNote" hidden>إنت في مساحة مشتركة: هتخرج منها، ومصاريف الطرف التاني مش هتتمسح.</p>
   <div class="sheet-actions" style="margin-top:14px"><button class="btn danger-solid" id="wipeConfirm">امسح المختار</button><button class="btn" id="wipeCancel">إلغاء</button></div>
 </div>
+<div class="sheet" id="curAddSheet" role="dialog" aria-modal="true" aria-labelledby="curAddTitle">
+  <div class="grab"></div>
+  <h2 id="curAddTitle">عملة تانية</h2>
+  <p class="hint center">اكتب اسم العملة أو كودها (زي TRY)، واختارها من القايمة. المبالغ بتتحول بسعر النهارده الحقيقي.</p>
+  <div class="field"><input id="curAddQ" type="text" placeholder="ابحث: ليرة، دولار كندي، TRY…" autocomplete="off" aria-label="ابحث عن عملة" style="font-size:1.05rem"></div>
+  <div class="cur-list" id="curAddList"></div>
+  <p class="hint center" id="curAddMsg" aria-live="polite"></p>
+  <div class="sheet-actions" style="margin-top:12px"><button class="btn" id="curAddCancel" type="button">إلغاء</button></div>
+</div>
+
 <div class="sheet" id="curSheet" role="dialog" aria-modal="true" aria-labelledby="curTitle">
   <div class="grab"></div>
   <h2 id="curTitle">تغيير العملة</h2>
@@ -2328,8 +2342,21 @@ let PAY={}; const syncPays=()=>{PAY=Object.fromEntries(S.pays.map(x=>[x.id,x]));
 const payOf=x=>PAY[x.pay]?x.pay:'cash';
 if(!S.fixedLog||typeof S.fixedLog!=='object') S.fixedLog={};
 if(!S.currency) S.currency='EGP';
-const CURRENCIES=[{id:'EGP',s:'ج.م',n:'جنيه مصري'},{id:'SAR',s:'ر.س',n:'ريال سعودي'},{id:'AED',s:'د.إ',n:'درهم إماراتي'},{id:'KWD',s:'د.ك',n:'دينار كويتي'},{id:'QAR',s:'ر.ق',n:'ريال قطري'},{id:'BHD',s:'د.ب',n:'دينار بحريني'},{id:'OMR',s:'ر.ع',n:'ريال عماني'},{id:'JOD',s:'د.أ',n:'دينار أردني'},{id:'DZD',s:'د.ج',n:'دينار جزائري'},{id:'USD',s:'$',n:'دولار أمريكي'},{id:'EUR',s:'€',n:'يورو'},{id:'GBP',s:'£',n:'جنيه إسترليني'},{id:'ILS',s:'₪',n:'شيكل'}];
+const CURRENCIES=[{id:'EGP',s:'ج.م',n:'جنيه مصري'},{id:'SAR',s:'ر.س',n:'ريال سعودي'},{id:'AED',s:'د.إ',n:'درهم إماراتي'},{id:'KWD',s:'د.ك',n:'دينار كويتي'},{id:'QAR',s:'ر.ق',n:'ريال قطري'},{id:'BHD',s:'د.ب',n:'دينار بحريني'},{id:'OMR',s:'ر.ع',n:'ريال عماني'},{id:'JOD',s:'د.أ',n:'دينار أردني'},{id:'DZD',s:'د.ج',n:'دينار جزائري'},{id:'SDG',s:'ج.س',n:'جنيه سوداني'},{id:'USD',s:'$',n:'دولار أمريكي'},{id:'EUR',s:'€',n:'يورو'},{id:'GBP',s:'£',n:'جنيه إسترليني'},{id:'ILS',s:'₪',n:'شيكل'}];
 const CS=()=>(CURRENCIES.find(c=>c.id===S.currency)||CURRENCIES[0]).s;
+/* Currencies the person adds himself (Settings ▸ بياناتي ▸ عملة تانية): any currency that has a rate in rates.json, so the conversion is real.
+   They live in S.curs (codes only) and are pushed into CURRENCIES, so every screen, account and backup sees them like the built-in ones. */
+const CUR_BASE=new Set(CURRENCIES.map(c=>c.id)), CUR_MAX_CUSTOM=8;
+const CUR_SKIP=new Set(['XAU','XAG','XPT','XPD','XDR','XTS','XXX','XBA','XBB','XBC','XBD','XSU','XUA']);
+let CUR_DN=null; try{CUR_DN={ar:new Intl.DisplayNames(['ar'],{type:'currency'}),en:new Intl.DisplayNames(['en'],{type:'currency'})}}catch(e){}
+const curNameAr=c=>{try{const n=CUR_DN&&CUR_DN.ar.of(c); return n&&n!==c?n:c}catch(e){return c}};
+const curNameEn=c=>{try{const n=CUR_DN&&CUR_DN.en.of(c); return n&&n!==c?n:c}catch(e){return c}};
+function curAddCustom(c){ if(!/^[A-Z]{3}$/.test(c)||CURRENCIES.some(x=>x.id===c)) return false; CURRENCIES.push({id:c,s:c,n:curNameAr(c),x:1}); return true }
+function curMerge(list){
+  const cur=(Array.isArray(S.curs)?S.curs:[]).filter(c=>typeof c==='string'&&/^[A-Z]{3}$/.test(c)&&!CUR_BASE.has(c));
+  (Array.isArray(list)?list:[]).forEach(c=>{ if(typeof c==='string'&&/^[A-Z]{3}$/.test(c)&&!CUR_BASE.has(c)&&!cur.includes(c)&&cur.length<CUR_MAX_CUSTOM) cur.push(c) });
+  S.curs=cur.slice(0,CUR_MAX_CUSTOM); S.curs.forEach(curAddCustom);
+}
 if(!S.since) S.since=Date.now();
 
 const $ = s=>document.querySelector(s);
@@ -2510,6 +2537,7 @@ function ratesRefresh(force,cb){
 }
 const CLEAN={debts:cleanDebt,gams:cleanGam,incomes:cleanIncome,goals:cleanGoal,fixed:cleanFixed};
 /* clean whatever is already stored on the phone (older versions, old backups) */
+curMerge([]); // the currencies this person added, before anything is checked against CURRENCIES
 (function(){
   const arr=v=>Array.isArray(v)?v:[];
   S.expenses=arr(S.expenses).map(x=>cleanExpense(x,true)).filter(Boolean);
@@ -2988,6 +3016,23 @@ document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.t
 $('#homeAv').onclick=()=>go('me');
 $('#eyeBtn').onclick=()=>{S.hideAmt=!S.hideAmt;save();paintEye()};
 $('#meBack').onclick=()=>go('expenses');
+/* Swipe right / left to move between the main tabs. The tabs run right-to-left, so a swipe to the right opens the next one.
+   Not while a sheet, the lock, a long-press sort or a form is in use, not inside a sub-page, and not on something that scrolls sideways. */
+(function(){
+  let sx=0, sy=0, st=0, ok=false;
+  const hs=el=>{ for(let n=el; n&&n!==document.body&&n!==document.documentElement; n=n.parentElement){
+    if(n.matches&&n.matches('input,textarea,select,canvas,[contenteditable="true"],.noswipe')) return true;
+    if(n.scrollWidth>n.clientWidth+4){ const o=getComputedStyle(n).overflowX; if(o==='auto'||o==='scroll') return true } } return false };
+  const busy=()=>$('#lock').classList.contains('open')||$('#mbPick').classList.contains('open')||!$('#welcome').hidden||!!document.querySelector('.sheet.open')||!$('#updLock').hidden||voiceOn||Date.now()<sortSuppress||!S.onboarded;
+  const inSub=()=>(tab==='me'&&mePage)||(tab==='settings'&&(setPage||spManageOn))||(tab==='reports'&&$('#reportsMain').hidden);
+  document.addEventListener('touchstart',e=>{ if(e.touches.length!==1){ok=false;return} const t=e.touches[0];
+    ok= t.clientX>24&&t.clientX<innerWidth-24&&!hs(e.target); sx=t.clientX; sy=t.clientY; st=Date.now() },{passive:true});
+  document.addEventListener('touchcancel',()=>{ok=false},{passive:true});
+  document.addEventListener('touchend',e=>{ if(!ok) return; ok=false; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Date.now()-st>700||Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.55) return;
+    if(busy()||inSub()||String(getSelection()).length) return;
+    const j=TABS.indexOf(tab)+(dx>0?1:-1); if(j>=0&&j<TABS.length) go(TABS[j]) },{passive:true});
+})();
 
 /* Sheet */
 let selCat=null, editId=null, voiceOn=false;
@@ -3199,6 +3244,10 @@ $('#saveBtn').onclick=()=>{
    An amount in another currency is converted only with a real rate (rates.json or one the person typed): never guessed. */
 const ACC=id=>S.accounts.find(a=>a.id===id)||null;
 const curSym=id=>(CURRENCIES.find(c=>c.id===id)||{s:id}).s;
+/* several accounts can share a name (two "هشام" cards): the bank and the last 4 digits tell them apart wherever they are listed */
+const accDisp=a=>{ if(!a) return ''; const nm=x=>String(x.name).trim().toLowerCase();
+  if(!S.accounts.some(o=>o.id!==a.id&&nm(o)===nm(a))) return a.name;
+  const bits=[a.bank,a.last4?'••'+a.last4:''].filter(Boolean); return bits.length? a.name+' · '+bits.join(' ') : a.name };
 function accBal(id){
   const a=ACC(id); if(!a) return 0; let b=a.open;
   S.expenses.forEach(e=>{if(e.acc===id) b-=e.accAmt||0});
@@ -3237,7 +3286,7 @@ function paintAccRow(){
   const p=$('#accPill'); p.hidden=!S.accounts.length; document.querySelector('.head-pills').classList.toggle('three',!p.hidden); if(p.hidden){closeAccMenu();return}
   if(!ACC(selAcc)) selAcc='';
   const a=ACC(selAcc);
-  p.innerHTML=`${a?esc(ACC_TYPES[a.type].e):'🧾'} <span class="acc-pn">${a?esc(a.name):'بدون حساب'}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>`;
+  p.innerHTML=`${a?esc(ACC_TYPES[a.type].e):'🧾'} <span class="acc-pn">${a?esc(accDisp(a)):'بدون حساب'}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>`;
 }
 function closeAccMenu(){const m=$('#accMenu'); if(m) m.classList.remove('open'); const p=$('#accPill'); if(p) p.setAttribute('aria-expanded','false')}
 $('#accPill').addEventListener('mousedown',e=>e.preventDefault());
@@ -3246,7 +3295,7 @@ $('#accPill').onclick=e=>{ e.stopPropagation(); const m=$('#accMenu');
   if(m.classList.contains('open')){closeAccMenu();return}
   closePayMenu(); closeDateMenu();
   m.innerHTML=`<button type="button" role="menuitemradio" aria-checked="${!selAcc}" data-accpick=""><span class="pe">🧾</span><span class="acc-mi">من غير حساب<small>${ACC_NONE_NOTE}</small></span></button>`+
-    S.accounts.map(a=>`<button type="button" role="menuitemradio" aria-checked="${a.id===selAcc}" data-accpick="${esc(a.id)}"><span class="pe">${esc(ACC_TYPES[a.type].e)}</span><span class="acc-mi">${esc(a.name)}<small>${fmt(accBal(a.id))} ${esc(curSym(a.cur))}</small></span></button>`).join('');
+    S.accounts.map(a=>`<button type="button" role="menuitemradio" aria-checked="${a.id===selAcc}" data-accpick="${esc(a.id)}"><span class="pe">${esc(ACC_TYPES[a.type].e)}</span><span class="acc-mi">${esc(accDisp(a))}<small>${fmt(accBal(a.id))} ${esc(curSym(a.cur))}</small></span></button>`).join('');
   m.classList.add('open'); $('#accPill').setAttribute('aria-expanded','true');
   const r=$('#accPill').getBoundingClientRect(), w=m.offsetWidth;
   m.style.left=Math.max(8,Math.min(r.left,window.innerWidth-w-8))+'px'; m.style.top=(r.bottom+6)+'px'};
@@ -3259,7 +3308,7 @@ function renderAccounts(){
   L.innerHTML=S.accounts.length? S.accounts.map(a=>{
     const b=accBal(a.id), T=ACC_TYPES[a.type];
     const sub=[T.n,a.bank,a.last4?'\u2066••'+a.last4+'\u2069':'',a.phone?'\u2066'+a.phone+'\u2069':'',a.cur!==S.currency?a.cur:''].filter(Boolean).join(' · ');
-    return `<button type="button" class="acc-row" data-acc="${esc(a.id)}"><span class="ai">${T.e}</span><span class="an">${esc(a.name)}<small>${esc(sub)}</small></span><span class="ab${b<0?' neg':''}">${money(b)}<small>${esc(curSym(a.cur))}</small></span></button>`
+    return `<button type="button" class="acc-row" data-acc="${esc(a.id)}"><span class="ai">${T.e}</span><span class="an">${esc(accDisp(a))}<small>${esc(sub)}</small></span><span class="ab${b<0?' neg':''}">${money(b)}<small>${esc(curSym(a.cur))}</small></span></button>`
   }).join('') : '<div class="empty"><b>لسه مضفتش حسابات</b>ضيف حساب بنكي أو محفظة أو كاش، وسجّل رصيده.</div>';
   const {tot,missing}=moneyTotals();
   $('#accTotal').innerHTML=S.accounts.length?`${money(tot)} ${CS()}${missing.length?' *':''}`:'';
@@ -3267,7 +3316,7 @@ function renderAccounts(){
   $('#trList').innerHTML=trs.length? '<p class="acc-sub">آخر التحويلات</p>'+trs.map(t=>{
     const f=ACC(t.from), to=ACC(t.to), cross=f&&to&&f.cur!==to.cur;
     const when=dkToDMY(dayKey(t.ts))+' · '+new Date(t.ts).toLocaleTimeString(LOC,{hour:'2-digit',minute:'2-digit'});
-    return `<button type="button" class="acc-row" data-tr="${esc(t.id)}"><span class="ai">⇄</span><span class="an">من ${esc(f?f.name:'؟')} إلى ${esc(to?to.name:'؟')}<small>${esc(when)}${t.fee?' · رسوم '+fmt(t.fee):''}</small></span><span class="ab">${money(t.out)}<small>${esc(curSym(f?f.cur:S.currency))}${cross?' ← '+fmt(t.in)+' '+esc(curSym(to.cur)):''}</small></span></button>`
+    return `<button type="button" class="acc-row" data-tr="${esc(t.id)}"><span class="ai">⇄</span><span class="an">من ${esc(f?accDisp(f):'؟')} إلى ${esc(to?accDisp(to):'؟')}<small>${esc(when)}${t.fee?' · رسوم '+fmt(t.fee):''}</small></span><span class="ab">${money(t.out)}<small>${esc(curSym(f?f.cur:S.currency))}${cross?' ← '+fmt(t.in)+' '+esc(curSym(to.cur)):''}</small></span></button>`
   }).join(''):'';
   $('#addTr').disabled=S.accounts.length<2;
   $('#moneyViewSel').value=S.moneyView;
@@ -3283,7 +3332,7 @@ $('#moneyViewSel').onchange=e=>{S.moneyView=e.target.value;save();renderAll()};
 var accEdit=null, accType='bank', accBalInit='', accDelAsk=false, accHistAll=false;
 /* every movement of one account, newest first, in the account's own currency */
 function accMoves(id){
-  const L=[], nm=x=>{const a=ACC(x); return a?a.name:'؟'};
+  const L=[], nm=x=>{const a=ACC(x); return a?accDisp(a):'؟'};
   S.expenses.forEach(e=>{ if(e.acc===id) L.push({ts:e.ts,amt:-e.accAmt,t:(CAT[e.cat]||CAT.other).name+(e.note?': '+e.note:'')}) });
   S.transfers.forEach(t=>{ if(t.from===id) L.push({ts:t.ts,amt:-(t.out+t.fee),t:'تحويل إلى '+nm(t.to)+(t.fee?' (برسوم '+fmt(t.fee)+')':'')}); if(t.to===id) L.push({ts:t.ts,amt:t.in,t:'تحويل من '+nm(t.from)}) });
   S.inflows.forEach(x=>{ if(x.acc===id) L.push({ts:x.ts,amt:x.accAmt,t:'دخل: '+(x.src||'استلام')}) });
@@ -3319,7 +3368,6 @@ $('#accCancel').onclick=closeSheets;
 $('#accSave').onclick=()=>{
   const E=m=>{$('#accErr').textContent=m}, name=$('#accName').value.trim();
   if(!name){E('اكتب اسم الحساب');return}
-  if(S.accounts.some(a=>a.id!==accEdit&&a.name===name)){E('فيه حساب بنفس الاسم');return}
   const raw=$('#accBal').value.trim(); let v;
   if(accEdit&&raw===accBalInit) v=+accBalInit; else v= raw===''?0:evalExpr(raw);
   if(!Number.isFinite(v)||Math.abs(v)>=MAXAMT){E('اكتب الرصيد بالأرقام');return}
@@ -3327,6 +3375,9 @@ $('#accSave').onclick=()=>{
   if(accType==='bank'&&last4&&!/^\d{4}$/.test(last4)){E('اكتب آخر 4 أرقام من الكارت بس');return}
   if(accType==='wallet'&&phone&&!/^\+?\d{8,15}$/.test(phone)){E('رقم المحفظة مش مظبوط');return}
   const base={name,type:accType,bank:accType==='cash'?'':$('#accBank').value.trim(),cur:$('#accCur').value,last4:accType==='bank'?last4:'',phone:accType==='wallet'?phone:''};
+  /* the same name is fine; only an account identical in name + bank + last 4 digits + phone is refused (it would be a copy) */
+  {const k=x=>[x.name.trim().toLowerCase(),(x.bank||'').trim().toLowerCase(),x.last4||'',x.phone||'',x.type].join('|');
+   if(S.accounts.some(a=>a.id!==accEdit&&k(a)===k(base))){E(accType==='bank'?'عندك حساب بنفس الاسم والبنك وآخر 4 أرقام. غيّر آخر 4 أرقام أو اسم البنك':'عندك حساب بنفس البيانات دي بالظبط');return}}
   if(accEdit){ const a=ACC(accEdit), cur=accBal(a.id); Object.assign(a,base); a.open=r2(a.open+(v-cur)) } // typing the balance you see now moves the opening balance, never the history
   else S.accounts.push({id:uid(),...base,open:r2(v),ts:Date.now()});
   save();closeSheets();renderAll();
@@ -3346,10 +3397,12 @@ $('#accDel').onclick=()=>{
 /* --- a transfer between my accounts (also between currencies, with the rate that was really used) --- */
 var trEdit=null, trAuto=0, trSrc='a', trAsked=false;
 const trNum=el=>{const v=evalExpr(el.value); return Number.isFinite(v)?v:NaN};
+const trAvailOf=f=>{ let v=accBal(f.id); const old=trEdit&&S.transfers.find(z=>z.id===trEdit); if(old&&old.from===f.id) v+=old.out+old.fee; if(old&&old.to===f.id) v-=old.in; return r2(v) };
 function trSides(){const f=ACC($('#trFrom').value), t=ACC($('#trTo').value); return {f,t,x:!!(f&&t&&f.id!==t.id&&f.cur!==t.cur)}}
 function trCalcIn(){const o=trNum($('#trOut')), r=parseFloat($('#trRate').value); $('#trIn').value= o>0&&r>0? String(r2(o*r)):''}
 function trPaint(reset){
   const {f,t,x}=trSides(); $('#trOutCur').textContent=f?curSym(f.cur):''; $('#trRateRow').hidden=!x;
+  $('#trAvail').textContent= f? `المتاح في «${accDisp(f)}»: ${fmt(trAvailOf(f))} ${curSym(f.cur)}` : '';
   if(!x) return;
   trAuto=rateFor(f.cur,t.cur)||0;
   if(reset){ $('#trRate').value=trAuto?String(+trAuto.toPrecision(6)):''; trSrc='a'; trCalcIn() }
@@ -3360,7 +3413,7 @@ var trCaps=null, inCap=null;
 function openTrSheet(id,pre){
   if(S.accounts.length<2&&!id){toast('محتاج حسابين على الأقل');return}
   const t=id?S.transfers.find(z=>z.id===id):null; trEdit=t?t.id:null; trAsked=false;
-  const o=S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(a.name)} (${esc(curSym(a.cur))})</option>`).join('');
+  const o=S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(accDisp(a))} (${esc(curSym(a.cur))})</option>`).join('');
   $('#trFrom').innerHTML=o; $('#trTo').innerHTML=o;
   $('#trFrom').value=t?t.from:S.accounts[0].id; $('#trTo').value=t?t.to:S.accounts[1].id;
   $('#trTitle').textContent=t?'تعديل تحويل':'تحويل بين حساباتي'; $('#trSave').textContent=t?'حفظ التعديل':'حفظ'; $('#trDel').hidden=!t;
@@ -3384,6 +3437,8 @@ $('#trSave').onclick=()=>{
   if(!f||!t){E('اختار الحسابين');return} if(f.id===t.id){E('اختار حسابين مختلفين');return}
   const out=trNum($('#trOut')); if(!(out>0&&out<MAXAMT)){E('اكتب المبلغ');return}
   const feeRaw=$('#trFee').value.trim(), fee=feeRaw===''?0:trNum($('#trFee')); if(!(fee>=0&&fee<MAXAMT)){E('الرسوم مش مظبوطة');return}
+  { const need=r2(out+fee), avail=trAvailOf(f); /* never move more than the account really has */
+    if(need>avail+0.004){E(avail>0? `المبلغ ${fmt(need)}${fee?' (مع الرسوم)':''} أكبر من المتاح في «${accDisp(f)}»: ${fmt(avail)} ${curSym(f.cur)}. قلّل المبلغ`:`مفيش رصيد متاح في «${accDisp(f)}» للتحويل`);return} }
   let inn=out, rate=null;
   if(x){ const r=parseFloat($('#trRate').value), i=trNum($('#trIn'));
     if(i>0){ inn=r2(i); rate= r>0&&Math.abs(r2(out*r)-inn)<0.011? r : inn/out }
@@ -3397,7 +3452,7 @@ $('#trSave').onclick=()=>{
   if(old) S.transfers[S.transfers.indexOf(old)]=rec; else S.transfers.push(rec);
   if(trCaps) S.capQ=(S.capQ||[]).filter(q=>!trCaps.includes(q.id));
   save();closeSheets();renderAll();
-  toast(`اتسجّل تحويل ${fmt(rec.out)} ${curSym(f.cur)} من ${f.name} إلى ${t.name}`);
+  toast(`اتسجّل تحويل ${fmt(rec.out)} ${curSym(f.cur)} من ${accDisp(f)} إلى ${accDisp(t)}`);
 };
 $('#trDel').onclick=()=>{
   const t=S.transfers.find(z=>z.id===trEdit); if(!t) return;
@@ -3415,7 +3470,7 @@ function renderMoney(){
   if(m.fixed) h+=`<div class="mny-split"><div><small>للميزانية</small><b>${money(m.forB)} ${CS()}</b></div><div><small>مدخرات</small><b>${money(m.sav)} ${CS()}</b></div></div>`;
   if(m.fixed&&m.tot<m.rem&&!m.missing.length) h+=`<p class="hint" style="margin:8px 0 0">المتبقي في الميزانية (${fmt(m.rem)}) أكبر من الفلوس اللي في حساباتك.</p>`;
   if(m.missing.length) h+=`<p class="hint" style="margin:8px 0 0">مفيش سعر صرف دلوقتي لـ ${esc(m.missing.map(a=>a.name).join('، '))}، فمش محسوبين في الإجمالي.</p>`;
-  if(S.moneyView==='split') h+=S.accounts.map(a=>{const b=accBal(a.id); return `<div class="mny-acc"><span>${esc(ACC_TYPES[a.type].e)} ${esc(a.name)}</span><b${b<0?' style="color:var(--bad)"':''}>${money(b)} ${esc(curSym(a.cur))}</b></div>`}).join('');
+  if(S.moneyView==='split') h+=S.accounts.map(a=>{const b=accBal(a.id); return `<div class="mny-acc"><span>${esc(ACC_TYPES[a.type].e)} ${esc(accDisp(a))}</span><b${b<0?' style="color:var(--bad)"':''}>${money(b)} ${esc(curSym(a.cur))}</b></div>`}).join('');
   if(m.fixed) h+=`<button type="button" class="btn mny-btn" id="mvOpen">نقل بين المدخرات والميزانية</button>`;
   box.innerHTML=h+'</div>';
   const b=$('#mvOpen'); if(b) b.onclick=openMv;
@@ -3536,7 +3591,7 @@ function openItemSheet(itemId){
   $('#iiTitle').textContent=`${p.name} · القسط ${idx+1}`;
   $('#iiInfo').textContent=`دفعت ${fmt(itemPaid(it))} من ${fmt(it.amount)} ${CS()}`;
   $('#iiAmt').value=String(it.amount); $('#iiDue').value=it.due; $('#iiErr').textContent=''; $('#iiPay').hidden=itemDone(it);
-  $('#iiHist').innerHTML=instPayList(it).map(x=>{const a=ACC(x.acc); return `<li><span>دفعت ${fmt(x.amount)} ${CS()}${a?' · '+esc(a.name):''}</span><span class="ipd">${esc(shortDate(x.ts))}<button type="button" data-ipdel="${x.k}:${esc(x.id)}">حذف</button></span></li>`}).join('');
+  $('#iiHist').innerHTML=instPayList(it).map(x=>{const a=ACC(x.acc); return `<li><span>دفعت ${fmt(x.amount)} ${CS()}${a?' · '+esc(accDisp(a)):''}</span><span class="ipd">${esc(shortDate(x.ts))}<button type="button" data-ipdel="${x.k}:${esc(x.id)}">حذف</button></span></li>`}).join('');
   $('#scrim').classList.add('open'); $('#iiSheet').classList.add('open');
 }
 $('#iiCancel').onclick=closeSheets;
@@ -3565,7 +3620,7 @@ function openInstPay(itemId){
   $('#ipInfo').textContent=`القسط ${fmt(it.amount)} ${CS()} · ميعاده ${dkToDMY(it.due)} · فاضل ${fmt(rem)} ${CS()}`;
   $('#ipAmt').value=String(rem); $('#ipCur').textContent=CS(); $('#ipAmtBox').classList.remove('err');
   $('#ipAccRow').hidden=!S.accounts.length;
-  $('#ipAcc').innerHTML='<option value="">من غير حساب</option>'+S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(a.name)} (${esc(curSym(a.cur))})</option>`).join('');
+  $('#ipAcc').innerHTML='<option value="">من غير حساب</option>'+S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(accDisp(a))} (${esc(curSym(a.cur))})</option>`).join('');
   $('#ipAcc').value=ACC(S.lastAcc)?S.lastAcc:'';
   $('#ipDay').max=todayKey(); $('#ipDay').value=todayKey();
   $('#ipNote').textContent=p.rec?'الشراء ده متسجل قبل كده كمصروف، فالدفع هيتخصم من الحساب بس ومش هيتحسب مصروف تاني':'القسط هيتحسب مصروف في ميزانيتك وتقاريرك';
@@ -3674,7 +3729,7 @@ function openInSheet(id,pre){
   $('#inAmt').value=x?String(x.amount):''; $('#inCur').textContent=CS(); $('#inAmtBox').classList.remove('err');
   $('#inSrc').value=x?x.src:(S.payType==='monthly'&&S.incomes[0]?S.incomes[0].name:''); $('#inSrcList').innerHTML=S.incomes.map(i=>`<option value="${esc(i.name)}">`).join('');
   $('#inAccRow').hidden=!S.accounts.length;
-  $('#inAcc').innerHTML='<option value="">من غير حساب (مش مسجل في مليم)</option>'+S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(a.name)} (${esc(curSym(a.cur))})</option>`).join('');
+  $('#inAcc').innerHTML='<option value="">من غير حساب (مش مسجل في مليم)</option>'+S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(accDisp(a))} (${esc(curSym(a.cur))})</option>`).join('');
   $('#inAcc').value= x? (x.acc||'') : (ACC(S.lastAcc)?S.lastAcc:'');
   $('#inDay').max=todayKey(); $('#inDay').value=x?dayKey(x.ts):todayKey(); $('#inNote').value=x?x.note:'';
   const al=x&&x.alloc; $('#inAlSpend').value=al&&al.spend?String(al.spend):''; $('#inAlBills').value=al&&al.bills?String(al.bills):''; $('#inAlSave').value=al&&al.save?String(al.save):'';
@@ -3746,16 +3801,16 @@ function renderMoneyReport(P,list,total){
     a=`<div class="card-h"><h3>الحسابات</h3><span class="hint">${esc(repShort(P))}</span></div>`;
     if(S.accounts.length){
       a+=`<div class="mny-split"><div><small>إجمالي الحسابات (دلوقتي)</small><b>${money(t.tot)} ${CS()}${t.missing.length?' *':''}</b></div>${m.fixed?`<div><small>مدخرات</small><b>${money(m.sav)} ${CS()}</b></div>`:`<div><small>عدد الحسابات</small><b>${S.accounts.length}</b></div>`}</div>`;
-      a+=`<p class="acc-sub">الأرصدة</p>`+S.accounts.map(x=>{const b=accBal(x.id); return `<div class="mny-acc"><span>${esc(ACC_TYPES[x.type].e)} ${esc(x.name)}</span><b${b<0?' style="color:var(--bad)"':''}>${money(b)} ${esc(curSym(x.cur))}</b></div>`}).join('');
+      a+=`<p class="acc-sub">الأرصدة</p>`+S.accounts.map(x=>{const b=accBal(x.id); return `<div class="mny-acc"><span>${esc(ACC_TYPES[x.type].e)} ${esc(accDisp(x))}</span><b${b<0?' style="color:var(--bad)"':''}>${money(b)} ${esc(curSym(x.cur))}</b></div>`}).join('');
       const by={}, none={n:0,a:0}; list.forEach(e=>{ if(e.acc&&ACC(e.acc)){const o=by[e.acc]||(by[e.acc]={n:0,a:0}); o.n++; o.a+=e.amount} else {none.n++; none.a+=e.amount} });
-      a+=`<p class="acc-sub">المصروفات من كل حساب</p>`+S.accounts.map(x=>{const o=by[x.id]||{n:0,a:0}; return `<div class="mny-acc"><span>${esc(x.name)} · ${o.n} عملية</span><b>${money(o.a)} ${CS()}</b></div>`}).join('')+`<div class="mny-acc"><span>🧾 من غير حساب · ${none.n} عملية</span><b>${money(none.a)} ${CS()}</b></div>`;
+      a+=`<p class="acc-sub">المصروفات من كل حساب</p>`+S.accounts.map(x=>{const o=by[x.id]||{n:0,a:0}; return `<div class="mny-acc"><span>${esc(accDisp(x))} · ${o.n} عملية</span><b>${money(o.a)} ${CS()}</b></div>`}).join('')+`<div class="mny-acc"><span>🧾 من غير حساب · ${none.n} عملية</span><b>${money(none.a)} ${CS()}</b></div>`;
       const recv={}; inR.forEach(x=>{ if(x.acc&&ACC(x.acc)) recv[x.acc]=(recv[x.acc]||0)+x.amount });
       if(Object.keys(recv).length) a+=`<p class="acc-sub">الدخل المستلم على كل حساب</p>`+Object.keys(recv).map(id=>`<div class="mny-acc"><span>${esc(ACC(id).name)}</span><b style="color:var(--ok)">+${money(recv[id])} ${CS()}</b></div>`).join('');
     }
     if(trR.length||S.transfers.length){
       let fee=0, miss=false; trR.forEach(x=>{ if(!x.fee) return; const f=ACC(x.from), mm=f?toMain(x.fee,f.cur):null; if(mm==null) miss=true; else fee+=mm });
       a+=`<p class="acc-sub">التحويلات بين حساباتك (مش مصروف ولا دخل)</p><div class="mny-acc"><span>${trR.length===1?'تحويل واحد':trR.length+' '+(trR.length<=10?'تحويلات':'تحويل')} في ${name} ده</span><b>${trR.length?'رسوم '+money(r2(fee))+' '+CS()+(miss?' *':''):'—'}</b></div>`;
-      a+=trR.slice().sort((x,y)=>y.ts-x.ts).slice(0,5).map(x=>{const f=ACC(x.from), to=ACC(x.to); return `<div class="mny-acc"><span>${esc(f?f.name:'؟')} ← ${esc(to?to.name:'؟')} · ${esc(dkToDMY(dayKey(x.ts)))}</span><b>${money(x.out)} ${esc(curSym(f?f.cur:S.currency))}</b></div>`}).join('');
+      a+=trR.slice().sort((x,y)=>y.ts-x.ts).slice(0,5).map(x=>{const f=ACC(x.from), to=ACC(x.to); return `<div class="mny-acc"><span>${esc(f?accDisp(f):'؟')} ← ${esc(to?accDisp(to):'؟')} · ${esc(dkToDMY(dayKey(x.ts)))}</span><b>${money(x.out)} ${esc(curSym(f?f.cur:S.currency))}</b></div>`}).join('');
     }
     if(S.accounts.length&&t.missing.length) a+=`<p class="hint" style="margin:8px 0 0">* فيه حسابات بعملة تانية ومفيش سعر صرف دلوقتي، فمش محسوبة في الإجمالي.</p>`;
   }
@@ -4723,7 +4778,7 @@ $('#mbGo').onclick=async()=>{
   if(p1!==p2) return err(mbKind==='pin'?'الرقمين مش زي بعض':'كلمتين السر مش زي بعض');
   b.disabled=true; b.textContent='لحظة...';
   try{
-    const id=mbNewId(), ns={onboarded:false,profile:{name,age:null},pinH:await pinMake(p1),lockKind:mbKind,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,press:S.press,trans:S.trans,haptic:S.haptic,currency:S.currency};
+    const id=mbNewId(), ns={onboarded:false,profile:{name,age:null},pinH:await pinMake(p1),lockKind:mbKind,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,press:S.press,trans:S.trans,haptic:S.haptic,currency:S.currency,curs:S.curs};
     if(!lsSet(mbKey(id),JSON.stringify(ns))){try{localStorage.removeItem(mbKey(id))}catch(e){} delete mem[mbKey(id)]; err('مساحة التخزين مش كفاية لعضو جديد'); return}
     MB.list.push({id,name}); mbGo(id,true);
   }catch(e){err('حصلت مشكلة، جرب تاني')}
@@ -4892,7 +4947,7 @@ async function exportXlsx(all){
     if(S.accounts.length||S.inflows.length||S.transfers.length||S.insts.length){
       const inP=t=>per.some(x=>t>=x.P.start&&t<x.P.next), rows=[], hdr=[];
       rows.push(['الحسابات (الأرصدة دلوقتي)']); hdr.push(rows.length-1);
-      rows.push(['الحساب','النوع','العملة','الرصيد']); S.accounts.forEach(a=>rows.push([a.name,ACC_TYPES[a.type].n,a.cur,accBal(a.id)])); rows.push([]);
+      rows.push(['الحساب','النوع','العملة','الرصيد']); S.accounts.forEach(a=>rows.push([accDisp(a),ACC_TYPES[a.type].n,a.cur,accBal(a.id)])); rows.push([]);
       const inf=S.inflows.filter(x=>inP(x.ts)).sort((a,b)=>a.ts-b.ts);
       rows.push(['الدخل المستلم']); hdr.push(rows.length-1); rows.push(['التاريخ','المصدر',amtH,'الحساب','ملاحظة']);
       inf.forEach(x=>rows.push([dkToDMY(dayKey(x.ts)),x.src||'دخل',x.amount,(ACC(x.acc)||{}).name||'',x.note||''])); rows.push(['الإجمالي','',r2(inf.reduce((a,x)=>a+x.amount,0))],[]);
@@ -4916,7 +4971,7 @@ function pdfMoneyHtml(months){
   if(!(S.accounts.length||S.inflows.length||S.transfers.length||S.insts.length)) return '';
   const per=months.map(k=>repP(k)), inP=t=>per.some(P=>t>=P.start&&t<P.next), A=a=>(a&&esc(a.name))||'';
   let h='<h2>الحسابات والدخل والتحويلات والأقساط</h2>';
-  if(S.accounts.length) h+=`<table><tr><th>الحساب</th><th>النوع</th><th>العملة</th><th>الرصيد دلوقتي</th></tr>${S.accounts.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(ACC_TYPES[a.type].n)}</td><td>${esc(a.cur)}</td><td>${fmt(accBal(a.id))}</td></tr>`).join('')}</table>`;
+  if(S.accounts.length) h+=`<table><tr><th>الحساب</th><th>النوع</th><th>العملة</th><th>الرصيد دلوقتي</th></tr>${S.accounts.map(a=>`<tr><td>${esc(accDisp(a))}</td><td>${esc(ACC_TYPES[a.type].n)}</td><td>${esc(a.cur)}</td><td>${fmt(accBal(a.id))}</td></tr>`).join('')}</table>`;
   const inf=S.inflows.filter(x=>inP(x.ts)).sort((a,b)=>a.ts-b.ts);
   if(inf.length) h+=`<table style="margin-top:14px"><tr><th>التاريخ</th><th>الدخل المستلم</th><th>الحساب</th><th>المبلغ (${CS()})</th></tr>${inf.map(x=>`<tr><td>${dkToDMY(dayKey(x.ts))}</td><td>${esc(x.src||'دخل')}</td><td>${A(ACC(x.acc))}</td><td>${fmt(x.amount)}</td></tr>`).join('')}<tr><td colspan="3"><b>الإجمالي</b></td><td><b>${fmt(r2(inf.reduce((a,x)=>a+x.amount,0)))}</b></td></tr></table>`;
   const trs=S.transfers.filter(t=>inP(t.ts)).sort((a,b)=>a.ts-b.ts);
@@ -4997,9 +5052,10 @@ $('#expCancel').onclick=closeSheets;
 /* Cloud backup */
 let db=null, myId=null;
 async function backupDoc(){return db.collection('data/users/'+myId).doc(ME.id==='m1'?'backup':'backup-'+ME.id)}
-const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,insts:S.insts,instPays:S.instPays,inflows:S.inflows,payType:S.payType,payAnchor:S.payAnchor,prefs:{moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,press:S.press,trans:S.trans,haptic:S.haptic,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide}});
+const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,insts:S.insts,instPays:S.instPays,inflows:S.inflows,payType:S.payType,payAnchor:S.payAnchor,prefs:{moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,curs:S.curs,press:S.press,trans:S.trans,haptic:S.haptic,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide}});
 function applyBackup(p,at){
   if(S.space) spDetach();
+  curMerge(p.prefs&&typeof p.prefs==='object'?p.prefs.curs:[]); // custom currencies first: accounts and the currency check below use them
   const old={ac:S.accounts,tr:S.transfers,ins:S.insts,ip:S.instPays,inf:S.inflows,pt:S.payType,pa:S.payAnchor,mv:S.moneyView,e:S.expenses,b:S.budget,c:S.cats,m:S.budgetMode,d:S.debts,g:S.gams,pd:S.payday,pr:S.profile,si:S.since,inc:S.incomes,go:S.goals,st:S.saveTarget,cu:S.currency,fx:S.fixed,fl:S.fixedLog,py:S.pays,lp:S.lastPay,pf:{theme:S.theme,accent:S.accent,style:S.style,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays}};
   /* every record goes through the same cleaners used for stored data: a crafted file can't inject HTML or break the screens */
   {const seen=new Set(); S.expenses=(Array.isArray(p.expenses)?p.expenses:[]).map(x=>cleanExpense(x,false)).filter(Boolean)
@@ -5818,7 +5874,7 @@ function openPaySheet(id){
   $('#payAll').textContent=`المبلغ كله (${fmt(rem)} ${CS()})`;
   $('#payAmt').value=''; $('#payErr').textContent=''; $('#payAmtBox').classList.remove('err');
   $('#payAccRow').hidden=!S.accounts.length; $('#payAccLab').textContent= x.dir==='in'?'استلمته على':'اتدفع من';
-  $('#payAcc').innerHTML='<option value="">من غير حساب</option>'+S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(a.name)} (${esc(curSym(a.cur))})</option>`).join(''); $('#payAcc').value=ACC(S.lastAcc)?S.lastAcc:'';
+  $('#payAcc').innerHTML='<option value="">من غير حساب</option>'+S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(accDisp(a))} (${esc(curSym(a.cur))})</option>`).join(''); $('#payAcc').value=ACC(S.lastAcc)?S.lastAcc:'';
   $('#payHist').innerHTML=(x.payments||[]).slice().reverse().map(p=>`<li><span>${x.dir==='in'?'استلمت':'سددت'} ${fmt(p.amount)} ${CS()}${ACC(p.acc)?' · '+esc(ACC(p.acc).name):''}</span><span class="ipd">${shortDate(p.ts)}<button type="button" data-pdel="${esc(p.id)}">حذف</button></span></li>`).join('');
   openSheetEl('paySheet'); $('#payAmt').focus({preventScroll:true});
 }
@@ -5969,7 +6025,7 @@ $('#homeToggles').onchange=e=>{ const c=e.target.closest('[data-hb]'); if(!c) re
 var pkCb=null;
 function pickAcc(o,cb){
   pkCb=cb; $('#pkTitle').textContent=o.title; $('#pkInfo').textContent=o.info||''; $('#pkLab').textContent=o.lab||'الحساب';
-  $('#pkAcc').innerHTML='<option value="">من غير حساب</option>'+S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(a.name)} (${esc(curSym(a.cur))})</option>`).join('');
+  $('#pkAcc').innerHTML='<option value="">من غير حساب</option>'+S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(accDisp(a))} (${esc(curSym(a.cur))})</option>`).join('');
   $('#pkAcc').value=ACC(S.lastAcc)?S.lastAcc:''; $('#pkErr').textContent=''; $('#scrim').classList.add('open'); $('#pkSheet').classList.add('open');
 }
 $('#pkCancel').onclick=closeSheets;
@@ -6101,7 +6157,44 @@ function renderMe(){
     tile('أطول سلسلة', st.best? daysTxt(st.best):'—', `سجلت في ${daysTxt(st.days)}`);
 }
 function applyCurrency(){document.querySelectorAll('.cur').forEach(e=>e.textContent=CS())}
-$('#currencySel').innerHTML=CURRENCIES.map(c=>`<option value="${c.id}">${c.n} (${c.s})</option>`).join('');
+function fillCurSelects(){
+  const cs=$('#currencySel'); if(!cs) return; const v=cs.value;
+  cs.innerHTML=CURRENCIES.map(c=>`<option value="${esc(c.id)}">${esc(c.n)} (${esc(c.s)})</option>`).join('')+'<option value="__more">＋ عملة تانية…</option>';
+  cs.value=CURRENCIES.some(c=>c.id===v)?v:S.currency;
+}
+fillCurSelects();
+/* the "other currency" picker: only currencies that have a real rate in rates.json */
+function curPool(){
+  const r=RT.data&&RT.data.rates; if(!r) return [];
+  return Object.keys(r).filter(c=>/^[A-Z]{3}$/.test(c)&&+r[c]>0&&!CUR_SKIP.has(c)&&!CURRENCIES.some(x=>x.id===c)&&(!CUR_DN||curNameAr(c)!==c||curNameEn(c)!==c))
+    .map(c=>({id:c,ar:curNameAr(c),en:curNameEn(c)})).sort((a,b)=>a.ar.localeCompare(b.ar,'ar'));
+}
+function curAddPaint(){
+  const q=$('#curAddQ').value.trim(), qa=vNorm(q), ql=q.toLowerCase(), all=curPool();
+  const hit=q? all.filter(x=>x.id.toLowerCase().includes(ql)||vNorm(x.ar).includes(qa)||x.en.toLowerCase().includes(ql)) : all;
+  $('#curAddList').innerHTML=hit.slice(0,80).map(x=>`<button type="button" class="cur-item" data-cc="${x.id}"><span>${esc(x.ar)}</span><b dir="ltr">${x.id}</b></button>`).join('');
+  $('#curAddMsg').textContent= !all.length? 'مفيش عملات تانية متاحة دلوقتي' : !hit.length? 'مفيش عملة بالاسم ده. جرّب الكود (زي TRY) أو اسم تاني' : hit.length>80? 'اكتب أكتر عشان تضيّق القايمة' : '';
+}
+function openCurAdd(){
+  $('#curAddQ').value=''; $('#curAddList').innerHTML=''; $('#curAddMsg').textContent='';
+  const go=()=>{ if(!RT.data){toast('محتاج نت عشان أجيب قايمة العملات وأسعارها. جرّب تاني لما النت يشتغل',null,null,5000);return} openSheetEl('curAddSheet'); curAddPaint() };
+  rateFor('USD','EGP'); // loads the saved copy
+  if(RT.data){go();return}
+  toast('بجيب قايمة العملات...',null,null,3000); ratesRefresh(true,go);
+}
+function curPickCustom(c){
+  if(!curPool().some(x=>x.id===c)) return;
+  if(!CURRENCIES.some(x=>x.id===c)){
+    const used=id=>S.currency===id||S.accounts.some(a=>a.cur===id);
+    if((S.curs||[]).length>=CUR_MAX_CUSTOM){ /* make room by dropping one the person is not using */
+      const drop=(S.curs||[]).find(id=>!used(id));
+      if(!drop){toast('وصلت للحد الأقصى: '+CUR_MAX_CUSTOM+' عملات إضافية مستخدمة');return}
+      S.curs=S.curs.filter(id=>id!==drop); const i=CURRENCIES.findIndex(x=>x.id===drop&&x.x); if(i>=0) CURRENCIES.splice(i,1);
+    }
+    curMerge([c]); fillCurSelects(); save();
+  }
+  closeSheets(); $('#currencySel').value=c; setTimeout(()=>curAsk(c),0);
+}
 /* ===== Changing the currency: every amount is converted with today's rate =====
    A 50 EGP cheese is not 50 USD. The rate comes from rates.json (see Rates.kt); with no rate the change is refused rather than done wrong. */
 var CURX=null; // the change waiting for the person to confirm: {from,to,k,at}
@@ -6175,7 +6268,10 @@ function curFixPending(){
   S.expenses.forEach(fix); Object.values(spCloudExpenses||{}).forEach(fix);
   if(ch){save();renderAll()}
 }
-$('#currencySel').onchange=e=>curAsk(e.target.value);
+$('#currencySel').onchange=e=>{ if(e.target.value==='__more'){e.target.value=S.currency; openCurAdd(); return} curAsk(e.target.value) };
+$('#curAddQ').addEventListener('input',curAddPaint);
+$('#curAddList').addEventListener('click',e=>{const b=e.target.closest('[data-cc]'); if(b) curPickCustom(b.dataset.cc)});
+$('#curAddCancel').onclick=()=>closeSheets();
 $('#curGo').onclick=()=>{const x=CURX; if(!x) return; CURX=null; curApply(x)};
 $('#curCancel').onclick=()=>closeSheets();
 bindMoney($('#saveTargetIn'));
@@ -7710,7 +7806,7 @@ var caPre={};
 function caPaint(e,pre){
   if(pre) caPre=pre;
   document.querySelectorAll('#caKind button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.ck===caMode?'true':'false'));
-  const isIn=!e.pair&&e.c.dir==='in', accs=S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(a.name)} (${esc(curSym(a.cur))})</option>`).join('');
+  const isIn=!e.pair&&e.c.dir==='in', accs=S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(accDisp(a))} (${esc(curSym(a.cur))})</option>`).join('');
   const none='<option value="">من غير حساب</option>', ph='<option value="" disabled>اختار الحساب</option>';
   if(caMode==='transfer'){
     $('#caAccLab').textContent='من حساب'; $('#caOtherLab').textContent='إلى حساب'; $('#caOtherRow').hidden=false;
