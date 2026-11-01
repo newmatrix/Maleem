@@ -20,7 +20,7 @@ jobs:
   rates:
     runs-on: ubuntu-latest
     env:
-      CODES: "USD EGP SAR AED KWD QAR BHD OMR JOD ILS EUR GBP"
+      CODES: "USD EGP SAR AED KWD QAR BHD OMR JOD ILS EUR GBP DZD"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
