@@ -2095,7 +2095,7 @@ function cleanProfile(p){p=p&&typeof p==='object'?p:{}; return {name:str(p.name,
 /* ===== Exchange rates =====
    rates.json (base USD) is refreshed daily by a GitHub workflow and read by Kotlin (Rates.kt), which keeps the last good copy.
    rateFor(a,b) = how many b one a is worth (0 = no rate yet). */
-const RT={data:null,at:0,tried:false,busy:false,waiters:[]};
+const RT={data:null,at:0,tried:false,busy:false,waiters:[],err:'',why:''}; // err: why the last refresh gave nothing ('net' | 'http' | 'bad' | 'big' | '')
 function ratesLoad(j){
   try{const o=typeof j==='string'?JSON.parse(j):j, d=o&&o.data;
     if(d&&d.base==='USD'&&d.rates&&typeof d.rates==='object'&&+d.updated>0){RT.data={updated:+d.updated,rates:d.rates};RT.at=+o.checkedAt||0;return true}}catch(e){}
@@ -2108,17 +2108,17 @@ function rateFor(from,to){
   const a=+r[from], b=+r[to]; return a>0&&b>0&&Number.isFinite(a)&&Number.isFinite(b)?b/a:0;
 }
 function ratesDone(){RT.busy=false; RT.waiters.splice(0).forEach(f=>{try{f()}catch(e){}})}
-window.__ratesInfo=json=>{ if(json&&ratesLoad(json)) setTimeout(()=>{try{curFixPending()}catch(e){}},0); ratesDone() };
+window.__ratesInfo=(json,err)=>{ const ok=!!(json&&ratesLoad(json)); RT.err=ok?'':(err||(json?'bad':'net')); RT.why=ok?'':(err||''); if(ok) setTimeout(()=>{try{curFixPending()}catch(e){}},0); ratesDone() };
 /* asks for fresh rates (Android: through Kotlin, which throttles to once every 3 hours unless [force]); [cb] runs when done or after 9 seconds */
 function ratesRefresh(force,cb){
   if(cb) RT.waiters.push(cb);
   if(RT.busy) return;
-  RT.busy=true; setTimeout(()=>{if(RT.busy) ratesDone()},9000);
+  RT.busy=true; RT.err=''; RT.why=''; setTimeout(()=>{if(RT.busy){RT.err='net'; RT.why='timeout9'; ratesDone()}},9000);
   if(AB&&AB.ratesRefresh){AB.ratesRefresh(!!force); return}
   /* the web version has no CSP in the way, so it can read the file itself */
   try{ const ctl=new AbortController(); setTimeout(()=>ctl.abort(),8000);
     fetch('https://raw.githubusercontent.com/newmatrix/Maleem/main/rates.json?t='+Math.floor(Date.now()/60000),{cache:'no-store',signal:ctl.signal})
-      .then(r=>r.ok?r.json():null).then(j=>{ if(j&&ratesLoad({data:j,checkedAt:Date.now()})) setTimeout(()=>{try{curFixPending()}catch(e){}},0); ratesDone() }).catch(()=>ratesDone());
+      .then(r=>{ if(!r.ok){RT.err='http'; RT.why='http'+r.status; return null} return r.json() }).then(j=>{ if(j){ if(ratesLoad({data:j,checkedAt:Date.now()})) setTimeout(()=>{try{curFixPending()}catch(e){}},0); else RT.err='bad' } ratesDone() }).catch(e=>{RT.err='net'; RT.why=(e&&e.name==='AbortError')?'timeout8':String((e&&e.message)||e).slice(0,40); ratesDone()});
   }catch(e){ratesDone()}
 }
 const CLEAN={debts:cleanDebt,gams:cleanGam,incomes:cleanIncome,goals:cleanGoal,fixed:cleanFixed};
@@ -4705,7 +4705,7 @@ function curAsk(to){
   toast('بجيب سعر العملة...',null,null,3000);
   ratesRefresh(true,()=>{
     const k=rateFor(from,to);
-    if(!k){back();toast('محتاج نت عشان أجيب سعر العملة. جرّب تاني لما النت يشتغل',null,null,6000);return}
+    if(!k){back();toast(RT.err==='bad'||RT.err==='big'?'ملف أسعار العملات لسه مش جاهز عندنا، وده مش بسبب النت عندك. جرّب تاني بعد شوية':RT.err==='http'?'مش قادر أوصل لملف أسعار العملات دلوقتي. جرّب تاني بعد شوية'+(RT.why?' ['+RT.why+']':''):'محتاج نت عشان أجيب سعر العملة. جرّب تاني لما النت يشتغل'+(RT.why?' ['+RT.why+']':''),null,null,6000);return}
     CURX={from,to,k,at:RT.data?RT.data.updated*1000:0};
     const strong=rateFor(to,from)>=1;
     $('#curTxt').textContent='هتتحول كل مبالغك من '+CUR_NAME(from)+' إلى '+CUR_NAME(to)+': المصروفات والميزانية والدخل والمصاريف الثابتة والأهداف والسلف والجمعيات.';
