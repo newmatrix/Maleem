@@ -9,7 +9,8 @@ package com.heshamtaha.maleem
  */
 object PayParser {
 
-    data class Result(val amount: Double, val currency: String, val merchant: String, val method: String)
+    /** dir = "out" (money left the account) or "in" (money came in). The web app decides what to do with incoming ones. */
+    data class Result(val amount: Double, val currency: String, val merchant: String, val method: String, val dir: String = "out")
 
     /** Chat / social apps: people write "دفعت 200 جنيه" there all the time, it is never a bank message. */
     private val IGNORED_PACKAGES = setOf(
@@ -109,10 +110,10 @@ object PayParser {
         val t = normDigits("$title\n$text").trim()
         if (t.length < 8) return null
         if (OTP.containsMatchIn(t) || FAILED.containsMatchIn(t)) return null
-        if (!OUTGOING.containsMatchIn(t)) return null
         // "تم تحويل 500 جنيه إلى حسابك" is money coming in, even though it says تحويل
-        if (INCOMING.containsMatchIn(t)) return null
+        val incoming = INCOMING.containsMatchIn(t)
+        if (!incoming && !OUTGOING.containsMatchIn(t)) return null
         val (amount, cur) = pickAmount(t) ?: return null
-        return Result(amount, cur, merchant(t), method(pkg, t))
+        return Result(amount, cur, merchant(t), method(pkg, t), if (incoming) "in" else "out")
     }
 }

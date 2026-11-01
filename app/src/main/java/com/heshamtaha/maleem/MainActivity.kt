@@ -771,6 +771,13 @@ class MainActivity : AppCompatActivity() {
             PayCapture.setEnabled(this@MainActivity, on)
         }
 
+        /** The web app says whether money coming IN should also be picked up (only when the user has accounts). */
+        @JavascriptInterface
+        fun captureIncoming(on: Boolean) {
+            if (!pageOk) return
+            PayCapture.setIncoming(this@MainActivity, on)
+        }
+
         /** Opens Android's "notification access" screen (straight to Maleem's switch on Android 11+). */
         @JavascriptInterface
         fun captureOpenSettings() {

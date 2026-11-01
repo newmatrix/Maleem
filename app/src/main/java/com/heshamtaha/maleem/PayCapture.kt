@@ -42,6 +42,11 @@ object PayCapture {
 
     fun enabled(c: Context) = prefs(c).getBoolean("on", false)
 
+    /** Money coming IN is only picked up when the user has accounts in the app (the web app switches this on / off). */
+    fun incomingEnabled(c: Context) = prefs(c).getBoolean("incoming", false)
+
+    fun setIncoming(c: Context, on: Boolean) { prefs(c).edit().putBoolean("incoming", on).apply() }
+
     fun hasAccess(c: Context) = NotificationManagerCompat.getEnabledListenerPackages(c).contains(c.packageName)
 
     fun component(c: Context) = ComponentName(c, PayListener::class.java)
@@ -109,6 +114,7 @@ object PayCapture {
         val amount = item.optDouble("amount")
         val pkg = item.optString("pkg")
         val text = item.optString("text")
+        val dir = item.optString("dir", "out")
 
         val old = try { JSONArray(p.getString("recent", "[]")) } catch (_: Exception) { JSONArray() }
         val recent = JSONArray()
@@ -118,13 +124,13 @@ object PayCapture {
             val dt = kotlin.math.abs(o.optLong("at") - now)
             if (dt >= RECENT_KEEP) continue // forget old ones
             recent.put(o)
-            if (dt < DUP_WINDOW && o.optDouble("amount") == amount && (o.optString("pkg") != pkg || o.optString("text") == text)) dup = true
+            if (dt < DUP_WINDOW && o.optString("dir", "out") == dir && o.optDouble("amount") == amount && (o.optString("pkg") != pkg || o.optString("text") == text)) dup = true
         }
         if (dup) {
             p.edit().putString("recent", recent.toString()).apply()
             return false
         }
-        recent.put(JSONObject().put("at", now).put("amount", amount).put("pkg", pkg).put("text", text))
+        recent.put(JSONObject().put("at", now).put("amount", amount).put("pkg", pkg).put("text", text).put("dir", dir))
 
         val q = queue(c)
         val out = JSONArray()
@@ -146,7 +152,7 @@ object PayCapture {
     }
 
     @SuppressLint("MissingPermission")
-    fun notifyUser(c: Context, count: Int, amount: Double, source: String) {
+    fun notifyUser(c: Context, count: Int, amount: Double, source: String, dir: String = "out") {
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(c, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) return
@@ -157,7 +163,7 @@ object PayCapture {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val amt = if (amount == Math.floor(amount)) amount.toLong().toString() else String.format(java.util.Locale.US, "%.2f", amount)
-        val title = if (count > 1) "$count عمليات دفع مستنية تسجلها" else "لقيت عملية دفع: $amt"
+        val title = if (count > 1) "$count عمليات دفع مستنية تسجلها" else if (dir == "in") "لقيت فلوس داخلة: $amt" else "لقيت عملية دفع: $amt"
         val body = if (count > 1) "آخرها $amt من $source. افتح مليم وراجعها." else "من $source. دوس عشان تسجلها في مليم."
         val n = NotificationCompat.Builder(c, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat)
@@ -196,6 +202,7 @@ class PayListener : NotificationListenerService() {
         val r = PayParser.parse(pkg, title, text) ?: return
 
         if (PayCapture.isBlocked(this, pkg)) return
+        if (r.dir == "in" && !PayCapture.incomingEnabled(this)) return
 
         val app = try {
             packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString()
@@ -212,6 +219,7 @@ class PayListener : NotificationListenerService() {
             .put("cur", r.currency.take(8))
             .put("merchant", r.merchant)
             .put("method", r.method)
+            .put("dir", r.dir)
             .put("source", source)
             .put("pkg", pkg)
             .put("text", ("$title\n$text").trim().take(300))
@@ -219,6 +227,6 @@ class PayListener : NotificationListenerService() {
 
         val live = PayCapture.onNew
         if (live != null) live()
-        else PayCapture.notifyUser(this, PayCapture.pendingCount(this), r.amount, source)
+        else PayCapture.notifyUser(this, PayCapture.pendingCount(this), r.amount, source, r.dir)
     }
 }
