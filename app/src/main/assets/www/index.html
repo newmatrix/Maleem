@@ -111,8 +111,17 @@ button{cursor:pointer}
 .topbar h1{font-size:1.5rem;margin:0;font-weight:700;letter-spacing:-.01em}
 .topbar .sub{color:var(--muted);font-size:.9rem}
 .topbar.home{justify-content:flex-start;gap:12px}
+.eye-btn{margin-inline-start:auto;width:42px;height:42px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;flex:none;background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.eye-btn:active{transform:scale(.92)}
+.eye-btn svg{width:21px;height:21px}
+#v-expenses.amt-hidden #hero .big,#v-expenses.amt-hidden #hero>:not(.head):not(.label):not(.big):not(.cta):not(.bar):not(.ctxt),#v-expenses.amt-hidden #moneyBox,#v-expenses.amt-hidden #sumBox,#v-expenses.amt-hidden #todayTotal,#v-expenses.amt-hidden #todayList .val{filter:blur(9px);user-select:none;pointer-events:none}
 .home-av{width:46px;height:46px;border-radius:50%;border:0;padding:0;overflow:hidden;flex:none;display:grid;place-items:center;font:inherit;font-size:1.2rem;font-weight:700;color:var(--brand);background:color-mix(in srgb,var(--brand) 15%,var(--surface));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--brand) 30%,transparent);cursor:pointer;transition:transform .15s}
 .home-av:active{transform:scale(.92)}
+.data-av-wrap{position:relative;width:96px;height:96px;margin:2px auto 8px}
+.data-av{width:96px;height:96px;border-radius:50%;border:0;padding:0;overflow:hidden;display:grid;place-items:center;font:inherit;font-size:2.4rem;font-weight:700;color:var(--brand);background:color-mix(in srgb,var(--brand) 15%,var(--surface));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--brand) 35%,transparent);cursor:pointer}
+.data-av:active{transform:scale(.97)}
+.data-av img{width:100%;height:100%;object-fit:cover;display:block}
+.data-av-cam{position:absolute;bottom:0;inset-inline-end:0;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--brand);color:var(--brand-ink,#fff);border:2px solid var(--surface);pointer-events:none}
 .home-av img{width:100%;height:100%;object-fit:cover;display:block}
 
 /* Hero: banknote-like card */
@@ -283,6 +292,7 @@ button{cursor:pointer}
 .seg{display:flex;background:var(--surface-2);border-radius:13px;padding:4px;margin-top:10px}
 .seg button{flex:1;border:0;background:none;padding:9px 6px;border-radius:10px;font-weight:500;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:var(--shadow)}
+#payTypeSeg button,#wlPt button{font-size:.84rem;padding:9px 2px;white-space:nowrap;line-height:1.3}
 .field{display:flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:13px;padding:4px 14px;margin-top:10px}
 .field input{flex:1;border:0;background:none;padding:10px 0;font-size:1.15rem;font-weight:600;outline:none;min-width:0}
 .field span{color:var(--muted)}
@@ -495,7 +505,8 @@ button{cursor:pointer}
 .set-item .si svg{width:19px;height:19px}
 .set-item .st{flex:1;min-width:0}
 .set-item .st b{display:block;font-weight:600;font-size:.98rem}
-.set-item .st small{display:block;color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-item .st small{display:block;color:var(--ink);opacity:.74;font-size:.86rem;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me-page .card .hint{color:var(--ink);opacity:.78;font-size:.92rem;line-height:1.55}
 .set-item .chev{width:18px;height:18px;color:var(--muted);flex:none}
 .set-item.danger .st b{color:var(--bad)}
 .set-empty{padding:18px 14px;text-align:center;color:var(--muted)}
@@ -1126,6 +1137,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
     <div class="topbar home">
       <button class="home-av" id="homeAv" type="button" aria-label="صفحتي (أنا)"></button>
       <div><h1 id="greet"></h1><div class="sub" id="todayLabel"></div></div>
+      <button class="eye-btn" id="eyeBtn" type="button" aria-pressed="false" aria-label="إخفاء المبالغ"></button>
     </div>
     <div class="hero" id="hero"></div>
     <div id="moneyBox"></div>
@@ -1335,7 +1347,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
     <div class="me-page" data-mepage="data" hidden>
     <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>بياناتي</h1></div>
     <div class="card">
-      <h3>بياناتي</h3>
+      <div class="data-av-wrap"><button class="data-av" id="dataAv" type="button" aria-label="الصورة الشخصية"></button><span class="data-av-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg></span></div>
       <div class="field"><input id="profName" type="text" placeholder="اسمك" maxlength="24" autocomplete="given-name" aria-label="الاسم" style="font-size:1.05rem"></div>
       <div class="field"><input id="profAge" type="text" inputmode="numeric" placeholder="العمر" maxlength="3" aria-label="العمر" style="font-size:1.05rem"><span>سنة</span></div>
       <div class="pay-row"><div class="txt">العملة</div><select id="currencySel" aria-label="العملة"></select></div>
@@ -1838,7 +1850,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <div class="field"><input id="instName" type="text" placeholder="اشتريت إيه؟ (مثلًا: موبايل)" maxlength="60" aria-label="الحاجة المقسّطة" style="font-size:1.05rem"></div>
   <div class="field"><input id="instParty" type="text" placeholder="الجهة اللي بقسط معاها (اختياري)" maxlength="40" aria-label="الجهة" style="font-size:1.05rem"></div>
   <div id="instGen">
-    <label class="amount-box" style="margin-top:12px"><input id="instTotal" class="v" type="text" inputmode="decimal" placeholder="إجمالي المبلغ اللي عليك" aria-label="إجمالي المبلغ" dir="ltr" autocomplete="off"><span class="c cur" id="instCur"></span></label>
+    <div class="field"><input id="instTotal" type="text" inputmode="decimal" placeholder="إجمالي المبلغ اللي عليك" aria-label="إجمالي المبلغ" dir="rtl" autocomplete="off" style="font-size:1.05rem"><span class="cur" id="instCur"></span></div>
     <div class="pay-row"><div class="txt">مدة التقسيط</div><select id="instMonths" aria-label="عدد الأقساط"></select></div>
     <div class="pay-row"><div class="txt">القسط الشهري<small>تقدر تغيّر أي قسط لوحده بعد الحفظ</small></div><input id="instMonthly" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="القسط الشهري" style="width:120px"></div>
     <div class="pay-row"><div class="txt">ميعاد أول قسط</div><input id="instFirst" class="date-in" type="date" aria-label="ميعاد أول قسط" style="width:150px"></div>
@@ -1937,12 +1949,15 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
   <div class="grab"></div>
   <h2 id="gamTitle">جمعية جديدة</h2>
   <div class="field"><input id="gamName" type="text" placeholder="اسم الجمعية، مثلاً جمعية الشغل" maxlength="30" aria-label="اسم الجمعية" style="font-size:1.05rem"></div>
-  <label class="amount-box" id="gamAmtBox"><input id="gamAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="قيمة القسط الشهري" dir="ltr" autocomplete="off"><span class="c"><span class="cur">ج.م</span> قسط</span></label>
+  <label class="amount-box" id="gamAmtBox"><input id="gamAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="قيمة القسط الشهري" dir="ltr" autocomplete="off"><span class="c"><span class="cur">ج.م</span> <span id="gamAmtLbl">قسط</span></span></label>
   <div class="pay-row"><div class="txt">عدد الشهور<small>عدد الأعضاء = عدد الشهور</small></div><select id="gamMembers" aria-label="عدد الشهور"></select></div>
+  <div class="pay-row"><div class="txt">داخل بكام فرد؟<small>لو داخل بأكتر من اسم، بتدفع قسط عن كل فرد وتقبض دور لكل فرد</small></div><select id="gamShares" aria-label="عدد الأفراد اللي داخل بيهم"></select></div>
   <div class="pay-row"><div class="txt">أول شهر</div><input type="text" id="gamStart" class="date-in wp-in" readonly inputmode="none" placeholder="اختار الشهر" dir="ltr" autocomplete="off" aria-label="أول شهر، دوس عشان تختار الشهر والسنة"></div>
   <div class="tp-wrap wp" id="gamStartWp" hidden></div>
   <div class="pay-row"><div class="txt">يوم دفع القسط</div><select id="gamDay" aria-label="يوم دفع القسط"></select></div>
-  <div class="pay-row"><div class="txt">دورك تقبض<small id="gamTurnHint"></small></div><select id="gamTurn" aria-label="دورك"></select></div>
+  <div class="pay-row"><div class="txt"><span id="gamTurnLbl">دورك تقبض</span><small id="gamTurnHint"></small></div><select id="gamTurn" aria-label="دورك"></select></div>
+  <div id="gamTurnsMore"></div>
+  <p class="hint" id="gamSumm" style="margin:10px 4px 0;line-height:1.55" hidden></p>
   <div class="set-row" style="border-top:0;padding-top:14px">
     <div class="txt">احسب القسط من مصاريفي<small>القسط يتسجل كمصروف في فئة جمعية لما تدفعه</small></div>
     <label class="switch"><input type="checkbox" id="gamAsExp" checked aria-label="احسب القسط من مصاريفي"><i></i></label>
@@ -2287,7 +2302,7 @@ let PAY={}; const syncPays=()=>{PAY=Object.fromEntries(S.pays.map(x=>[x.id,x]));
 const payOf=x=>PAY[x.pay]?x.pay:'cash';
 if(!S.fixedLog||typeof S.fixedLog!=='object') S.fixedLog={};
 if(!S.currency) S.currency='EGP';
-const CURRENCIES=[{id:'EGP',s:'ج.م',n:'جنيه مصري'},{id:'SAR',s:'ر.س',n:'ريال سعودي'},{id:'AED',s:'د.إ',n:'درهم إماراتي'},{id:'KWD',s:'د.ك',n:'دينار كويتي'},{id:'QAR',s:'ر.ق',n:'ريال قطري'},{id:'BHD',s:'د.ب',n:'دينار بحريني'},{id:'OMR',s:'ر.ع',n:'ريال عماني'},{id:'JOD',s:'د.أ',n:'دينار أردني'},{id:'ILS',s:'₪',n:'شيكل'},{id:'USD',s:'$',n:'دولار أمريكي'},{id:'EUR',s:'€',n:'يورو'},{id:'GBP',s:'£',n:'جنيه إسترليني'}];
+const CURRENCIES=[{id:'EGP',s:'ج.م',n:'جنيه مصري'},{id:'SAR',s:'ر.س',n:'ريال سعودي'},{id:'AED',s:'د.إ',n:'درهم إماراتي'},{id:'KWD',s:'د.ك',n:'دينار كويتي'},{id:'QAR',s:'ر.ق',n:'ريال قطري'},{id:'BHD',s:'د.ب',n:'دينار بحريني'},{id:'OMR',s:'ر.ع',n:'ريال عماني'},{id:'JOD',s:'د.أ',n:'دينار أردني'},{id:'DZD',s:'د.ج',n:'دينار جزائري'},{id:'USD',s:'$',n:'دولار أمريكي'},{id:'EUR',s:'€',n:'يورو'},{id:'GBP',s:'£',n:'جنيه إسترليني'},{id:'ILS',s:'₪',n:'شيكل'}];
 const CS=()=>(CURRENCIES.find(c=>c.id===S.currency)||CURRENCIES[0]).s;
 if(!S.since) S.since=Date.now();
 
@@ -2357,10 +2372,15 @@ function cleanGam(g){
   if(!g||typeof g!=='object') return null;
   const inst=numIn(g.inst,0.01,MAXAMT,0); if(!inst) return null;
   const members=intIn(g.members,2,60,10), paid={};
+  /* one person can be in the gam'eya with several shares: turns = the month number of each share's payout (1 share = 1 turn),
+     recvT = which of those payouts were already received. Old records only have turn/received and still work. */
+  let turns=[...new Set((Array.isArray(g.turns)?g.turns:[]).map(Number).filter(n=>Number.isInteger(n)&&n>=1&&n<=members))].slice(0,5).sort((a,b)=>a-b);
+  if(!turns.length) turns=[intIn(g.turn,1,members,1)];
+  let recvT=null; if(g.recvT&&typeof g.recvT==='object'){recvT={}; turns.forEach(t=>{const r=g.recvT[t]; if(r&&typeof r==='object') recvT[t]={ts:numIn(r.ts,0,MAXTS,0)}})}
   if(g.paid&&typeof g.paid==='object') Object.keys(g.paid).forEach(k=>{const r=g.paid[k];
     if(isMK(k)&&r&&typeof r==='object'){const o={ts:numIn(r.ts,0,MAXTS,0)}; if(isId(r.exp)) o.exp=r.exp; paid[k]=o}});
   return cleanOwner({id:idOr(g.id),name:str(g.name,60).trim()||'جمعية',inst:r2(inst),members,start:isMK(g.start)?g.start:monKey(Date.now()),
-    day:intIn(g.day,1,31,1),turn:intIn(g.turn,1,members,1),asExp:g.asExp!==false,paid,received:g.received===true,created:numIn(g.created,0,MAXTS,0)},g);
+    day:intIn(g.day,1,31,1),turn:turns[0],turns,asExp:g.asExp!==false,paid,received:recvT?turns.every(t=>recvT[t]):g.received===true,...(recvT?{recvT}:{}),created:numIn(g.created,0,MAXTS,0)},g);
 }
 function cleanIncome(x){
   if(!x||typeof x!=='object') return null;
@@ -2655,9 +2675,12 @@ function dailyLine(rem,P){
   if(rem<=0||per<=0) return '';
   return `<p class="fc daily">💡 تقدر تصرف حوالي <b>${money(per)}</b> ${CS()} في اليوم${dl===1?' النهارده':' لحد '+endWord()}${pend>0?'، بعد المصاريف الثابتة الجاية':''}</p>`;
 }
+const EYE_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+function paintEye(){ const h=!!S.hideAmt, b=$('#eyeBtn'); if(!b) return; $('#v-expenses').classList.toggle('amt-hidden',h); b.setAttribute('aria-pressed',h?'true':'false'); b.setAttribute('aria-label',h?'إظهار المبالغ':'إخفاء المبالغ'); b.innerHTML=h?EYE_OFF:EYE_ON }
 function renderHome(){
   const now=Date.now(), mk=monKey(now), tk=dayKey(now);
-  greet();
+  greet(); paintEye();
   $('#todayLabel').textContent=new Date().toLocaleDateString(LOC,{weekday:'long',day:'numeric',month:'long'});
   const fixed=S.budgetMode==='fixed', P=periodOf(now), spent= fixed? sum(ofPeriod(P)) : sum(ofMonth(mk)), B=fixed?S.budget:0;
   let h='';
@@ -2923,13 +2946,14 @@ function go(t){
     if(on){v.style.setProperty('--dx',dir>0?'-24px':dir<0?'24px':'0px');v.classList.remove('active');void v.offsetWidth}
     v.classList.toggle('active',on)});
   document.querySelectorAll('.nav button').forEach(b=>{if(b.dataset.tab===t)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
-  $('#fab').hidden = t==='settings'||t==='me'; $('#micFab').hidden = t==='settings'||t==='me'||t==='debts';
+  $('#fab').hidden = t==='settings'||t==='me'||t==='reports'; $('#micFab').hidden = t==='settings'||t==='me'||t==='reports'; $('#micFab').setAttribute('aria-label', t==='debts'?'إضافة بالصوت':'تسجيل مصروف بالصوت');
   if(t==='reports') renderReports();
   if(t==='debts') renderDebts();
   const y=tabY[t]||0; pageTo(y); if(y) requestAnimationFrame(()=>pageTo(y));
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.tab));
 $('#homeAv').onclick=()=>go('me');
+$('#eyeBtn').onclick=()=>{S.hideAmt=!S.hideAmt;save();paintEye()};
 $('#meBack').onclick=()=>go('expenses');
 
 /* Sheet */
@@ -3715,8 +3739,8 @@ $('#repSeg').onclick=e=>{const b=e.target.closest('[data-rt]'); if(!b||b.dataset
 var mePage=null, meHomeY=0;
 const ME_TITLES={"accounts": "الحسابات", "income": "الدخل المستلم", "sources": "مصادر الدخل", "fixed": "المصاريف الثابتة", "saving": "الادخار", "budget": "الميزانية وطريقة القبض", "data": "بياناتي", "stats": "إحصائياتي", "home": "الصفحة الرئيسية"};
 const ME_ICO={accounts:'<path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14.5" r="1"/>',income:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M8 13l4 4 4-4"/>',budget:'<path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/>',saving:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',sources:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',fixed:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',data:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',stats:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>'};
-const ME_GROUPS=[['فلوسي',[['accounts','#0E7490'],['income','#16A34A'],['budget','#C79A2B'],['saving','#8B5CF6']]],['الدخل والالتزامات الثابتة',[['sources','#2D7FD3'],['fixed','#D9466F']]],['عنّي',[['data','#475569'],['stats','#E07A2E'],['home','#0EA5A4']]]];
-$('#meGroups').innerHTML=ME_GROUPS.map(([g,rows])=>`<div class="set-gt">${g}</div><div class="card set-list">${rows.map(([k,c])=>`<button type="button" class="set-item" data-me-go="${k}" id="mi-${k}"><span class="si" style="--c:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ME_ICO[k]}</svg></span><span class="st"><b>${ME_TITLES[k]}</b><small id="ms-${k}"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>`).join('')}</div>`).join('');
+const ME_GROUPS=[['',[['stats','#E07A2E']]],['فلوسي',[['home','#0EA5A4'],['accounts','#0E7490'],['income','#16A34A'],['budget','#C79A2B'],['saving','#8B5CF6']]],['الدخل والالتزامات الثابتة',[['sources','#2D7FD3'],['fixed','#D9466F']]],['عنّي',[['data','#475569']]]];
+$('#meGroups').innerHTML=ME_GROUPS.map(([g,rows])=>`${g?`<div class="set-gt">${g}</div>`:''}<div class="card set-list"${g?'':' style="margin-top:0"'}>${rows.map(([k,c])=>`<button type="button" class="set-item" data-me-go="${k}" id="mi-${k}"><span class="si" style="--c:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ME_ICO[k]}</svg></span><span class="st"><b>${ME_TITLES[k]}</b><small id="ms-${k}"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>`).join('')}</div>`).join('');
 function meGo(p,quiet){
   if(p&&!mePage) meHomeY=pageY();
   mePage=p||null; $('#meHome').hidden=!!mePage;
@@ -3847,6 +3871,7 @@ function voiceCancel(){try{AB&&AB.cancelVoice&&AB.cancelVoice()}catch(e){} voice
 $('#micFab').onclick=()=>{
   if(voiceOn) return;
   if(!(AB&&AB.startVoice)){toast('التسجيل بالصوت شغّال داخل تطبيق الموبايل بس');return}
+  $('#vcHint').textContent= tab==='debts'? VOB_HINT[obTab]||VOB_HINT.debts : 'قول المبلغ والفئة، مثلًا: «٤٦٠ جنيه باقة انترنت ارضي»';
   voiceOpen(); try{AB.startVoice()}catch(e){voiceClose();toast('مقدرتش أشغّل المايك')}
 };
 $('#vcCancel').onclick=voiceCancel;
@@ -3863,12 +3888,249 @@ window.__voiceError=code=>{if(!voiceOn) return; voiceClose();
     :code===8?'المايك مشغول، جرّب تاني':'حصلت مشكلة في المايك، جرّب تاني')};
 window.__voiceResult=alts=>{if(!voiceOn) return; voiceClose();
   const list=(Array.isArray(alts)?alts:[alts]).filter(Boolean);
+  if(tab==='debts'&&list.length){ obVoiceResult(list); return }
   const all=list.map(parseVoice), best=all.find(p=>p.amount)||all[0]||{amount:null,cat:null,note:'',yday:false};
   if(!list.length){toast('ما سمعتش حاجة واضحة، جرّب تاني');return}
   /* never saved automatically: the add sheet opens filled in so you can check it first */
   openSheet(null,{amount:best.amount,cat:best.cat,note:best.note});
   if(best.yday){selDay=yestKey();paintDate()}
   toast(!best.amount?'ما سمعتش المبلغ، اكتبه وادوس حفظ':!best.cat?'مش متأكد من الفئة، اختارها وادوس حفظ':'راجع البيانات وادوس حفظ',null,null,3200)};
+/* ===== Voice entry for التزاماتي: سلف، جمعيات، تقسيط =====
+   Same rule as the expenses mic: the speech service gives text, everything after that runs on the phone,
+   and nothing is saved by itself: the matching sheet opens filled in so you can check it first. */
+const vK=t=>vNorm(t).replace(/[^\u0621-\u064Aa-z0-9]/g,'');
+const vMap=o=>Object.assign(Object.create(null),o);
+const VMON=vMap({يناير:0,فبراير:1,مارس:2,ابريل:3,مايو:4,يونيو:5,يونيه:5,يوليو:6,يوليه:6,اغسطس:7,سبتمبر:8,اكتوبر:9,نوفمبر:10,ديسمبر:11});
+const VWDAYS=vMap({الاحد:0,الاثنين:1,الاتنين:1,التلات:2,الثلاثاء:2,الاربع:3,الاربعاء:3,الخميس:4,الجمعه:5,السبت:6});
+const VORD=vMap({الاول:1,اول:1,التاني:2,تاني:2,الثاني:2,التالت:3,تالت:3,الثالث:3,الرابع:4,رابع:4,الخامس:5,خامس:5,السادس:6,سادس:6,السابع:7,سابع:7,التامن:8,الثامن:8,تامن:8,التاسع:9,تاسع:9,العاشر:10,عاشر:10,الحداشر:11,الاتناشر:12});
+const VNEXT=new Set(['الجاي','الجايي','القادم','القادمه','الجايه']);
+const vMonOf=k=>k in VMON? VMON[k] : (k.length>3&&'وبلف'.includes(k[0])&&(k.slice(1) in VMON)? VMON[k.slice(1)] : -1);
+const vNumAt=(k,i)=>{const x=k[i]; if(!x) return null; if(/^\d+$/.test(x)) return +x; if(Object.prototype.hasOwnProperty.call(VW,x)) return VW[x]; return null};
+const vHas=(k,i,j,set)=>{for(let x=Math.max(0,i);x<=Math.min(k.length-1,j);x++) if(set.has(k[x])) return true; return false};
+/* every number said in the sentence (digits or words), skipping tokens already used for something else */
+function vAllNums(tok,skip){
+  const nt=tok.map(t=>vNorm(t).replace(/(\d)[,،](?=\d{3}(?!\d))/g,'$1').replace(/[٫]/g,'.')), out=[], used=new Set(skip||[]);
+  nt.forEach((t,i)=>{ if(used.has(i)) return; const m=t.match(/\d+(?:\.\d+)?/); if(!m) return;
+    let n=parseFloat(m[0]); const idx=[i], nx=(nt[i+1]||'').replace(/[^\u0621-\u064A]/g,'');
+    if(!used.has(i+1)){ if(VTH.has(nx)){n*=1000;idx.push(i+1)} else if(nx==='نص'||nx==='نصف'){n=vFrac(n,.5);idx.push(i+1)} else if(nx==='ربع'){n=vFrac(n,.25);idx.push(i+1)} }
+    out.push({n:Math.round(n*100)/100,idx}); idx.forEach(x=>used.add(x)) });
+  voiceWordRuns(tok.map((t,i)=>used.has(i)?'§':t)).forEach(r=>out.push({n:r.n,idx:r.idx}));
+  return out.sort((a,b)=>a.idx[0]-b.idx[0]);
+}
+/* a spoken date -> yyyy-mm-dd: بكرة، بعد أسبوع، بعد 3 أيام، الشهر الجاي، آخر الشهر، يوم 15، 15 نوفمبر، يوم الخميس */
+function voiceDate(tok){
+  const k=tok.map(vK), used=new Set(), T=new Date(); T.setHours(12,0,0,0);
+  const mk=(y,m,d)=>dayKey(new Date(y,m,Math.min(d,new Date(y,m+1,0).getDate()),12));
+  const plus=n=>{const x=new Date(T); x.setDate(x.getDate()+n); return dayKey(x)};
+  const done=(dk,...ix)=>{ix.forEach(i=>used.add(i)); return {dk,used}};
+  const dayOk=n=>n!=null&&n>=1&&n<=31;
+  for(let i=0;i<k.length;i++){ const mi=vMonOf(k[i]); if(mi<0) continue;
+    let di=-1, d=null; if(dayOk(vNumAt(k,i-1))){di=i-1;d=vNumAt(k,i-1)} else if(dayOk(vNumAt(k,i+1))){di=i+1;d=vNumAt(k,i+1)}
+    if(d==null) d=T.getDate();
+    let y=T.getFullYear(); const today0=new Date(y,T.getMonth(),T.getDate(),12);
+    if(new Date(y,mi,Math.min(d,28),12)<today0) y++;
+    const ix=[i]; if(di>=0){ix.push(di); if(k[Math.min(di,i)-1]==='يوم') ix.push(Math.min(di,i)-1)}
+    return done(mk(y,mi,d),...ix);
+  }
+  for(let i=0;i<k.length;i++){ const w=k[i];
+    if(w==='بعد'&&(k[i+1]==='بكره'||k[i+1]==='بكرا')) return done(plus(2),i,i+1);
+    if(w==='بكره'||w==='بكرا') return done(plus(1),i);
+    if(w==='النهارده'||w==='انهارده') return done(plus(0),i);
+    if(w==='بعد'){
+      let j=i+1, cnt=1; const n=vNumAt(k,j); if(n!=null){cnt=n;j++}
+      const U=vMap({يوم:['d',1],ايام:['d',1],يومين:['d',1,1],اسبوع:['d',7],اسابيع:['d',7],اسبوعين:['d',7,1],شهر:['m',1],شهور:['m',1],اشهر:['m',1],شهرين:['m',1,1],سنه:['m',12],سنين:['m',12],سنتين:['m',12,1]})[k[j]||''];
+      if(U){ const c=U[2]?2:cnt, ix=[]; for(let x=i;x<=j;x++) ix.push(x);
+        if(U[0]==='d') return done(plus(U[1]*c),...ix);
+        const t=new Date(T.getFullYear(),T.getMonth()+U[1]*c,1); return done(mk(t.getFullYear(),t.getMonth(),T.getDate()),...ix) }
+    }
+    if(w==='الاسبوع'&&VNEXT.has(k[i+1])) return done(plus(7),i,i+1);
+    if(w==='الشهر'&&VNEXT.has(k[i+1])){const t=new Date(T.getFullYear(),T.getMonth()+1,1); return done(mk(t.getFullYear(),t.getMonth(),T.getDate()),i,i+1)}
+    if(w==='اخر'&&k[i+1]==='الشهر') return done(mk(T.getFullYear(),T.getMonth(),31),i,i+1);
+    if(w in VWDAYS){ const diff=((VWDAYS[w]-T.getDay()+7)%7)||7; return done(plus(diff),...(k[i-1]==='يوم'?[i-1,i]:[i])) }
+    const n=vNumAt(k,i+1);
+    if((w==='يوم'&&dayOk(n))||(dayOk(vNumAt(k,i))&&k[i+1]==='الشهر'&&w!=='يوم')){
+      const dd=w==='يوم'?n:vNumAt(k,i), at=w==='يوم'?[i,i+1]:[i,i+1];
+      const t=new Date(T.getFullYear(),T.getMonth()+(T.getDate()<=dd?0:1),1); return done(mk(t.getFullYear(),t.getMonth(),dd),...at) }
+  }
+  return {dk:null,used};
+}
+const vStopPre=['هي','ها','هر','هس','هد','هب','هق','يوم','بعد','بكر','النهارد','الاسبوع','الشهر','اخر','في','عشان','علشان','دي','ده','لما','وقت','جنيه','ج'];
+const vIsStop=(k,i,taken)=>{const w=k[i]||''; if(!w||taken.has(i)) return true; const b=w.length>2&&w[0]==='و'?w.slice(1):w;
+  return vStopPre.some(p=>b===p||b.startsWith(p)&&p.length>=2&&p!=='في'&&p!=='ده'&&p!=='دي')||vMonOf(w)>=0||(w in VWDAYS)||/^\d+$/.test(w)||(w in VW)||VTH.has(w)||VCUR.test(w)};
+/* a name: up to 2 words from index s */
+function vName(tok,k,s,taken,strip){
+  const o=[]; for(let i=s;i<tok.length&&o.length<2;i++){ if(vIsStop(k,i,taken)) break; o.push(tok[i]) }
+  if(!o.length) return '';
+  if(strip&&o[0].length>=4&&o[0][0]==='ل'&&o[0][1]!=='ي'){ o[0]= o[0][1]==='ل'&&o[0][2]!=='ي'? 'ال'+o[0].slice(2) : o[0].slice(1) }
+  return o.join(' ').replace(/[،,.؟?!]+$/g,'').slice(0,30);
+}
+function vAfterBecause(tok,k,taken){
+  const i=k.findIndex(w=>w==='عشان'||w==='علشان'||w==='بسبب'); if(i<0) return '';
+  const o=[]; for(let j=i+1;j<tok.length&&o.length<5;j++){ if(taken.has(j)||/^\d+$/.test(k[j])||['ب','في','كل','على','لمده','مده'].includes(k[j])) break; o.push(tok[j]) } return o.join(' ');
+}
+/* ---- سلفة ---- */
+function parseVoiceDebt(text){
+  const tok=String(text||'').trim().split(/\s+/).filter(Boolean), out={dir:null,person:'',amount:null,due:null,note:'',score:0};
+  if(!tok.length) return out;
+  const k=tok.map(vK), D=voiceDate(tok); out.due=D.dk;
+  const nums=vAllNums(tok,D.used).filter(r=>r.n>0&&r.n<=10000000), cur=i=>i>=0&&i<tok.length&&VCUR.test(k[i]);
+  const pick=nums.find(r=>cur(r.idx[r.idx.length-1]+1)||cur(r.idx[0]-1))||nums[0];
+  const taken=new Set(D.used); if(pick){out.amount=pick.n; pick.idx.forEach(i=>taken.add(i))}
+  k.forEach((w,i)=>{if(cur(i)) taken.add(i)});
+  const first=n=>{for(let i=0;i<tok.length;i++){ if(!taken.has(i)&&!vIsStop(k,i,taken)&&i>=n) return i } return -1};
+  const c=k.findIndex((w,i)=>w==='عند'&&(k[i-1]==='ليا'||k[i-1]==='لي'));
+  const sl=k.findIndex(w=>['سلفت','اسلفت','سلفته','سلفتها'].includes(w));
+  const bo=k.findIndex(w=>['استلفت','اقترضت','استدنت','اتسلفت','اخدت'].includes(w));
+  const tk=k.findIndex((w,i)=>w==='مني'&&['اخد','خد','استلف','استلفت','اخدوا'].includes(k[i-1]));
+  if(c>=0){ out.dir='in'; out.person=vName(tok,k,c+1,taken,false) }
+  else if(sl>=0){ out.dir='in'; out.person=vName(tok,k,sl+1,taken,false) }
+  else if(tk>=1){ out.dir='in'; out.person=vName(tok,k,tk-2>=0&&!vIsStop(k,tk-2,taken)?tk-2:tk-1,taken,false) }
+  else if(bo>=0){ out.dir='out'; const f=k.findIndex((w,i)=>i>bo&&w==='من'); out.person=vName(tok,k,(f>=0?f+1:bo+1),taken,false) }
+  else if(k.includes('عليا')||(k[0]==='علي'&&nums.length&&vNumAt(k,1)!=null)||k[0]==='عليا'){
+    out.dir='out';
+    for(let i=0;i<tok.length;i++){ if(taken.has(i)) continue; const w=tok[i];
+      if(w==='ل'||k[i]==='لحد'){ out.person=vName(tok,k,i+1,taken,false); break }
+      if(w.length>=4&&w[0]==='ل'&&w[1]!=='ي'&&!['لمده','لحد'].includes(k[i])&&!vIsStop(k,i,taken)||k[i].startsWith('لل')&&w.length>=4){ out.person=vName(tok,k,i,taken,true); break } }
+  }
+  out.note=vAfterBecause(tok,k,taken).slice(0,80);
+  out.score=(out.dir?1:0)+(out.person?1:0)+(out.amount?1:0)+(out.due?.5:0);
+  return out;
+}
+/* ---- جمعية ---- */
+function parseVoiceGam(text){
+  const tok=String(text||'').trim().split(/\s+/).filter(Boolean), out={name:'',inst:null,pot:null,members:null,shares:1,turns:[],turnNote:'',start:null,day:null,score:0};
+  if(!tok.length) return out;
+  const k=tok.map(vK), kv=k.map(w=>w.length>3&&w[0]==='و'?w.slice(1):w), taken=new Set(), T=new Date(), cm=T.getMonth(), cy=T.getFullYear();
+  const mark=(...ix)=>ix.forEach(i=>taken.add(i));
+  /* start month */
+  for(let i=0;i<k.length;i++){ const mi=vMonOf(k[i]); if(mi>=0){ out.start=`${mi<cm?cy+1:cy}-${pad(mi+1)}`; mark(i); break } }
+  if(!out.start){ const i=k.findIndex((w,j)=>w==='الشهر'&&(VNEXT.has(k[j+1])||k[j+1]==='ده'||k[j+1]==='دا')); if(i>=0){ const nx=VNEXT.has(k[i+1]); const t=new Date(cy,cm+(nx?1:0),1); out.start=`${t.getFullYear()}-${pad(t.getMonth()+1)}`; mark(i,i+1) } }
+  /* payment day: يوم 5 */
+  k.forEach((w,i)=>{ if(w==='يوم'&&!out.day){const n=vNumAt(k,i+1); if(n>=1&&n<=31){out.day=Math.min(28,n); mark(i,i+1)}} });
+  /* shares */
+  k.forEach((w,i)=>{ const b=w.length>3&&w[0]==='ب'?w.slice(1):w;
+    if(b==='فردين'||b==='اسمين'){out.shares=2;mark(i)}
+    else if((b==='افراد'||b==='اسماء')&&vNumAt(k,i-1)>=2){out.shares=Math.min(5,vNumAt(k,i-1));mark(i,i-1)}
+    else if(b==='فرد'&&k[i+1]==='واحد'){out.shares=1;mark(i,i+1)} });
+  /* months: a number right before شهر/شهور */
+  let qabdAfter=null;
+  k.forEach((w,i)=>{ if(['شهر','شهور','اشهر'].includes(w)){ let j=i-1; const n=vNumAt(k,j);
+      if(n!=null&&n>=2&&n<=60){ const ix=[i,j]; if(!out.members||vHas(k,i-5,i-1,new Set(['لمده','مده','لمدة']))) {} 
+        const qabd=vHas(kv,j-4,j-1,new Set(['هقبض','هقبضها','اقبض','اقبضها','هاخد','هاخدها','هستلم','هقبضهم','تقبض','هاخدهم']))&&k[j-1]==='بعد';
+        if(qabd) qabdAfter=n; else if(!out.members) out.members=n; else {}
+        mark(...ix); if(k[j-1]==='بعد') mark(j-1) } } });
+  /* turns: دوري ... / هقبض في الشهر ... */
+  const ordAt=i=>{const x=k[i]; if(x in VORD) return VORD[x]; if(x&&x[0]==='و'&&(x.slice(1) in VORD)) return VORD[x.slice(1)]; const n=vNumAt(k,i); return n!=null&&n>=1&&n<=60?n:null};
+  const SKIP=new Set(['في','الشهر','شهر','رقم','انا','هو','هي','و','ال']);
+  kv.forEach((w,i)=>{ const dor=['دوري','دور','ادواري','دوره'].includes(w), qb=['هقبض','هقبضها','اقبض','هاخد','هاخدها','هستلم','تقبض'].includes(w);
+    if(!(dor||qb)) return; let j=i+1, seenMonth=false; const got=[], ix=[];
+    for(;j<k.length&&j<i+9;j++){ if(k[j]==='الشهر'||k[j]==='شهر') seenMonth=true; const o=ordAt(j);
+      if(o!=null&&!taken.has(j)&&(dor||seenMonth)){got.push(o);ix.push(j)} else if(SKIP.has(k[j])||k[j]==='و'||(k[j][0]==='و'&&ordAt(j)!=null)){} else if(got.length) break; else if(!dor||j>i+3) break }
+    if(got.length&&!out.turns.length){out.turns=got;mark(...ix)} });
+  if(!out.turns.length&&qabdAfter) {out.turns=[qabdAfter]; out.turnNote='بعد '+qabdAfter+' شهور'}
+  if(qabdAfter&&!out.members) out.members=qabdAfter;
+  if(out.turns.length>out.shares) out.shares=Math.min(5,out.turns.length);
+  /* amounts */
+  const nums=vAllNums(tok,taken).filter(r=>r.n>=1&&r.n<=10000000);
+  const INST=new Set(['القسط','قسط','بقسط','والقسط','ادفع','هدفع','بدفع','شهريا']), POT=new Set(['هقبض','هقبضها','اقبض','اقبضها','هاخد','هاخدها','هستلم','هقبضهم','تقبض','هاخدهم']);
+  let inst=null, pot=null; const rest=[];
+  nums.forEach(r=>{ const a=r.idx[0], b=r.idx[r.idx.length-1];
+    const instCtx=vHas(kv,a-2,a-1,INST)||vHas(k,b+1,b+3,new Set(['شهريا']))||(k[b+1]==='في'&&k[b+2]==='الشهر')||(k[b+1]==='كل'&&k[b+2]==='شهر')||(k[b+1]==='في'&&k[b+2]==='شهر')||(vCurSkip(k,b+1)&&((k[b+2]==='في'&&k[b+3]==='الشهر')||(k[b+2]==='كل'&&k[b+3]==='شهر')));
+    const potCtx=vHas(kv,a-2,a-1,POT);
+    if(instCtx&&inst==null) inst=r.n; else if(potCtx&&pot==null) pot=r.n; else rest.push(r.n) });
+  rest.sort((x,y)=>x-y);
+  if(inst==null&&pot==null){ if(rest.length>=2){inst=rest[0];pot=rest[rest.length-1]} else if(rest.length===1) inst=rest[0] }
+  else if(inst==null&&rest.length) inst=rest[0];
+  else if(pot==null&&rest.length&&rest[rest.length-1]>inst) pot=rest[rest.length-1];
+  if(inst!=null&&inst===pot) pot=null;
+  if(inst==null&&pot!=null&&out.members) inst=Math.round(pot/out.members*100)/100;
+  if(!out.members&&inst&&pot&&Number.isInteger(pot/inst)&&pot/inst>=2&&pot/inst<=60) out.members=pot/inst;
+  out.inst=inst; out.pot=pot;
+  /* name */
+  const w=vAfterBecause(tok,k,taken).split(/\s+/).filter(Boolean).filter(x=>!['اجيب','اشتري','اشتر','اعمل','اجهز','احوش','اسافر','اجيبلي','اشتريلي','ل','لاجل'].includes(vK(x)));
+  let nm= w.length? w.slice(0,3).join(' ') : '';
+  if(!nm){ const g=k.indexOf('جمعيه'); if(g>=0){ const o=[]; for(let i=g+1;i<tok.length&&o.length<2;i++){ if(vIsStop(k,i,taken)||['القسط','قسط','بقسط','في','ب','لمده','مده','اول','دوري','دور','يوم','على','كل','هقبض','دخلت','علشان','عشان'].includes(kv[i])) break; o.push(tok[i]) } nm=o.join(' ') } }
+  out.name= nm? 'جمعية '+nm : 'جمعية';
+  out.name=out.name.slice(0,30);
+  out.score=(out.inst?1:0)+(out.members?1:0)+(out.start?.5:0)+(out.turns.length?.5:0);
+  return out;
+}
+const vCurSkip=(k,i)=>i<k.length&&VCUR.test(k[i]||'');
+/* ---- تقسيط ---- */
+function parseVoiceInst(text){
+  const tok=String(text||'').trim().split(/\s+/).filter(Boolean), out={name:'',party:'',total:null,months:null,monthly:null,first:null,score:0};
+  if(!tok.length) return out;
+  const k=tok.map(vK), D=voiceDate(tok), taken=new Set(D.used); out.first=D.dk;
+  /* months: a number before شهر/شهور, or سنة/سنتين */
+  k.forEach((w,i)=>{ if(out.months) return;
+    if(['شهر','شهور','اشهر'].includes(w)){const n=vNumAt(k,i-1); if(n>=1&&n<=60&&!taken.has(i-1)){out.months=n;taken.add(i);taken.add(i-1)}}
+    else if(w==='شهرين'&&!taken.has(i)){out.months=2;taken.add(i)}
+    else if(w==='سنتين'&&!taken.has(i)){out.months=24;taken.add(i)}
+    else if((w==='سنه'||w==='سنين')&&!taken.has(i)){const n=vNumAt(k,i-1); out.months=Math.min(60,(n!=null&&n<=5?n:1)*12);taken.add(i);if(n!=null&&n<=5)taken.add(i-1)} });
+  k.forEach((w,i)=>{ if(VCUR.test(w)) taken.add(i) });
+  const nums=vAllNums(tok,taken).filter(r=>r.n>=1&&r.n<=10000000);
+  const MON=new Set(['القسط','قسط','قسطه','والقسط','اقساط','شهريا']);
+  let total=null, monthly=null; const rest=[];
+  nums.forEach(r=>{ const a=r.idx[0], b=r.idx[r.idx.length-1];
+    const mctx=vHas(k,a-2,a-1,MON)||(k[b+1]==='في'&&k[b+2]==='الشهر')||(k[b+1]==='كل'&&k[b+2]==='شهر')||k[b+1]==='شهريا';
+    const tctx=k[a-1]==='ب'||tok[a][0]==='ب'||vHas(k,a-2,a-1,new Set(['سعره','ثمنه','بسعر','اجمالي','الاجمالي','بقيمه','قيمته','المبلغ']));
+    if(mctx&&monthly==null) monthly=r.n; else if(tctx&&total==null) total=r.n; else rest.push(r.n) });
+  rest.sort((x,y)=>y-x);
+  if(total==null&&rest.length) total=rest.shift();
+  if(monthly==null&&rest.length) monthly=rest.pop();
+  if(total!=null&&monthly!=null&&monthly>total){const x=total;total=monthly;monthly=x}
+  if(total==null&&monthly!=null&&out.months) total=Math.round(monthly*out.months*100)/100;
+  if(!out.months&&total&&monthly&&total/monthly>=1&&total/monthly<=60) out.months=Math.round(total/monthly);
+  out.total=total; out.monthly=monthly;
+  /* what was bought: the first words before the first number or the price word */
+  const FILL=new Set(['اشتريت','جبت','اشتري','قسطت','هقسط','هقسطه','بقسط','تقسيط','عايز','عاوز','عملت','اخدت','سجل','سجلي','ضيف','اضف','جديد','قسط','تقسيطه','دخلت','انا','القسط','والقسط','الاقساط','اقساط','سعره','ثمنه','بسعر']);
+  const firstNum=Math.min(...nums.map(r=>r.idx[0]).concat([tok.length]));
+  const nm=[]; for(let i=0;i<Math.min(firstNum,tok.length)&&nm.length<3;i++){ const w=k[i]; if(FILL.has(w)||w==='ب'||w==='على'||w==='من'||w==='بسعر'||!w) { if(nm.length&&(w==='ب'||w==='على'||w==='من'||w==='بسعر')) break; continue } if(w[0]==='ب'&&/\d/.test(tok[i])) break; nm.push(tok[i]) }
+  out.name=nm.join(' ').slice(0,60);
+  const f=k.findIndex((w,i)=>(w==='من'||w==='عند'||w==='مع')&&!taken.has(i)&&vNumAt(k,i+1)==null&&vMonOf(k[i+1]||'')<0);
+  if(f>=0){ const o=[]; for(let i=f+1;i<tok.length&&o.length<3;i++){ if(vIsStop(k,i,taken)||['اول','على','ب','هقسط'].includes(k[i])) break; o.push(tok[i]) } out.party=o.join(' ').slice(0,40) }
+  out.score=(out.total?1:0)+(out.months?1:0)+(out.name?1:0)+(out.first?.5:0);
+  return out;
+}
+/* ---- put the result in the right sheet ---- */
+const VOB_HINT={debts:'قول مثلًا: «عليا ٥٠٠ جنيه لمحمد وهرجعهم يوم ١٥» أو «ليا عند محمد ١٠٠٠ جنيه وهيرجعهملي بعد أسبوع»',
+  gams:'قول مثلًا: «جمعية ٥٠٠٠ في الشهر لمدة ١٠ شهور، أول شهر نوفمبر، ودوري الشهر ٣»',
+  insts:'قول مثلًا: «موبايل بـ ١٢٠٠٠ جنيه على ٦ شهور، أول قسط الشهر الجاي»'};
+function obVoiceResult(list){
+  const P={debts:parseVoiceDebt,gams:parseVoiceGam,insts:parseVoiceInst}[obTab]||parseVoiceDebt;
+  const all=list.map(P), r=all.reduce((b,x)=>x.score>b.score?x:b,all[0]), miss=[];
+  if(obTab==='gams'){
+    openGamSheet();
+    $('#gamName').value=r.name||'جمعية';
+    if(r.inst) $('#gamAmt').value=String(r.inst); else miss.push('القسط');
+    if(r.members) $('#gamMembers').value=String(Math.min(36,Math.max(2,r.members))); else miss.push('عدد الشهور');
+    if(r.members>36) miss.push('الحد الأقصى 36 شهر');
+    $('#gamShares').value=String(Math.max(1,Math.min(5,r.shares||1)));
+    if(r.start) $('#gamStart').value=mkToMY(r.start); else miss.push('أول شهر');
+    if(r.day) $('#gamDay').value=String(r.day);
+    fillTurns(r.turns.length?r.turns:[1]);
+    if(!r.turns.length) miss.push('دورك');
+    gamSumm();
+    toast(miss.length? 'ما سمعتش: '+miss.join('، ')+'. كمّلهم وادوس حفظ' : (r.turnNote?`حطيت دورك ${r.turnNote}، غيّره لو غلط وادوس حفظ`:'راجع البيانات وادوس حفظ'),null,null,4200);
+  } else if(obTab==='insts'){
+    openInstSheet();
+    if(r.name) $('#instName').value=r.name; else miss.push('اسم الحاجة');
+    if(r.party) $('#instParty').value=r.party;
+    if(r.total) $('#instTotal').value=String(r.total); else miss.push('الإجمالي');
+    if(r.months) $('#instMonths').value=String(Math.min(60,Math.max(1,r.months))); else miss.push('المدة');
+    if(r.first) $('#instFirst').value=r.first;
+    if(r.monthly&&r.total&&r.months&&Math.abs(r.monthly*r.months-r.total)>1){instMonthlyAuto=false;$('#instMonthly').value=String(r.monthly)} else instAutoMonthly();
+    toast(miss.length? 'ما سمعتش: '+miss.join('، ')+'. كمّلهم وادوس حفظ' : 'راجع البيانات وادوس حفظ',null,null,4200);
+  } else {
+    openDebtSheet();
+    if(r.dir){debtDirSel=r.dir;paintDir()} else miss.push('هي ليك ولا عليك');
+    if(r.person) $('#debtPerson').value=r.person; else miss.push('الاسم');
+    if(r.amount) $('#debtAmt').value=String(r.amount); else miss.push('المبلغ');
+    if(r.due) $('#debtDue').value=dkToDMY(r.due);
+    if(r.note) $('#debtNote').value=r.note;
+    toast(miss.length? 'ما سمعتش: '+miss.join('، ')+'. كمّلهم وادوس حفظ' : 'راجع البيانات وادوس حفظ',null,null,4200);
+  }
+}
 
 function delExpense(id){
   const i=S.expenses.findIndex(e=>e.id===id); if(i<0)return;
@@ -5358,8 +5620,19 @@ function ensureGamCat(){
   const i=S.cats.findIndex(c=>c.id==='other');
   S.cats.splice(i<0?S.cats.length:i,0,{id:'gam',name:'جمعية',e:'🤝',c:'#0E7490'}); syncCats();
 }
+/* shares: the months this person gets paid (one per share), what he pays each month (inst x shares), and which payouts he already got */
+function gamTurns(g){let t=[...new Set((Array.isArray(g.turns)?g.turns:[]).map(Number).filter(n=>Number.isInteger(n)&&n>=1&&n<=g.members))]; if(!t.length) t=[Math.min(Math.max(1,+g.turn||1),g.members)]; return t.sort((a,b)=>a-b)}
+function gamShares(g){return gamTurns(g).length}
+function gamMonthly(g){return r2(g.inst*gamShares(g))}
+function gamRecvd(g,t){return g.recvT&&typeof g.recvT==='object'? !!g.recvT[t] : g.received===true}
+function gamSetRecv(g,t,on){
+  if(!g.recvT||typeof g.recvT!=='object'){g.recvT={}; if(g.received===true) gamTurns(g).forEach(x=>{g.recvT[x]={ts:g.created||Date.now()}})}
+  if(on) g.recvT[t]={ts:Date.now()}; else delete g.recvT[t];
+  g.received=gamTurns(g).every(x=>g.recvT[x]);
+}
+const GAM_ORD=['الأول','التاني','التالت','الرابع','الخامس'];
 function gamInfo(g){
-  const cur=monKey(Date.now()), last=addMonths(g.start,g.members-1), turnMk=addMonths(g.start,g.turn-1);
+  const cur=monKey(Date.now()), last=addMonths(g.start,g.members-1), turnMk=addMonths(g.start,gamTurns(g)[0]-1);
   const paidN=Object.keys(g.paid||{}).filter(k=>k>=g.start&&k<=last).length, active= cur>=g.start && cur<=last;
   return {cur,last,turnMk,paidN,active,ended:cur>last,notStarted:cur<g.start,total:g.inst*g.members};
 }
@@ -5405,11 +5678,11 @@ function debtCard(x){
   </div>`;
 }
 function gamCard(g){
-  const I=gamInfo(g);
+  const I=gamInfo(g), T=gamTurns(g), K=T.length;
   let dots='';
   for(let i=0;i<g.members;i++){
     const mk=addMonths(g.start,i), paid=!!(g.paid||{})[mk];
-    dots+=`<button class="md${paid?' paid':''}${mk===I.cur?' cur':''}${i+1===g.turn?' turn':''}" data-gdot="${esc(g.id)}|${esc(mk)}" ${mk>I.cur?'disabled':''} title="${monthName(mk)}" aria-label="${monthName(mk)}${paid?' مدفوع':''}">${i+1}</button>`;
+    dots+=`<button class="md${paid?' paid':''}${mk===I.cur?' cur':''}${T.includes(i+1)?' turn':''}" data-gdot="${esc(g.id)}|${esc(mk)}" ${mk>I.cur?'disabled':''} title="${monthName(mk)}" aria-label="${monthName(mk)}${paid?' مدفوع':''}">${i+1}</button>`;
   }
   const curPaid=!!(g.paid||{})[I.cur];
   const payDate=(()=>{const [y,m]=I.cur.split('-').map(Number);return new Date(y,m-1,Math.min(g.day,daysIn(I.cur)))})();
@@ -5419,12 +5692,17 @@ function gamCard(g){
   else if(!curPaid) stat+=` · قسط ${monthOnly(I.cur)} يوم ${shortDate(payDate)}`;
   let foot='';
   const turnNow=I.turnMk===I.cur;
-  const turnBtn= g.received? `<span class="ok-badge">قبضتها ✓</span>` : (I.turnMk<=I.cur? `<button class="btn sm goldb" data-grecv="${esc(g.id)}">قبضت الجمعية</button>`:'');
+  const turnBtn= gamRecvd(g,T[0])? `<span class="ok-badge">قبضتها ✓</span>` : (I.turnMk<=I.cur? `<button class="btn sm goldb" data-grecv="${esc(g.id)}|${T[0]}">قبضت الجمعية</button>`:'');
   const payBtn= I.active&&!curPaid? `<button class="btn sm teal" data-gpay="${esc(g.id)}">دفعت قسط ${monthOnly(I.cur)}</button>` : '';
-  foot=`<div class="gfoot"><div class="t"><small>${g.received?'قبضت':turnNow?'دورك الشهر ده':'دورك تقبض'}</small><b>${monthName(I.turnMk)}</b> <small style="display:inline">· ${fmt(I.total)} ${CS()}</small></div>
+  foot=`<div class="gfoot"><div class="t"><small>${gamRecvd(g,T[0])?'قبضت':turnNow?'دورك الشهر ده':'دورك تقبض'}</small><b>${monthName(I.turnMk)}</b> <small style="display:inline">· ${fmt(I.total)} ${CS()}</small></div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${payBtn}${turnBtn}</div></div>`;
+  if(K>1){ /* several shares: one row per payout, and the monthly payment button on its own */
+    foot=(payBtn?`<div class="gfoot" style="justify-content:flex-end">${payBtn}</div>`:'')+T.map((t,i)=>{const mk=addMonths(g.start,t-1), done=gamRecvd(g,t);
+      const btn= done? `<span class="ok-badge">قبضتها ✓</span>` : (mk<=I.cur? `<button class="btn sm goldb" data-grecv="${esc(g.id)}|${t}">قبضت الجمعية</button>`:'');
+      return `<div class="gfoot"><div class="t"><small>${done?'قبضت':mk===I.cur?'دورك الشهر ده':'دورك تقبض'} · الفرد ${GAM_ORD[i]}</small><b>${monthName(mk)}</b> <small style="display:inline">· ${fmt(I.total)} ${CS()}</small></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${btn}</div></div>`}).join('');
+  }
   return `<div class="gc${g.id===justAddedOb?' new':''}">
-    <div class="gh"><div class="tile">🤝</div><div class="body"><b>${esc(g.name)}${spByTag(g)}</b><small>قسط ${fmt(g.inst)} ${CS()} كل شهر · ${g.members} ${g.members<=10?'شهور':'شهر'}</small></div>
+    <div class="gh"><div class="tile">🤝</div><div class="body"><b>${esc(g.name)}${spByTag(g)}</b><small>${K>1?`قسط ${fmt(gamMonthly(g))} ${CS()} كل شهر · ${K===2?'فردين':K+' أفراد'}`:`قسط ${fmt(g.inst)} ${CS()} كل شهر`} · ${g.members} ${g.members<=10?'شهور':'شهر'}</small></div>
       <button class="more" data-obmore="gam:${esc(g.id)}" aria-label="خيارات" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button></div>
     <div class="months">${dots}</div>
     <div class="glegend"><span><i style="background:#0E7490"></i>مدفوع</span><span><i style="border:1.5px dashed var(--muted)"></i>لسه</span><span style="color:var(--gold)">★ <span style="color:var(--muted)">دورك</span></span></div>
@@ -5440,8 +5718,8 @@ function dueItems(range){
     icon:x.dir==='in'?'📥':'💸', title:x.dir==='in'?`${x.person} يرجعلك فلوس`:`ترد لـ ${x.person}`, amount:debtRem(x), when:relDay(n), cls:dueCls(n)})});
   S.gams.filter(isMine).forEach(g=>{const I=gamInfo(g); if(!I.active) return;
     const [y,m]=I.cur.split('-').map(Number), dk=dayKey(new Date(y,m-1,Math.min(g.day,daysIn(I.cur)))), n=diffDays(dk);
-    if(!(g.paid||{})[I.cur] && n<=range) out.push({id:'g:'+g.id+':'+I.cur,n,icon:'🤝',title:`قسط ${g.name}`,amount:g.inst,when:relDay(n),cls:dueCls(n),gpay:g.id});
-    if(I.turnMk===I.cur && !g.received && n<=range) out.push({id:'t:'+g.id,n,icon:'🎉',title:`دورك تقبض ${g.name}`,amount:I.total,when:relDay(n),cls:'soon'});
+    if(!(g.paid||{})[I.cur] && n<=range) out.push({id:'g:'+g.id+':'+I.cur,n,icon:'🤝',title:`قسط ${g.name}`,amount:gamMonthly(g),when:relDay(n),cls:dueCls(n),gpay:g.id});
+    gamTurns(g).forEach(t=>{ if(addMonths(g.start,t-1)===I.cur && !gamRecvd(g,t) && n<=range) out.push({id:'t:'+g.id+':'+t,n,icon:'🎉',title:`دورك تقبض ${g.name}`,amount:I.total,when:relDay(n),cls:'soon'}) });
   });
   S.insts.forEach(p=>p.items.forEach(it=>{ if(itemDone(it)) return; const n=diffDays(it.due); if(n<=range) out.push({id:'i:'+it.id,n,icon:'💳',title:`قسط ${p.name}`,amount:itemRem(it),when:relDay(n),cls:dueCls(n),ipay:it.id})}));
   fixedDueItems(range).forEach(x=>out.push(x));
@@ -5536,14 +5814,35 @@ $('#paySave').onclick=()=>{
 let gamEdit=null;
 (function(){
   const ms=$('#gamMembers'); for(let i=2;i<=36;i++) ms.insertAdjacentHTML('beforeend',`<option value="${i}">${i} ${i<=10?'شهور':'شهر'}</option>`);
+  const sh=$('#gamShares'); for(let i=1;i<=5;i++) sh.insertAdjacentHTML('beforeend',`<option value="${i}">${i===1?'فرد واحد':i===2?'فردين':i+' أفراد'}</option>`);
   const ds=$('#gamDay'); for(let i=1;i<=28;i++) ds.insertAdjacentHTML('beforeend',`<option value="${i}">يوم ${i}</option>`);
 })();
+const gamMonthOpts=n=>Array.from({length:n},(_,i)=>`<option value="${i+1}">الشهر الـ ${i+1}</option>`).join('');
+const gamReadTurns=()=>[+$('#gamTurn').value, ...[...document.querySelectorAll('.gam-turn-x')].map(x=>+x.value)].filter(Boolean);
+/* sel = the months already chosen (array) or one month number; one select per share, each share gets a different month */
 function fillTurns(sel){
-  const n=+$('#gamMembers').value, t=$('#gamTurn'); t.innerHTML='';
-  for(let i=1;i<=n;i++) t.insertAdjacentHTML('beforeend',`<option value="${i}">الشهر الـ ${i}</option>`);
-  t.value=String(Math.min(sel||1,n)); turnHint();
+  const n=+$('#gamMembers').value, want=Array.isArray(sel)?sel:[sel||1];
+  let k=+$('#gamShares').value||1; if(k>n){k=n;$('#gamShares').value=String(k)}
+  const used=[], res=[];
+  for(let i=0;i<k;i++){ let v=Math.min(+want[i]||0,n); if(!v||used.includes(v)){ v=1; while(used.includes(v)&&v<n) v++ } used.push(v); res.push(v) }
+  const t=$('#gamTurn'); t.innerHTML=gamMonthOpts(n); t.value=String(res[0]);
+  $('#gamTurnLbl').textContent= k>1? 'دور الفرد الأول' : 'دورك تقبض';
+  $('#gamTurnsMore').innerHTML=res.slice(1).map((v,i)=>`<div class="pay-row"><div class="txt">دور الفرد ${GAM_ORD[i+1]}<small></small></div><select class="gam-turn-x" aria-label="دور الفرد ${GAM_ORD[i+1]}">${gamMonthOpts(n)}</select></div>`).join('');
+  document.querySelectorAll('.gam-turn-x').forEach((x,i)=>{x.value=String(res[i+1])});
+  $('#gamAmtLbl').textContent= k>1? 'قسط للفرد' : 'قسط';
+  turnHint();
 }
-function turnHint(){const st=parseMY($('#gamStart').value)||monKey(Date.now()); $('#gamTurnHint').textContent=monthName(addMonths(st,+$('#gamTurn').value-1))}
+function turnHint(){
+  const st=parseMY($('#gamStart').value)||monKey(Date.now());
+  $('#gamTurnHint').textContent=monthName(addMonths(st,+$('#gamTurn').value-1));
+  document.querySelectorAll('.gam-turn-x').forEach(x=>{const h=x.closest('.pay-row').querySelector('small'); if(h) h.textContent=monthName(addMonths(st,+x.value-1))});
+  gamSumm();
+}
+function gamSumm(){
+  const el=$('#gamSumm'), k=+$('#gamShares').value||1, inst=parseFloat($('#gamAmt').value), n=+$('#gamMembers').value;
+  if(k<2||!(inst>0)){el.hidden=true;return}
+  el.hidden=false; el.textContent=`هتدفع ${fmt(r2(inst*k))} ${CS()} كل شهر (${fmt(inst)} × ${k}) وتقبض ${fmt(r2(inst*n))} ${CS()} ${k===2?'مرتين':k+' مرات'}، يعني ${fmt(r2(inst*n*k))} ${CS()} إجمالي.`;
+}
 /* Inline wheel pickers: tapping the field opens day / month / year wheels under it (no keyboard, no typing the "/").
    The field keeps its text format (dd/mm/yyyy, mm/yyyy), so the existing checks on save stay the same. */
 const WP_MONTHS=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -5589,15 +5888,15 @@ $('#dueChips').onclick=e=>{const b=e.target.closest('[data-qd]'); if(!b) return;
   wpCloseAll();
   if(v==='') $('#debtDue').value=''; else { if(v==='m') t.setMonth(t.getMonth()+1); else t.setDate(t.getDate()+(+v)); $('#debtDue').value=shortDate(t.getTime()) }
   $('#debtDue').classList.remove('err'); $('#debtErr').textContent=''};
-$('#gamMembers').onchange=()=>fillTurns(+$('#gamTurn').value);
-$('#gamTurn').onchange=turnHint; $('#gamStart').addEventListener('change',turnHint);
+$('#gamMembers').onchange=()=>fillTurns(gamReadTurns()); $('#gamShares').onchange=()=>fillTurns(gamReadTurns());
+$('#gamTurn').onchange=turnHint; $('#gamTurnsMore').onchange=turnHint; $('#gamAmt').addEventListener('input',gamSumm); $('#gamStart').addEventListener('change',turnHint);
 function openGamSheet(id){
   const g=id?S.gams.find(x=>x.id===id):null; gamEdit=g?id:null;
   $('#gamTitle').textContent=g?'تعديل الجمعية':'جمعية جديدة';
   $('#gamSave').textContent=g?'حفظ التعديل':'حفظ';
   $('#gamName').value=g?g.name:''; $('#gamAmt').value=g?String(g.inst):'';
   $('#gamMembers').value=String(g?g.members:10); $('#gamStart').value=mkToMY(g?g.start:monKey(Date.now())); $('#gamStart').classList.remove('err');
-  $('#gamDay').value=String(g?g.day:1); fillTurns(g?g.turn:1);
+  $('#gamDay').value=String(g?g.day:1); $('#gamShares').value=String(g?gamShares(g):1); fillTurns(g?gamTurns(g):[1]);
   $('#gamAsExp').checked=g?g.asExp!==false:true;
   $('#gamErr').textContent=''; $('#gamAmtBox').classList.remove('err');
   openSheetEl('gamSheet'); $('#gamName').focus({preventScroll:true});
@@ -5605,13 +5904,18 @@ function openGamSheet(id){
 $('#gamCancel').onclick=closeSheets;
 $('#gamSave').onclick=()=>{
   const name=$('#gamName').value.trim()||'جمعية', inst=parseFloat($('#gamAmt').value), members=+$('#gamMembers').value,
-    start=parseMY($('#gamStart').value), day=+$('#gamDay').value, turn=+$('#gamTurn').value, asExp=$('#gamAsExp').checked;
+    start=parseMY($('#gamStart').value), day=+$('#gamDay').value, turns=gamReadTurns().sort((a,b)=>a-b), turn=turns[0], asExp=$('#gamAsExp').checked;
   if(!(inst>0)){$('#gamErr').textContent='اكتب قيمة القسط';$('#gamAmtBox').classList.add('err');$('#gamAmt').focus();return}
   if(!start){$('#gamErr').textContent='اكتب أول شهر كده: شهر/سنة، مثلاً '+mkToMY(monKey(Date.now()));$('#gamStart').classList.add('err');$('#gamStart').focus();return}
-  if(gamEdit){const g=S.gams.find(x=>x.id===gamEdit); Object.assign(g,{name,inst,members,start,day,turn,asExp})}
-  else{const id=uid(); justAddedOb=id; S.gams.push({id,name,inst,members,start,day,turn,asExp,paid:{},received:false,created:Date.now()})}
+  if(new Set(turns).size!==turns.length){$('#gamErr').textContent='اختار شهر قبض مختلف لكل فرد';return}
+  if(gamEdit){const g=S.gams.find(x=>x.id===gamEdit);
+    /* keep "already received" with the same share (by order) when the months change */
+    const oldT=gamTurns(g), rv={}; oldT.forEach((t,i)=>{ if(gamRecvd(g,t)&&i<turns.length) rv[turns[i]]={ts:(g.recvT&&g.recvT[t]&&g.recvT[t].ts)||Date.now()} });
+    Object.assign(g,{name,inst,members,start,day,turn,turns,asExp});
+    if(Object.keys(rv).length) g.recvT=rv; else delete g.recvT; g.received=turns.every(t=>rv[t])}
+  else{const id=uid(); justAddedOb=id; S.gams.push({id,name,inst,members,start,day,turn,turns,asExp,paid:{},received:false,created:Date.now()})}
   const was=gamEdit; save();closeSheets();renderAll();justAddedOb=null;
-  toast(was?'اتعدلت الجمعية':`اتضافت ${name} · دورك ${monthName(addMonths(start,turn-1))}`);
+  toast(was?'اتعدلت الجمعية':`اتضافت ${name} · ${turns.length>1?'أدوارك '+turns.map(t=>monthName(addMonths(start,t-1))).join(' و'):'دورك '+monthName(addMonths(start,turn-1))}`);
   setTimeout(checkDue,500);
 };
 function deleteGam(id){
@@ -5636,7 +5940,7 @@ $('#pkCancel').onclick=closeSheets;
 $('#pkGo').onclick=()=>{ const cb=pkCb, a=$('#pkAcc').value; if(!cb) return; if(cb(a)===false) return; closeSheets() };
 function toggleGamPaid(id,mk,acc){
   const g=S.gams.find(x=>x.id===id); if(!g) return; g.paid=g.paid||{};
-  if(!g.paid[mk]&&acc===undefined&&g.asExp!==false&&S.accounts.length){ pickAcc({title:'قسط '+g.name,info:`${fmt(g.inst)} ${CS()} · ${monthName(mk)}`,lab:'اتدفع من'},a=>{ setTimeout(()=>toggleGamPaid(id,mk,a),0) }); return }
+  if(!g.paid[mk]&&acc===undefined&&g.asExp!==false&&S.accounts.length){ pickAcc({title:'قسط '+g.name,info:`${fmt(gamMonthly(g))} ${CS()} · ${monthName(mk)}`,lab:'اتدفع من'},a=>{ setTimeout(()=>toggleGamPaid(id,mk,a),0) }); return }
   if(g.paid[mk]){
     const rec=g.paid[mk]; delete g.paid[mk];
     let exp=null; if(rec.exp){const j=S.expenses.findIndex(e=>e.id===rec.exp); if(j>=0) exp=S.expenses.splice(j,1)[0]}
@@ -5648,8 +5952,8 @@ function toggleGamPaid(id,mk,acc){
   if(g.asExp!==false){
     ensureGamCat();
     const [y,m]=mk.split('-').map(Number), ts= mk===monKey(Date.now())? Date.now() : new Date(y,m-1,Math.min(g.day,daysIn(mk)),12).getTime();
-    const e={id:uid(),amount:g.inst,cat:'gam',note:'قسط '+g.name,ts}; const ac=ACC(acc);
-    if(ac){const aa=toAcc(g.inst,ac); if(aa==null){toast('الحساب ده بعملة تانية ومفيش سعر صرف متاح دلوقتي. اختار حساب بنفس العملة، أو جرّب لما النت يشتغل',null,null,5000);ratesRefresh(false);return} e.acc=ac.id;e.accAmt=aa; S.lastAcc=ac.id}
+    const e={id:uid(),amount:gamMonthly(g),cat:'gam',note:'قسط '+g.name,ts}; const ac=ACC(acc);
+    if(ac){const aa=toAcc(gamMonthly(g),ac); if(aa==null){toast('الحساب ده بعملة تانية ومفيش سعر صرف متاح دلوقتي. اختار حساب بنفس العملة، أو جرّب لما النت يشتغل',null,null,5000);ratesRefresh(false);return} e.acc=ac.id;e.accAmt=aa; S.lastAcc=ac.id}
     else if(S.accounts.length) S.lastAcc='';
     S.expenses.push(e); rec.exp=e.id;
     if(mk===monKey(Date.now())) justAdded=e.id;
@@ -5669,12 +5973,12 @@ document.addEventListener('click',e=>{
   const ie=e.target.closest('[data-iedit]'); if(ie){openItemSheet(ie.dataset.iedit);return}
   const gp=e.target.closest('[data-gpay]'); if(gp){e.stopPropagation();toggleGamPaid(gp.dataset.gpay,monKey(Date.now()));return}
   const gd=e.target.closest('[data-gdot]'); if(gd){const [id,mk]=gd.dataset.gdot.split('|');toggleGamPaid(id,mk);return}
-  const gr=e.target.closest('[data-grecv]'); if(gr){const g=S.gams.find(x=>x.id===gr.dataset.grecv); if(g){
+  const gr=e.target.closest('[data-grecv]'); if(gr){const [gid,gt]=gr.dataset.grecv.split('|'), g=S.gams.find(x=>x.id===gid); if(g){ const gT=gamTurns(g), turnNo=gT.includes(+gt)?+gt:gT[0];
     const done=acc=>{ let inf=null; const ac=ACC(acc), v=r2(g.inst*g.members);
       if(ac){const aa=toAcc(v,ac); if(aa==null){toast('الحساب ده بعملة تانية ومفيش سعر صرف متاح دلوقتي. اختار حساب بنفس العملة، أو جرّب لما النت يشتغل',null,null,5000);ratesRefresh(false);return false}
-        inf={id:uid(),amount:v,ts:Date.now(),src:('قبض جمعية '+g.name).slice(0,40),note:'',acc:ac.id,accAmt:aa}; S.inflows.push(inf); S.lastAcc=ac.id}
-      g.received=true;save();renderAll();
-      toast(`مبروك! قبضت ${fmt(v)} ${CS()} 🎉${inf?' واتضافت على «'+ac.name+'»':''}`,'تراجع',()=>{g.received=false;if(inf) S.inflows=S.inflows.filter(z=>z.id!==inf.id);save();renderAll()},4000) };
+        inf={id:uid(),amount:v,ts:Date.now(),src:('قبض جمعية '+g.name+(gT.length>1?' ('+(gT.indexOf(turnNo)+1)+')':'')).slice(0,40),note:'',acc:ac.id,accAmt:aa}; S.inflows.push(inf); S.lastAcc=ac.id}
+      gamSetRecv(g,turnNo,true);save();renderAll();
+      toast(`مبروك! قبضت ${fmt(v)} ${CS()} 🎉${inf?' واتضافت على «'+ac.name+'»':''}`,'تراجع',()=>{gamSetRecv(g,turnNo,false);if(inf) S.inflows=S.inflows.filter(z=>z.id!==inf.id);save();renderAll()},4000) };
     if(S.accounts.length) pickAcc({title:'قبضت '+g.name,info:`${fmt(g.inst*g.members)} ${CS()}`,lab:'استلمتها على'},a=>done(a)); else done('')
   } return}
   const go_=e.target.closest('[data-goob]'); if(go_){ if(go_.dataset.goob) obTab=go_.dataset.goob; go('debts'); renderDebts() }
@@ -5704,6 +6008,8 @@ function renderMe(){
   paintHomeAv();
   if(P.photo) $('#meAv').dataset.obmore='photo:me'; else delete $('#meAv').dataset.obmore;
   $('#meAv').innerHTML= isPhoto(P.photo)? `<img src="${esc(P.photo)}" alt="">` : esc(name? name[0] : '👋');
+  const dav=$('#dataAv'); if(dav){ if(P.photo) dav.dataset.obmore='photo:me'; else delete dav.dataset.obmore;
+    dav.innerHTML= isPhoto(P.photo)? `<img src="${esc(P.photo)}" alt="">` : esc(name? Array.from(name)[0].toUpperCase() : 'م') }
   $('#meName').textContent= name || 'أهلاً بيك';
   const sinceTxt='بتستخدم مليم من '+shortDate(S.since||Date.now());
   $('#meSub').textContent= name? (P.age? `${P.age} سنة · `:'')+sinceTxt : 'اكتب اسمك تحت عشان التطبيق يناديك بيه';
@@ -6318,6 +6624,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-gdep]'); i
 
 /* photo */
 $('#meAv').onclick=()=>{ if(!(S.profile&&S.profile.photo)) $('#photoFile').click() };
+$('#dataAv').onclick=()=>{ if(!(S.profile&&S.profile.photo)) $('#photoFile').click() };
 $('#photoFile').onchange=e=>{
   const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
   const r=new FileReader(); r.onload=()=>{const img=new Image(); img.onload=()=>{
@@ -6373,8 +6680,8 @@ function syncNative(){ if(AB) try{syncWidget()}catch(e){}
     });
     S.gams.filter(isMine).forEach(g=>{for(let i=0;i<g.members;i++){const mk=addMonths(g.start,i); if((g.paid||{})[mk]) continue;
       const [y,m]=mk.split('-').map(Number), dk=dayKey(new Date(y,m-1,Math.min(g.day,daysIn(mk))));
-      out.push({at:at10(dk,-1),title:'بكرة قسط '+g.name,body:`القسط ${fmt(g.inst)} ${CS()}`},{at:at10(dk,0),title:'النهارده قسط '+g.name,body:`القسط ${fmt(g.inst)} ${CS()}`});
-      if(i+1===g.turn&&!g.received) out.push({at:at10(dk,0),title:'النهارده دورك تقبض '+g.name,body:`${fmt(g.inst*g.members)} ${CS()}`});
+      out.push({at:at10(dk,-1),title:'بكرة قسط '+g.name,body:`القسط ${fmt(gamMonthly(g))} ${CS()}`},{at:at10(dk,0),title:'النهارده قسط '+g.name,body:`القسط ${fmt(gamMonthly(g))} ${CS()}`});
+      if(gamTurns(g).includes(i+1)&&!gamRecvd(g,i+1)) out.push({at:at10(dk,0),title:'النهارده دورك تقبض '+g.name,body:`${fmt(g.inst*g.members)} ${CS()}`});
     }});
   }
   if(S.dueRemind){
@@ -6832,7 +7139,7 @@ function spMerge3(b,l,c){
   const out={};
   new Set([...Object.keys(l),...Object.keys(c)]).forEach(k=>{
     if(k==='payments')out[k]=spMergeList(b[k],l[k],c[k]);
-    else if(k==='paid')out[k]=spMergeMap(b[k],l[k],c[k]);
+    else if(k==='paid'||k==='recvT')out[k]=spMergeMap(b[k],l[k],c[k]);
     else{const v=spStable(l[k])!==spStable(b[k])?l[k]:c[k];if(v!==undefined)out[k]=v}
   });
   return out;
