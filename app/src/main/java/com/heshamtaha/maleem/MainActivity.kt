@@ -834,6 +834,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        /* ---------- suggestions to the developer (see Feedback.kt) ---------- */
+
+        /** Sends a suggestion / problem to the developer's Google Form; answers with window.__fbDone(\"\" | error code). */
+        @JavascriptInterface
+        fun feedbackSend(name: String, email: String, kind: String, text: String) {
+            if (!pageOk) return
+            Feedback.send(this@MainActivity, name, email, kind, text) { err ->
+                js("window.__fbDone && window.__fbDone(${JSONObject.quote(err ?: "")})")
+            }
+        }
+
         /** The last rates.json we read plus when (synchronous, small). */
         @JavascriptInterface
         fun ratesState(): String = if (!pageOk) "{}" else Rates.cached(this@MainActivity)
