@@ -1,6 +1,6 @@
 # سياسة الخصوصية - تطبيق مليم
 
-آخر تحديث: أكتوبر 2026
+آخر تحديث: نوفمبر 2026
 
 تطبيق **مليم** بيساعدك تسجل مصاريفك وتتابع ميزانيتك والسلف والجمعيات.
 
@@ -19,6 +19,8 @@
 **التقسيط والدخل المستلم:** خطط التقسيط (الجهة، والأقساط، والمدفوع) والدخل اللي بتسجّله (المبلغ، والمصدر، والتوزيع لو وزّعته) بتتحفظ على موبايلك بس زي باقي بياناتك، وبتدخل في النسخة الاحتياطية اللي إنت بتعملها، ومش بتتشارك في المساحة المشتركة.
 
 **التحديثات:** نسخة أندرويد بتدخل على GitHub (raw.githubusercontent.com و github.com) كل كام ساعة وهي مفتوحة، عشان تعرف لو فيه نسخة جديدة أو رسالة من المطوّر. الطلب ده مفيهوش أي بيانات منك غير اللي أي اتصال بالنت بيبعته (زي عنوان الـ IP)، وGitHub بيتعامل معاه حسب سياسته. لو وافقت على التحديث، التطبيق بينزّل النسخة الجديدة من GitHub ويتأكد إنها سليمة وموقّعة بنفس مفتاح مليم، وبعدين أندرويد بيسألك قبل ما يثبّتها.
+
+**الاقتراحات والملاحظات (لو بعتّها بإيدك):** صفحة «اقتراحات وملاحظات» بتبعت اللي كتبته (الاسم، والإيميل لو كتبته، ونوع الرسالة، والنص) مع رقم نسخة مليم وإصدار أندرويد، لفورم Google بتاع المطوّر، وبيوصل للمطوّر في جدول وإيميل. مفيش بيانات مالية بتتبعت أبدًا، ومفيش حاجة بتتبعت غير لما انت تدوس «ابعت». الإيميل اختياري وبيتستخدم للرد عليك بس، وGoogle بتتعامل مع الفورم حسب سياستها.
 
 **النسخ الاحتياطي التلقائي بتاع جوجل:** التطبيق مقفول فيه النسخ الاحتياطي السحابي بتاع أندرويد، يعني بياناتك المالية مش بتترفع على حساب جوجل بتاعك من غير ما تختار. النقل المباشر من موبايل لموبايل (لما تجهز موبايل جديد بنفسك) لسه متاح.
 
@@ -52,7 +54,7 @@
 
 # Privacy Policy - Maleem
 
-Last updated: October 2026
+Last updated: November 2026
 
 **Maleem** helps you record your expenses and track your budget, loans and savings circles.
 
@@ -71,6 +73,8 @@ All data you enter (expenses, budget, categories, loans, savings circles, settin
 **Installments and received income:** Installment plans (the company, the installments and what was paid) and the income you record (amount, source, and the split if you made one) are kept on your phone only, like the rest of your data, are included in the backups you make, and are not shared in the shared space.
 
 **Updates:** The Android app checks GitHub (raw.githubusercontent.com and github.com) every few hours while it is open, to learn whether a new version or a message from the developer is available. The request carries no data about you beyond what any internet connection sends (such as your IP address), and GitHub handles it under its own policy. If you accept an update, the app downloads the new version from GitHub, checks that it is intact and signed with Maleem's own key, and Android asks you before installing it.
+
+**Suggestions and feedback (only if you send them):** the "اقتراحات وملاحظات" page sends what you type (your name, your email if you give one, the kind of message and the text), together with Maleem's version and the Android version, to the developer's Google Form; it reaches the developer in a spreadsheet and an email. No financial data is ever sent, and nothing is sent unless you press send. The email is optional and is used only to reply to you; Google handles the form under its own policy.
 
 **Google's automatic backup:** Android cloud backup is turned off for this app, so your financial data is not uploaded to your Google account without your choice. A direct phone-to-phone transfer that you start yourself is still possible.
 
