@@ -2,9 +2,10 @@ name: Update rates
 
 # Refreshes rates.json once a day (and on demand: Actions -> Update rates -> Run workflow).
 # The app reads rates.json from this repo (raw.githubusercontent.com), so phones never call a rates service themselves.
-# Source: open.er-api.com (free, no key, ~160 currencies, updated daily), with the jsDelivr currency-api as a fallback.
-# rates.json carries EVERY currency the source gives us (about 160), because the app lets a person pick any other currency
-# (Settings > بياناتي > عملة تانية) and only offers the ones that have a real rate here. CODES below is the list of currencies the app
+# Source: open.er-api.com (free, no key, ~160 currencies, updated daily), with the jsDelivr currency-api as a fallback,
+# and the same jsDelivr currency-api fills in the world currencies the first source does not carry (WORLD below).
+# rates.json carries every currency the source gives us (about 160, plus the missing world ones), because the app lets a person pick any
+# other currency (Settings > بياناتي > عملة تانية). A currency with no rate here is still offered: the person types the dollar rate. CODES below is the list of currencies the app
 # ships with: each of them must be present and positive, otherwise the old file is kept.
 # To ship one more built-in currency, add it to CURRENCIES in index.html and to CODES below.
 on:
@@ -24,6 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CODES: "USD EGP SAR AED KWD QAR BHD OMR JOD ILS EUR GBP DZD SDG"
+      # every currency in use in the world (ISO 4217). Keep in sync with WORLD_CUR in index.html. The app lists all of them;
+      # the ones missing from the first rates source are added from the second one, and what is still missing the person types.
+      WORLD: "AED AFN ALL AMD ANG AOA ARS AUD AWG AZN BAM BBD BDT BGN BHD BIF BMD BND BOB BRL BSD BTN BWP BYN BZD CAD CDF CHF CLP CNY COP CRC CUP CVE CZK DJF DKK DOP DZD EGP ERN ETB EUR FJD FKP GBP GEL GHS GIP GMD GNF GTQ GYD HKD HNL HTG HUF IDR ILS INR IQD IRR ISK JMD JOD JPY KES KGS KHR KMF KPW KRW KWD KYD KZT LAK LBP LKR LRD LSL LYD MAD MDL MGA MKD MMK MNT MOP MRU MUR MVR MWK MXN MYR MZN NAD NGN NIO NOK NPR NZD OMR PAB PEN PGK PHP PKR PLN PYG QAR RON RSD RUB RWF SAR SBD SCR SDG SEK SGD SHP SLE SOS SRD SSP STN SVC SYP SZL THB TJS TMT TND TOP TRY TTD TWD TZS UAH UGX USD UYU UZS VES VND VUV WST XAF XCD XCG XOF XPF YER ZAR ZMW ZWG"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,6 +54,19 @@ jobs:
                        | map_values(. * 1000000 | round / 1000000))}' fallback.json > new.json
           }
           fetch_primary || { echo "::warning::primary source failed, using the fallback"; fetch_fallback; }
+          # Add the world currencies the first source leaves out (for example SYP) from the second source. The first source always wins.
+          WORLDJ=$(printf '%s\n' $WORLD | jq -R . | jq -s .)
+          if curl -fsS --max-time 30 https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json > extra.json \
+             && jq -e '.usd | type == "object"' extra.json > /dev/null \
+             && jq --slurpfile ex extra.json --argjson world "$WORLDJ" '
+                  .rates = ((($ex[0].usd | with_entries(.key |= ascii_upcase)
+                              | with_entries(select((.key as $k | ($world | index($k)) != null) and (.value | type == "number") and .value >= 0.01))
+                              | map_values(. * 1000000 | round / 1000000))) + .rates)' new.json > merged.json \
+             && jq -e '(.rates | length) > 50' merged.json > /dev/null; then
+            mv merged.json new.json
+          else
+            echo "::warning::could not add the extra currencies, keeping the first source only"
+          fi
           # every currency we ship must be there and be a positive number, otherwise keep the old file
           jq -e --argjson want "$WANT" '. as $f | $want | all(. as $c | ($f.rates[$c] // 0) > 0)' new.json > /dev/null \
             || { echo "::error::rates.json would miss a currency, keeping the old one"; exit 1; }
