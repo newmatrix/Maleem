@@ -1245,7 +1245,8 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 .me-page[data-mepage="budget"]>.card>h3:first-child:not(.look-h),.me-page[data-mepage="budget"]>.card>.card-h>h3{display:block}
 .me-page[data-mepage="accounts"]>.card>.card-h>h3{display:block} /* two cards on that page: «حساباتي» and «مدخراتي» (round 48) */
 .me-page[data-mepage="budget"]>.card+.card{margin-top:14px}
-.me-page[data-mepage="budget"]>.card>.card-h{justify-content:space-between}
+/* section titles on the budget and accounts pages sit at the reading-direction start: right in Arabic, left in English (flex-end above was the opposite side) */
+.me-page[data-mepage="budget"]>.card>.card-h,.me-page[data-mepage="accounts"]>.card>.card-h{justify-content:space-between}
 </style>
 </head>
 <body>
