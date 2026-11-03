@@ -30,8 +30,6 @@ object PayCapture {
     private const val CHANNEL = "maleem_capture"
     private const val MAX_QUEUE = 30
     private const val NOTIF_ID = 7001
-    /** The same payment reported twice (bank SMS + bank app, or a re-posted notification) arrives within this window */
-    private const val DUP_WINDOW = 3 * 60_000L
     /** How long a capture is remembered for duplicate checks (also after the web app took it from the queue) */
     private const val RECENT_KEEP = 10 * 60_000L
 
@@ -103,10 +101,8 @@ object PayCapture {
         return q.toString()
     }
 
-    /**
-     * Adds a capture unless it is a duplicate. A duplicate is the same amount within [DUP_WINDOW] that comes either
-     * from ANOTHER app (bank SMS + bank app report one payment) or with the SAME text (a re-posted notification).
-     * Two different payments of the same amount from the same app (two 50 EGP coffees) are both kept.
+    /** Only a repeat of the same event (timestamp, package, text and notification key) is discarded.
+     * Equal amounts from different apps or at different times remain reviewable: they may be different payments.
      */
     @Synchronized fun add(c: Context, item: JSONObject): Boolean {
         val p = prefs(c)
@@ -124,13 +120,14 @@ object PayCapture {
             val dt = kotlin.math.abs(o.optLong("at") - now)
             if (dt >= RECENT_KEEP) continue // forget old ones
             recent.put(o)
-            if (dt < DUP_WINDOW && o.optString("dir", "out") == dir && o.optDouble("amount") == amount && (o.optString("pkg") != pkg || o.optString("text") == text)) dup = true
+            if (CaptureIdentity(o.optLong("at"), o.optDouble("amount"), o.optString("pkg"), o.optString("text"), o.optString("dir", "out"), o.optString("key")) ==
+                CaptureIdentity(now, amount, pkg, text, dir, item.optString("key"))) dup = true
         }
         if (dup) {
             p.edit().putString("recent", recent.toString()).apply()
             return false
         }
-        recent.put(JSONObject().put("at", now).put("amount", amount).put("pkg", pkg).put("text", text).put("dir", dir))
+        recent.put(JSONObject().put("at", now).put("amount", amount).put("pkg", pkg).put("text", text).put("dir", dir).put("key", item.optString("key")))
 
         val q = queue(c)
         val out = JSONArray()
@@ -215,6 +212,7 @@ class PayListener : NotificationListenerService() {
         val item = JSONObject()
             .put("id", "c" + java.lang.Long.toString(at, 36) + (Math.random() * 1e6).toLong().toString(36))
             .put("at", at)
+            .put("key", sbn.key)
             .put("amount", r.amount)
             .put("cur", r.currency.take(8))
             .put("merchant", r.merchant)

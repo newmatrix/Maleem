@@ -30,10 +30,14 @@ object Reminders {
     private const val DEFAULT_DAILY_MIN = 23 * 60 // 11 PM
     private const val MAX_DUE = 40
 
+    fun label(c: Context, key: String, fallback: String): String = try {
+        JSONObject(c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("cfg", "{}") ?: "{}").optJSONObject("labels")?.optString(key, fallback) ?: fallback
+    } catch (_: Exception) { fallback }
+
     fun createChannel(c: Context) {
         // minSdk is 26, so notification channels always exist
         c.getSystemService(NotificationManager::class.java).createNotificationChannel(
-            NotificationChannel(CHANNEL, "تذكيرات مليم", NotificationManager.IMPORTANCE_DEFAULT)
+            NotificationChannel(CHANNEL, label(c, "channel", "تذكيرات مليم"), NotificationManager.IMPORTANCE_DEFAULT)
         )
     }
 
@@ -126,7 +130,7 @@ class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(c: Context, i: Intent) {
         when (i.action) {
             Reminders.ACTION_DAILY -> {
-                Reminders.show(c, 1, "سجلت مصاريف النهارده؟", "لو صرفت حاجة النهارده سجلها قبل ما تنسى.")
+                Reminders.show(c, 1, Reminders.label(c, "dailyTitle", "سجلت مصاريف النهارده؟"), Reminders.label(c, "dailyBody", "لو صرفت حاجة النهارده سجلها قبل ما تنسى."))
                 Reminders.apply(c) // schedule tomorrow
             }
             Reminders.ACTION_DUE -> Reminders.show(

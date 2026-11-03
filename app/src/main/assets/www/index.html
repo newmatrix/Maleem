@@ -1016,6 +1016,9 @@ details.closed-list[open] summary::before{transform:rotate(-90deg)}
 #cats.wide::-webkit-scrollbar{display:none}
 #cats .cat{border-radius:13px;padding:7px 2px 6px;gap:2px;font-size:.68rem;line-height:1.2}
 #cats .cat .e{font-size:1.25rem}
+#cats .cat{min-width:0;overflow-wrap:anywhere}
+#cats .cat .cat-name{max-width:100%;overflow-wrap:anywhere}
+html[dir="ltr"] #cats.wide{grid-template-columns:repeat(var(--cols),minmax(76px,1fr))}
 /* calculator toggle inside the amount box */
 .calc-tg{align-self:center;flex:none;width:34px;height:34px;border:0;border-radius:11px;background:none;color:var(--muted);display:grid;place-items:center;padding:0;outline:none}
 .calc-tg svg{width:21px;height:21px}
@@ -1200,7 +1203,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .lang-demo .ld-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .lang-demo .ld-btn{background:#fff;color:var(--brand);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.85rem}
 .lang-demo .ld-chip{background:rgba(255,255,255,.18);border-radius:999px;padding:6px 12px;font-size:.85rem}
-html[dir="ltr"] .chev,html[dir="ltr"] .back-ic{transform:scaleX(-1)}
+html[dir="ltr"] #mPrev svg,html[dir="ltr"] #mNext svg,html[dir="ltr"] .chev,html[dir="ltr"] .back-ic{transform:scaleX(-1)}
 /* English reads left to right: mirror the few places the layout pins to a side (round 51) */
 html[dir="ltr"] .fab{left:auto;right:max(18px,calc(50% - 260px + 18px))}
 html[dir="ltr"] .mic-fab{left:auto;right:max(25px,calc(50% - 260px + 25px))}
@@ -1369,7 +1372,7 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
     <div class="topbar" style="justify-content:flex-start;gap:12px"><button class="back" id="meBack" type="button" aria-label="رجوع" style="display:none"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>أنا</h1></div>
     <div class="me-card">
       <button class="me-av" id="meAv" aria-label="الصورة الشخصية"></button>
-      <div class="me-txt"><b id="meName"></b><small id="meSub"></small></div>
+      <div class="me-txt"><b id="meName" data-notr dir="auto"></b><small id="meSub"></small></div>
       <span class="streak" id="meStreak" hidden></span>
     </div>
     <input type="file" id="photoFile" accept="image/*" hidden>
@@ -2496,7 +2499,11 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 <div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="toastAct" hidden></button><i class="tbar" id="tbar"></i></div>
 <div id="pdfReport" aria-hidden="true"></div>
 
-<script>/*I18N-START*/const I18N={"ar":{"x":{"أهلاً بيك في مليم":"أهلًا بك في مليم","سجّل مصاريفك بسهولة وتابع ميزانيتك. بياناتك بتفضل على موبايلك.":"سجّل مصروفاتك بسهولة وتابع ميزانيتك. بياناتك تبقى على هاتفك.","تقدر تسيبه فاضي، وتغيره بعدين من صفحة \"أنا\".":"يمكنك تركه فارغًا وتغييره لاحقًا من صفحة \"أنا\".","كمّل":"متابعة","عندي نسخة احتياطية؟ استعادة":"لديك نسخة احتياطية؟ استعادة","اختار الطريقة اللي تناسبك، وتقدر تغيّرها في أي وقت من صفحة \"أنا\".":"اختر الطريقة المناسبة لك، ويمكنك تغييرها في أي وقت من صفحة \"أنا\".","بتقبض إزاي؟":"كيف تتقاضى دخلك؟","الميزانية والتقارير بتبدأ من اليوم ده":"تبدأ الميزانية والتقارير من هذا اليوم","من غير حد للصرف. هنعرضلك إجمالي مصاريفك في الشهر وانت بتضيف.":"بلا حد للإنفاق. سنعرض لك إجمالي مصروفاتك في الشهر أثناء الإضافة.","مثلاً محمد":"مثلًا محمد","مثلاً 10000":"مثلًا 10000","💡 تقدر تصرف حوالي":"💡 يمكنك إنفاق حوالي","ج.م في اليوم لحد آخر الشهر":"ج.م يوميًا حتى نهاية الشهر","الفلوس اللي معايا":"أموالي","⚠ سحب كاش، مش متأكد من الحساب: هسألك":"⚠ سحب نقدي، الحساب غير مؤكد: سأسألك","نوع تاني؟":"نوع آخر؟","مصاريف النهارده":"مصروفات اليوم","📷 صوّر الإيصال":"📷 صوّر الإيصال","تسجيل المصاريف من الإشعارات":"تسجيل المصروفات من الإشعارات","عشان مليم يلقط عمليات الدفع لوحده، محتاج إذن":"لكي يلتقط مليم عمليات الدفع تلقائيًا، يحتاج إلى إذن","من أندرويد. بعد ما تدوس «افتح الإعدادات» فعّل":"من أندرويد. بعد الضغط على «افتح الإعدادات» فعّل","من القايمة وارجع.":"من القائمة ثم عُد.","🔎 مليم بيدوّر بس على رسايل الخصم والدفع اللي فيها مبلغ، وبيتجاهل الشات وأكواد التحقق (OTP). والفلوس الداخلة بيقراها بس لو ضفت حسابات في مليم، عشان يعرف الحساب ويسجّل الدخل أو التحويل بين حساباتك.":"🔎 يبحث مليم فقط عن رسائل الخصم والدفع التي تحتوي على مبلغ، ويتجاهل المحادثات ورموز التحقق (OTP). ولا يقرأ الأموال الواردة إلا إذا أضفت حسابات، ليعرف الحساب ويسجّل الدخل أو التحويل بين حساباتك.","📱 اللي بيلقطه بيفضل على موبايلك ومش بيترفع على أي سيرفر، وباقي الإشعارات مش بتتخزن خالص.":"📱 ما يلتقطه يبقى على هاتفك ولا يُرفع إلى أي خادم، ولا تُخزَّن بقية الإشعارات إطلاقًا.","✅ مفيش مصروف بيتسجل غير لما توافق عليه، وتقدر تقفل الميزة من الإعدادات في أي وقت.":"✅ لا يُسجَّل أي مصروف إلا بموافقتك، ويمكنك إيقاف الميزة من الإعدادات في أي وقت.","مش دلوقتي":"ليس الآن","اختار رقم سري":"اختر رقمًا سريًا","اختار طريقة القفل":"اختر طريقة القفل","لو العضو نسي كلمة السر، مفيش طريقة ترجعها. الحل الوحيد إن عضو تاني يمسحه هو وبياناته.":"إذا نسي العضو كلمة السر فلا توجد طريقة لاستعادتها. الحل الوحيد أن يحذفه عضو آخر مع بياناته.","دلوقتي":"الآن","ليا عند حد":"لي عند أحد","عليا لحد":"عليّ لأحد","ميعاد الرد":"موعد السداد","اختياري، وهيجيلك تذكير قبله بيوم":"اختياري، وستصلك تذكرة قبله بيوم","بكرة":"غدًا","من غير ميعاد":"بلا موعد","سيبه «من غير حساب» لو الفلوس دي مش من حساب متسجل":"اتركه «بدون حساب» إن لم تكن الأموال من حساب مسجّل","الرصيد دلوقتي":"الرصيد الآن","نبّهني لو الرصيد قل عن":"نبّهني إذا قلّ الرصيد عن","مش بنحفظ رقم الكارت كامل ولا الـ CVV، آخر 4 أرقام بس.":"لا نحفظ رقم البطاقة كاملًا ولا رمز CVV، فقط آخر 4 أرقام.","قفّل الفترة":"أغلق الفترة","يروح لـ":"يذهب إلى","هدف ادخار، أو من غير هدف":"هدف ادخار، أو بلا هدف","الباقي بيتحسب في مدخراتك تلقائي. اختيار الهدف بيزوّد اللي حوشته فيه بس.":"يُحتسب المتبقي في مدخراتك تلقائيًا. اختيار الهدف يزيد ما ادخرته فيه فقط.","الرصيد الحقيقي دلوقتي":"الرصيد الفعلي الآن","اللي ظاهر في البنك أو المحفظة":"ما يظهر في البنك أو المحفظة","بتسجّل تحويل عملته فعلاً. مش مصروف ومش دخل.":"تسجّل تحويلًا أجريته فعلًا. ليس مصروفًا ولا دخلًا.","اختياري، بتتخصم من حساب التحويل":"اختياري، تُخصم من الحساب المحوِّل","هتصرفهم من":"ستنفقها من","تقدر تغيّر أي قسط لوحده بعد الحفظ":"يمكنك تعديل أي قسط على حدة بعد الحفظ","الشراء اتسجل قبل كده كمصروف":"سُجّل الشراء من قبل كمصروف","لو اتسجل، الأقساط مش هتتحسب مصروف تاني، هتتخصم من الحساب بس":"إن كان مسجّلًا، فلن تُحتسب الأقساط مصروفًا مرة أخرى وستُخصم من الحساب فقط","بتتغير للقسط ده بس":"تتغير لهذا القسط فقط","اتدفع من":"دُفع من","الحساب اللي هيتخصم منه":"الحساب الذي سيُخصم منه","استلمته على":"استلمته في","الحساب اللي رصيده هيزيد":"الحساب الذي سيزيد رصيده","وزّع الفلوس دي (اختياري)":"وزّع هذا المبلغ (اختياري)","ده تقسيم لنفس الفلوس: مش بيزوّد رصيد ومش بيتحسب دخل تاني.":"هذا تقسيم للمبلغ نفسه: لا يزيد الرصيد ولا يُحتسب دخلًا مرة أخرى.","شراء دهب":"شراء ذهب","السعر الكلي اللي دفعته":"السعر الإجمالي المدفوع","اتدفع من حساب":"دُفع من حساب","الرصيد هينقص (اختياري)":"سينقص الرصيد (اختياري)","اتباع؟ (اختياري)":"بِيع؟ (اختياري)","اكتب اللي استلمته كله لما بعته. امسح الخانة لو عايز تلغي البيع.":"اكتب كامل المبلغ الذي استلمته عند البيع. امسح الخانة لإلغاء البيع.","الرصيد هيزيد (اختياري)":"سيزيد الرصيد (اختياري)","العملية دي محتاجة تحديد":"هذه العملية تحتاج إلى تحديد","تجاهل العملية دي":"تجاهل هذه العملية","فلوس رجعتلك من مصروف":"مبلغ عاد إليك من مصروف","من أنهي مصروف؟":"من أي مصروف؟","رجعت على":"عاد إلى","اختار اللي يناسبك وهيتضافوا لفئاتك. تقدر تعدّل أو تحذف أي واحدة بعد كده.":"اختر ما يناسبك وستُضاف إلى فئاتك. يمكنك تعديل أي منها أو حذفها لاحقًا.","زوّد على السلفة":"أضف إلى السلفة","داخل بكام فرد؟":"كم سهمًا تشارك به؟","لو داخل بأكتر من اسم، بتدفع قسط عن كل فرد وتقبض دور لكل فرد":"إن شاركت بأكثر من سهم، تدفع قسطًا عن كل سهم وتقبض دورًا لكل سهم","دورك تقبض":"دورك في القبض","احسب القسط من مصاريفي":"احسب القسط ضمن مصروفاتي","القسط يتسجل كمصروف في فئة جمعية لما تدفعه":"يُسجَّل القسط مصروفًا في فئة جمعية عند دفعه","فيه نسخة جديدة من مليم":"يتوفر إصدار جديد من مليم","بعدين":"لاحقًا","تمسح إيه؟":"ماذا تريد أن تحذف؟","اختار اللي عايز تمسحه. اللي مش مختار بيفضل زي ما هو. التقارير بتتحسب من المصاريف والدخل، فمسحهم بيفضّيها.":"اختر ما تريد حذفه، وما لم تختره يبقى كما هو. تُحسب التقارير من المصروفات والدخل، فحذفها يُفرغها.","عملة تانية":"عملة أخرى","اكتب اسم العملة أو كودها (زي TRY أو SYP)، واختارها من القايمة. المبالغ بتتحول بسعر النهارده الحقيقي. ولو العملة مالهاش سعر منشور هتكتب سعر الدولار بيها بنفسك.":"اكتب اسم العملة أو رمزها (مثل TRY أو SYP) واخترها من القائمة. تُحوَّل المبالغ بسعر اليوم الفعلي، وإن لم يكن للعملة سعر منشور فستكتب سعر الدولار بها بنفسك.","حوّل كل مبالغي":"حوّل جميع مبالغي","النهارده":"اليوم","امبارح":"أمس","📅 تاريخ تاني":"📅 تاريخ آخر","استيراد مصاريف":"استيراد مصروفات","تاريخ البنود اللي من غير تاريخ":"تاريخ البنود التي بلا تاريخ","الملف مفيهوش تاريخ لبعض البنود":"بعض البنود في الملف بلا تاريخ","شيل التحديد":"إلغاء التحديد","هنبهك أول ما تصرف النسبة دي من ميزانيتك":"سننبهك فور إنفاقك هذه النسبة من ميزانيتك","اختار كل كام يوم التطبيق يحفظ نسخة لوحده، أو أوقفه.":"اختر كل كم يومًا يحفظ التطبيق نسخة تلقائيًا، أو أوقفه.","أسبوعين":"أسبوعان","النسخة بتترفع على Google Drive لو ربطته، وإلا بتتحفظ على الموبايل في":"تُرفع النسخة إلى Google Drive إن ربطته، وإلا تُحفظ على الهاتف في","اختار حساب جوجل اللي نسخك كانت بتترفع عليه، ومليم هيدوّر في فولدر":"اختر حساب جوجل الذي كانت نسخك تُرفع إليه، وسيبحث مليم في مجلد","ويفتحلك نسخك، وتختار الأحدث أو نسخة أقدم.":"ويعرض نسخك لتختار الأحدث أو نسخة أقدم.","من ملف على الموبايل":"من ملف على الهاتف","هننبهك لما تقرب منه (بنفس نسبة تنبيه الميزانية)، ولما تعدّيه.":"سننبهك عند الاقتراب منه (بنفس نسبة تنبيه الميزانية) وعند تجاوزه.","حفظ المصاريف":"حفظ المصروفات","الشهر ده بس":"هذا الشهر فقط","تاريخ تاني…":"تاريخ آخر…","مصروف جاي (فكّرني)":"مصروف قادم (ذكّرني)","ده سحب كاش، مش مصروف":"هذا سحب نقدي، وليس مصروفًا","رجعتلي فلوس منه":"استرددت مبلغًا منه","كاش":"نقدًا","💵 كاش":"💵 نقدي","اكتبها تاني للتأكيد":"اكتبها مرة أخرى للتأكيد","ميعاد الرد، دوس عشان تختار اليوم والشهر والسنة":"موعد السداد، اضغط لاختيار اليوم والشهر والسنة","اشتريت إيه؟ (مثلًا: موبايل)":"ماذا اشتريت؟ (مثلًا: هاتف)","الجهة اللي بقسط معاها (اختياري)":"الجهة التي تقسّط معها (اختياري)","إجمالي المبلغ اللي عليك":"إجمالي المبلغ المستحق عليك","من فين؟ (مرتب، شغل حر، ...)":"من أين؟ (راتب، عمل حر، ...)","السعر اللي بعته بيه":"السعر الذي بعت به","المبلغ اللي رجع":"المبلغ المسترد","الحساب اللي الفلوس رجعت عليه":"الحساب الذي عاد إليه المبلغ","المبلغ اللي هتزوده":"المبلغ المضاف","اسم الجمعية، مثلاً جمعية الشغل":"اسم الجمعية، مثلًا جمعية العمل","عدد الأفراد اللي داخل بيهم":"عدد الأسهم التي تشارك بها","أول شهر، دوس عشان تختار الشهر والسنة":"أول شهر، اضغط لاختيار الشهر والسنة","ابحث: ليرة، دولار كندي، TRY…":"ابحث: ليرة، دولار كندي، TRY…","مثلاً 2000، وسيبه فاضي لو مش عايز حد":"مثلًا 2000، واتركه فارغًا إن لم ترد حدًا","اسم الفئة، مثلاً فاتورة باقة فليكس":"اسم الفئة، مثلًا فاتورة باقة الهاتف","بقرا الإيصال…":"جارٍ قراءة الإيصال…","شيل الصورة":"إزالة الصورة","مش هسجله الشهر ده":"لن أسجله هذا الشهر","الحساب اللي اتخصم منه المبلغ":"الحساب الذي خُصم منه المبلغ","المصاريف والسلف والجمعيات":"المصروفات والسلف والجمعيات","دوس عشان تدوّر على تحديث":"اضغط للبحث عن تحديث","اقتراح أو مشكلة وصلتلك":"اقتراح أو مشكلة واجهتك","مليم مجاني ومن غير إعلانات. لو عجبك وحابب تساعد إنه يكمّل، أي مبلغ يفرق معانا.":"مليم مجاني وبلا إعلانات. إن أعجبك وأردت المساعدة في استمراره، فأي مبلغ يُحدث فرقًا.","دوّر في الإعدادات":"ابحث في الإعدادات","مش مفعّلة":"غير مفعّلة","لسه معملتش نسخة":"لم تُنشئ نسخة بعد","مقفول":"متوقف","من غير قفل":"بلا قفل","التنبيهات والسرعة":"التنبيهات والاختصارات","الفئات":"الفئات","موبايل ونت":"هاتف وإنترنت","العربية وصيانتها":"السيارة وصيانتها","خروج وترفيه":"خروج وترفيه","الأولاد":"الأبناء","مساعدة الأهل":"مساعدة الأهل","بنزين":"وقود","انت":"أنت","شغالة":"مفعّلة","اختار لغة التطبيق، وشوف شكلها تحت قبل ما تحفظ.":"اختر لغة التطبيق وشاهد شكلها بالأسفل قبل الحفظ."},"p":[["فاضل (\\d+) يوم","متبقٍ $1 يومًا"],["من (\\d+) دقيقة","منذ $1 دقيقة"],["النهارده (.+)","اليوم $1"],["امبارح (.+)","أمس $1"],["يوم (\\d+)","اليوم $1"],["(\\d{1,2}:\\d{2}) ص","$1 ص"],["بالمعدل ده هيفضلك حوالي (.+) ج\\.م آخر الشهر","بهذا المعدل سيتبقى لك حوالي $1 ج.م في نهاية الشهر"],["(.+): (.+)","$1: $2"],["(.+):","$1:"],["· (.+)","· $1"],["([^\\u0600-\\u06FF\\w\\s«(]+) (.+)","$1 $2"]]},"en":{"x":{"أهلاً بيك في مليم":"Welcome to Maleem","سجّل مصاريفك بسهولة وتابع ميزانيتك. بياناتك بتفضل على موبايلك.":"Track your spending easily and keep an eye on your budget. Your data stays on your phone.","اسمك (اختياري)":"Your name (optional)","تقدر تسيبه فاضي، وتغيره بعدين من صفحة \"أنا\".":"You can leave it empty and change it later from the \"Me\" page.","كمّل":"Continue","عندي نسخة احتياطية؟ استعادة":"Have a backup? Restore","ميزانيتك":"Your budget","اختار الطريقة اللي تناسبك، وتقدر تغيّرها في أي وقت من صفحة \"أنا\".":"Pick what suits you. You can change it any time from the \"Me\" page.","ميزانية محددة":"Fixed budget","ميزانية مفتوحة":"Open budget","ج.م":"EGP","بتقبض إزاي؟":"How are you paid?","شهري":"Monthly","أسبوعي":"Weekly","كل أسبوعين":"Every two weeks","متغير":"Varies","يوم القبض":"Payday","الميزانية والتقارير بتبدأ من اليوم ده":"Your budget and reports start on this day","من غير حد للصرف. هنعرضلك إجمالي مصاريفك في الشهر وانت بتضيف.":"No spending limit. You will see your monthly total as you add expenses.","ابدأ":"Start","رجوع":"Back","مثلاً محمد":"e.g. Mohamed","نوع الميزانية":"Budget type","مثلاً 10000":"e.g. 10000","ميزانية الشهر":"Monthly budget","طريقة القبض":"Pay schedule","صباح الخير":"Good morning","مساء الخير":"Good evening","صرفت":"Spent","المتبقي":"Left","💡 تقدر تصرف حوالي":"💡 You can spend about","ج.م في اليوم لحد آخر الشهر":"EGP a day until the end of the month","الفلوس اللي معايا":"My money","للميزانية":"For the budget","مدخرات":"Savings","مدخراتي":"My savings","⇅ نقل بين حساباتي والميزانية":"⇅ Move between my accounts and the budget","تجاهل الكل":"Dismiss all","⚠ سحب كاش، مش متأكد من الحساب: هسألك":"⚠ Cash withdrawal, account unclear: I will ask you","نوع تاني؟":"Something else?","حدّد":"Choose","مصاريف النهارده":"Today's expenses","المصروفات":"Expenses","التقارير":"Reports","التزاماتي":"Commitments","أنا":"Me","الإعدادات":"Settings","مصروف جديد":"New expense","مصروف":"Expense","أكل وشرب":"Food & drinks","سوبر ماركت وبقالة":"Groceries","كافيهات ومطاعم":"Cafés & restaurants","مواصلات":"Transport","بنزين":"Fuel","العربية وصيانتها":"Car & maintenance","فواتير":"Bills","موبايل ونت":"Phone & internet","البيت":"Home","تسوق":"Shopping","ملابس":"Clothes","عناية وتجميل":"Personal care","صحة":"Health","الأولاد":"Kids","تعليم":"Education","خروج وترفيه":"Going out","اشتراكات":"Subscriptions","سفر":"Travel","صدقات وتبرعات":"Charity","مساعدة الأهل":"Helping family","هدايا":"Gifts","أخرى":"Other","جمعية":"Savings circle (gam'eya)","📷 صوّر الإيصال":"📷 Photo of receipt","🖼️ صورة من المعرض":"🖼️ From gallery","حفظ":"Save","إلغاء":"Cancel","تسجيل المصاريف من الإشعارات":"Record expenses from notifications","عشان مليم يلقط عمليات الدفع لوحده، محتاج إذن":"For Maleem to catch payments on its own, it needs the","«الوصول للإشعارات»":"\"Notification access\"","من أندرويد. بعد ما تدوس «افتح الإعدادات» فعّل":"permission from Android. After you tap \"Open settings\", turn on","مليم":"Maleem","من القايمة وارجع.":"in the list and come back.","🔎 مليم بيدوّر بس على رسايل الخصم والدفع اللي فيها مبلغ، وبيتجاهل الشات وأكواد التحقق (OTP). والفلوس الداخلة بيقراها بس لو ضفت حسابات في مليم، عشان يعرف الحساب ويسجّل الدخل أو التحويل بين حساباتك.":"🔎 Maleem only looks for payment and debit messages with an amount, and ignores chats and verification codes (OTP). It reads incoming money only if you added accounts, so it knows the account and records the income or a transfer between your accounts.","📱 اللي بيلقطه بيفضل على موبايلك ومش بيترفع على أي سيرفر، وباقي الإشعارات مش بتتخزن خالص.":"📱 What it catches stays on your phone and is never uploaded to any server. Other notifications are not stored at all.","✅ مفيش مصروف بيتسجل غير لما توافق عليه، وتقدر تقفل الميزة من الإعدادات في أي وقت.":"✅ Nothing is recorded until you approve it, and you can turn this off in Settings any time.","افتح الإعدادات":"Open settings","مش دلوقتي":"Not now","اختار رقم سري":"Choose a PIN","اختار طريقة القفل":"Choose a lock type","رقم سري 4 أرقام":"4-digit PIN","كلمة سر":"Password","عضو جديد":"New member","اسم العضو":"Member name","نوع القفل":"Lock type","الرقم السري":"PIN","لو العضو نسي كلمة السر، مفيش طريقة ترجعها. الحل الوحيد إن عضو تاني يمسحه هو وبياناته.":"If a member forgets the password there is no way to recover it. The only fix is for another member to delete them and their data.","إضافة":"Add","دلوقتي":"Just now","سلفة جديدة":"New loan","ليا عند حد":"Someone owes me","عليا لحد":"I owe someone","ميعاد الرد":"Due date","اختياري، وهيجيلك تذكير قبله بيوم":"Optional. You will get a reminder the day before","بكرة":"Tomorrow","بعد أسبوع":"In a week","بعد شهر":"In a month","من غير ميعاد":"No due date","الحساب":"Account","سيبه «من غير حساب» لو الفلوس دي مش من حساب متسجل":"Leave it as \"No account\" if this money is not from a saved account","حساب جديد":"New account","🏦 بنك":"🏦 Bank","👛 محفظة":"👛 Wallet","💵 كاش":"💵 Cash","العملة":"Currency","الرصيد دلوقتي":"Balance now","نبّهني لو الرصيد قل عن":"Alert me if the balance drops below","اختياري، بنفس عملة الحساب":"Optional, in the account currency","مش بنحفظ رقم الكارت كامل ولا الـ CVV، آخر 4 أرقام بس.":"We never store the full card number or the CVV, only the last 4 digits.","قفّل الفترة":"Close the period","يروح لـ":"Goes to","هدف ادخار، أو من غير هدف":"A savings goal, or none","الباقي بيتحسب في مدخراتك تلقائي. اختيار الهدف بيزوّد اللي حوشته فيه بس.":"What is left counts as savings automatically. Picking a goal only adds it to that goal.","مطابقة الرصيد":"Match the balance","الرصيد الحقيقي دلوقتي":"Real balance now","اللي ظاهر في البنك أو المحفظة":"What the bank or wallet shows","تحويل بين حساباتي":"Transfer between my accounts","بتسجّل تحويل عملته فعلاً. مش مصروف ومش دخل.":"Records a transfer you made. It is not an expense or income.","من":"From","إلى":"To","رسوم التحويل":"Transfer fee","اختياري، بتتخصم من حساب التحويل":"Optional, taken from the sending account","التاريخ":"Date","نقل بين حساباتي والميزانية":"Move between my accounts and the budget","من الميزانية":"From the budget","هتصرفهم من":"You will spend it from","نقل":"Move","تقسيط جديد":"New installment plan","مدة التقسيط":"Length","القسط الشهري":"Monthly installment","تقدر تغيّر أي قسط لوحده بعد الحفظ":"You can change any single installment after saving","ميعاد أول قسط":"First installment date","الشراء اتسجل قبل كده كمصروف":"The purchase was already recorded as an expense","لو اتسجل، الأقساط مش هتتحسب مصروف تاني، هتتخصم من الحساب بس":"If so, installments are not counted as expenses again, only taken from the account","قسط":"Installment","قيمة القسط":"Installment amount","بتتغير للقسط ده بس":"Changes this installment only","ميعاد القسط":"Installment date","دفعت":"Paid","دفع قسط":"Pay installment","اتدفع من":"Paid from","الحساب اللي هيتخصم منه":"The account it is taken from","تسجيل الدفع":"Record payment","استلمت دخل":"Income received","دخل":"Income","استلمته على":"Received into","الحساب اللي رصيده هيزيد":"The account that goes up","وزّع الفلوس دي (اختياري)":"Split this money (optional)","للمصاريف":"For spending","للأقساط والفواتير":"For installments and bills","للادخار":"For saving","اقترح توزيع":"Suggest a split","ده تقسيم لنفس الفلوس: مش بيزوّد رصيد ومش بيتحسب دخل تاني.":"This only splits the same money. It adds no balance and is not counted as income again.","شراء دهب":"Buy gold","عيار 21":"21K","عيار 24":"24K","عيار 18":"18K","جنيه ذهب":"Gold pound","السعر الكلي اللي دفعته":"Total price paid","تاريخ الشراء":"Purchase date","اتدفع من حساب":"Paid from account","الرصيد هينقص (اختياري)":"The balance goes down (optional)","اتباع؟ (اختياري)":"Sold? (optional)","اكتب اللي استلمته كله لما بعته. امسح الخانة لو عايز تلغي البيع.":"Write the full amount you got when you sold it. Clear the field to cancel the sale.","تاريخ البيع":"Sale date","الرصيد هيزيد (اختياري)":"The balance goes up (optional)","العملية دي محتاجة تحديد":"This payment needs a choice","تجاهل العملية دي":"Ignore this payment","فلوس رجعتلك من مصروف":"Money back from an expense","من أنهي مصروف؟":"From which expense?","رجعت على":"Came back to","سجّل":"Record","تمام":"OK","تسجيل سداد":"Record repayment","فئات مقترحة":"Suggested categories","اختار اللي يناسبك وهيتضافوا لفئاتك. تقدر تعدّل أو تحذف أي واحدة بعد كده.":"Pick what suits you and they are added to your categories. You can edit or delete any of them later.","إضافة المختار":"Add selected","زوّد على السلفة":"Add to the loan","قفل":"Close","جمعية جديدة":"New savings circle","عدد الشهور":"Number of months","عدد الأعضاء = عدد الشهور":"Members = months","داخل بكام فرد؟":"How many shares?","لو داخل بأكتر من اسم، بتدفع قسط عن كل فرد وتقبض دور لكل فرد":"With more than one share you pay for each share and collect once per share","أول شهر":"First month","يوم دفع القسط":"Payment day","دورك تقبض":"Your turn to collect","احسب القسط من مصاريفي":"Count the payment as an expense","القسط يتسجل كمصروف في فئة جمعية لما تدفعه":"The payment is recorded as an expense in the savings-circle category when you pay it","فيه نسخة جديدة من مليم":"A new version of Maleem is available","تحديث":"Update","بعدين":"Later","تمسح إيه؟":"What to delete?","اختار اللي عايز تمسحه. اللي مش مختار بيفضل زي ما هو. التقارير بتتحسب من المصاريف والدخل، فمسحهم بيفضّيها.":"Pick what to delete. Anything not picked stays. Reports come from expenses and income, so deleting those empties them.","امسح المختار":"Delete selected","عملة تانية":"Another currency","اكتب اسم العملة أو كودها (زي TRY أو SYP)، واختارها من القايمة. المبالغ بتتحول بسعر النهارده الحقيقي. ولو العملة مالهاش سعر منشور هتكتب سعر الدولار بيها بنفسك.":"Type the currency's name or code (like TRY or SYP) and pick it from the list. Amounts are converted at today's real rate. If a currency has no published rate, you enter the dollar rate yourself.","تغيير العملة":"Change currency","حوّل كل مبالغي":"Convert all my amounts","وقت التذكير اليومي":"Daily reminder time","تغيير تاريخ المصروف":"Change expense date","النهارده":"Today","امبارح":"Yesterday","📅 تاريخ تاني":"📅 Another date","استيراد مصاريف":"Import expenses","تاريخ البنود اللي من غير تاريخ":"Date for rows without a date","الملف مفيهوش تاريخ لبعض البنود":"Some rows in the file have no date","البنود":"Rows","شيل التحديد":"Clear selection","نسبة التنبيه":"Alert at","هنبهك أول ما تصرف النسبة دي من ميزانيتك":"We alert you as soon as you spend this share of your budget","النسخ الاحتياطي التلقائي":"Automatic backup","اختار كل كام يوم التطبيق يحفظ نسخة لوحده، أو أوقفه.":"Pick how often the app saves a backup by itself, or turn it off.","كل 7 أيام":"Every 7 days","إيقاف":"Off","كل يوم":"Every day","أسبوع":"Week","أسبوعين":"Two weeks","شهر":"Month","النسخة بتترفع على Google Drive لو ربطته، وإلا بتتحفظ على الموبايل في":"The backup goes to Google Drive if you linked it, otherwise it is saved on the phone in","استعادة نسخة احتياطية":"Restore a backup","اختار حساب جوجل اللي نسخك كانت بتترفع عليه، ومليم هيدوّر في فولدر":"Pick the Google account your backups went to, and Maleem looks in the folder","ويفتحلك نسخك، وتختار الأحدث أو نسخة أقدم.":"and lists your backups. Pick the latest or an older one.","من Google Drive":"From Google Drive","من ملف على الموبايل":"From a file on the phone","فئة جديدة":"New category","الأيقونة":"Icon","اللون":"Color","حد شهري للفئة (اختياري)":"Monthly limit (optional)","هننبهك لما تقرب منه (بنفس نسبة تنبيه الميزانية)، ولما تعدّيه.":"We alert you when you get close (same share as the budget alert) and when you go over.","حفظ المصاريف":"Save expenses","الشهر ده بس":"This month only","كل الشهور":"Every month","تاريخ تاني…":"Another date…","مصروف جاي (فكّرني)":"Upcoming expense (remind me)","تعديل":"Edit","تغيير التاريخ":"Change date","حذف":"Delete","ده سحب كاش، مش مصروف":"This was a cash withdrawal, not an expense","رجعتلي فلوس منه":"Some money came back","صفحتي (أنا)":"My page (Me)","إخفاء المبالغ":"Hide amounts","نسبة الصرف من الميزانية":"Share of the budget spent","كاش":"Cash","خيارات":"Options","إضافة مصروف":"Add expense","تسجيل مصروف بالصوت":"Add expense by voice","التنقل الرئيسي":"Main navigation","نوع العملية: مصروف":"Type: expense","تاريخ المصروف":"Expense date","طريقة الدفع":"Payment method","آلة حاسبة":"Calculator","المبلغ":"Amount","الفئة":"Category","ملاحظة (اختياري)":"Note (optional)","مسح":"Clear","كلمة السر":"Password","اكتبها تاني للتأكيد":"Type it again to confirm","تأكيد كلمة السر":"Confirm password","إغلاق التنبيه":"Close alert","نوع السلفة":"Loan type","اسم الشخص":"Person","اختار التاريخ":"Pick a date","ميعاد الرد، دوس عشان تختار اليوم والشهر والسنة":"Due date, tap to pick day, month and year","نوع الحساب":"Account type","اسم الحساب":"Account name","اسم البنك أو المحفظة":"Bank or wallet name","آخر 4 أرقام من الكارت (اختياري)":"Last 4 card digits (optional)","آخر 4 أرقام من الكارت":"Last 4 card digits","رقم المحفظة (اختياري)":"Wallet number (optional)","رقم المحفظة":"Wallet number","الرصيد":"Balance","حد الرصيد المنخفض":"Low-balance limit","هدف الادخار":"Savings goal","الرصيد الحقيقي":"Real balance","من حساب":"From account","إلى حساب":"To account","المبلغ المحوّل":"Amount sent","تاريخ التحويل":"Transfer date","اتجاه النقل":"Direction","الحساب التاني":"Other account","اشتريت إيه؟ (مثلًا: موبايل)":"What did you buy? (e.g. a phone)","الحاجة المقسّطة":"Item","الجهة اللي بقسط معاها (اختياري)":"Store or lender (optional)","الجهة":"Store or lender","إجمالي المبلغ اللي عليك":"Total you owe","إجمالي المبلغ":"Total","عدد الأقساط":"Number of installments","تاريخ الدفع":"Payment date","نوع العملية: دخل":"Type: income","من فين؟ (مرتب، شغل حر، ...)":"From where? (salary, freelance, ...)","مصدر الدخل":"Income source","تاريخ الاستلام":"Date received","العيار":"Karat","الوزن بالجرام":"Weight in grams","الوزن":"Weight","ملاحظة (اختياري): الصاغة، هدية، شبكة...":"Note (optional): jeweller, gift, engagement...","السعر اللي بعته بيه":"Price you sold it for","سعر البيع":"Sale price","نوع العملية":"Type","المصروف":"Expense","المبلغ اللي رجع":"Amount returned","الحساب اللي الفلوس رجعت عليه":"Account the money came back to","المبلغ المسدد":"Amount repaid","المبلغ اللي هتزوده":"Amount to add","ملاحظة":"Note","اسم الجمعية، مثلاً جمعية الشغل":"Circle name, e.g. work circle","اسم الجمعية":"Circle name","قيمة القسط الشهري":"Monthly payment","عدد الأفراد اللي داخل بيهم":"Number of shares","اختار الشهر":"Pick a month","أول شهر، دوس عشان تختار الشهر والسنة":"First month, tap to pick month and year","دورك":"Your turn","ابحث: ليرة، دولار كندي، TRY…":"Search: lira, Canadian dollar, TRY…","ابحث عن عملة":"Search currencies","الساعة":"Hour","الدقائق":"Minutes","صباحاً أو مساءً":"AM or PM","التاريخ الجديد":"New date","اختيار التاريخ الجديد":"Pick the new date","مدة النسخ الاحتياطي التلقائي":"Automatic backup interval","اسم الفئة، مثلاً فاتورة باقة فليكس":"Category name, e.g. phone plan","اسم الفئة":"Category name","لون":"Color","مثلاً 2000، وسيبه فاضي لو مش عايز حد":"e.g. 2000, leave empty for no limit","حد شهري للفئة":"Monthly category limit","اختيار تاريخ المصروف":"Pick the expense date","بدون حساب":"No account","صورة الإيصال":"Receipt photo","بقرا الإيصال…":"Reading the receipt…","شيل الصورة":"Remove photo","حذف المصروف":"Delete expense","مش هسجله الشهر ده":"Skip it this month","الحساب اللي اتخصم منه المبلغ":"The account it was paid from","زائد":"Plus","ناقص":"Minus","ضرب":"Times","قسمة":"Divide","يساوي":"Equals","عرض صورة الإيصال":"View receipt photo","سحب كاش من حساب":"Cash withdrawal from an account","الأعضاء":"Members","القفل والحماية":"Lock & security","من غير قفل":"No lock","التخصيص":"Personalize","اللغة":"Language","المظهر":"Appearance","تابع للنظام":"Follows the system","فاتح":"Light","داكن":"Dark","الفئات":"Categories","طرق الدفع":"Payment methods","التنبيهات والسرعة":"Alerts & shortcuts","التنبيهات والتذكيرات":"Alerts & reminders","التسجيل من إشعارات البنك":"Record from bank notifications","مقفول":"Off","الويدجت والإعدادات السريعة":"Widgets & quick settings","ويدجت للشاشة الرئيسية وبلاطة الصوت":"Home-screen widgets and the voice tile","المشاركة والبيانات":"Sharing & data","المساحة المشتركة":"Shared space","مش مفعّلة":"Not on","النسخ الاحتياطي":"Backup","لسه معملتش نسخة":"No backup yet","مسح البيانات":"Delete data","المصاريف والسلف والجمعيات":"Expenses, loans and savings circles","التطبيق":"App","التحديثات":"Updates","دوس عشان تدوّر على تحديث":"Tap to check for an update","اقتراحات وملاحظات":"Suggestions & feedback","اقتراح أو مشكلة وصلتلك":"An idea or a problem you ran into","مطور مليم":"Maleem's developer","ادعم مليم":"Support Maleem","مليم مجاني ومن غير إعلانات. لو عجبك وحابب تساعد إنه يكمّل، أي مبلغ يفرق معانا.":"Maleem is free and has no ads. If you like it and want to help it keep going, any amount makes a difference.","فودافون كاش":"Vodafone Cash","دوّر في الإعدادات":"Search settings","مسح البحث":"Clear search","فيسبوك":"Facebook","يوتيوب":"YouTube","عضو واحد":"1 member","انت":"You","شغالة":"On","من غير حساب":"No account","اختار لغة التطبيق، وشوف شكلها تحت قبل ما تحفظ.":"Pick the app language and see how it looks below before you save.","🧾 من غير حساب":"🧾 No account","1 عملية":"1 payment"},"p":[["(.+) يا (.+)","$1, $2"],["ميزانية (.+)","$1 budget"],["فاضل (\\d+) يوم","$1 days left"],["من (\\d+) دقيقة","$1 min ago"],["النهارده (.+)","Today $1"],["امبارح (.+)","Yesterday $1"],["1 مصروف","1 expense"],["(\\d+) عملية","$1 payments"],["(\\d+) عمليات","$1 payments"],["(\\d+) مصروف","$1 expenses"],["(\\d+) فئة","$1 categories"],["(\\d+) طرق","$1 methods"],["(\\d+) أعضاء","$1 members"],["يوم (\\d+)","Day $1"],["التذكير اليومي (.+)","Daily reminder $1"],["(\\d{1,2}:\\d{2}) ص","$1 AM"],["(\\d{1,2}:\\d{2}) م","$1 PM"],["عمليات لقطناها \\((\\d+)\\)","Captured payments ($1)"],["بالمعدل ده هيفضلك حوالي (.+) ج\\.م آخر الشهر","At this rate you will have about $1 EGP left by month end"],["(.+): (.+)","$1: $2"],["(.+): (.+)","$1: $2"],["(.+):","$1:"],["· (.+)","· $1"],["([^\\u0600-\\u06FF\\w\\s«(]+) (.+)","$1 $2"]]}};/*I18N-END*/</script>
+<!-- LOCALES-START -->
+<script src="locales/eg.js"></script>
+<script src="locales/ar.js"></script>
+<script src="locales/en.js"></script>
+<!-- LOCALES-END -->
 <script>
 (function(){
 'use strict';
@@ -2576,7 +2583,7 @@ let S = {expenses:[], budget:0, theme:'system', pin:null, lastBackup:null};
 try{const raw=lsGet(KEY); if(raw){S=Object.assign(S,JSON.parse(raw))}}catch(e){}
 const AB = window.AndroidBridge || null;
 let syncT;
-function save(){persist(); if(S.space) spQueue(); if(AB){clearTimeout(syncT);syncT=setTimeout(()=>{try{syncNative()}catch(e){}},800)}}
+function save(){userTextCache=null;persist(); if(S.space) spQueue(); if(AB){clearTimeout(syncT);syncT=setTimeout(()=>{try{syncNative()}catch(e){}},800)}}
 function syncCats(){
   if(!Array.isArray(S.cats)||!S.cats.length) S.cats=CATS.map(c=>({...c}));
   if(!S.cats.some(c=>c.id==='other')) S.cats.push({...CATS[CATS.length-1]});
@@ -2618,20 +2625,25 @@ if(!Array.isArray(S.bMoves)) S.bMoves=[];
    Anything not in the dictionary stays in Egyptian Arabic, so a missing entry never breaks a screen.
    [data-notr] keeps a subtree as it is (names of languages, the person's own words where it matters). */
 if(!['eg','ar','en'].includes(S.lang)) delete S.lang;
-const LANG_NAMES={eg:'العامية المصرية',ar:'العربية الفصحى',en:'English'};
+const LANG_NAMES=Object.fromEntries(['eg','ar','en'].map(k=>[k,I18N[k].name]));
 const LANG= S.lang || (/^ar\b/i.test(navigator.language||'')?'eg':'en');
 /* The dictionary is its own <script> before this one. If it is ever missing or broken (on Android a script the page does not know is
    blocked), the app must still open: it just shows Egyptian Arabic. */
+
 const I18D= LANG==='eg'? null : (()=>{ try{ const d=(typeof I18N!=='undefined'&&I18N[LANG])||{x:{},p:[]}; return {x:new Map(Object.entries(d.x||{})), p:(d.p||[]).map(([s,r])=>[new RegExp('^'+s+'$'),r])} }catch(e){ return null } })();
 const HAS_AR=/[\u0600-\u06FF]/;
+function dayCount(n,lang){return I18N[lang||LANG].days(+n)}
 function trText(s){
   if(!I18D||!s||!HAS_AR.test(s)) return null;
-  const k=s.replace(/\u200E/g,'').replace(/\s+/g,' ').trim(); let v=trKey(k,0); // marks this code added earlier are dropped first, so the result is the same every time
+  const k=s.replace(/\u200E/g,'').replace(/\s+/g,' ').trim();
+  const dayMatch=k.match(/^فاضل (\d+) يوم$/); if(dayMatch) return dayCount(dayMatch[1],LANG);
+  let v=trKey(k,0); // marks this code added earlier are dropped first, so the result is the same every time
   if(v==null||v===k) return null;
   const lead=s.match(/^\s*/)[0], tail=s.match(/\s*$/)[0]; return lead+v+tail;
 }
 /* exact entry, else each « · » part on its own, else the first pattern that fits (its $n parts are translated again) */
 function trKey(k,depth){
+  if(depth>0&&isUserText(k))return null;
   let v=I18D.x.get(k); if(v!=null) return v;
   if(depth>4||!HAS_AR.test(k)) return null;
   if(k.includes(' · ')){ const ps=k.split(' · '), out=ps.map(p=>{const t=trKey(p,depth+1); return t===p?null:t}); if(out.some(x=>x!=null)) return ps.map((p,i)=>out[i]!=null?out[i]:p).join(LANG==='en'?' · \u200E':' · ') } // LRM: an Arabic name next to English text keeps its place
@@ -2639,12 +2651,24 @@ function trKey(k,depth){
   return null;
 }
 const TX=s=>trText(s)||s; // for text that never reaches the page as a node (document.title, share text...)
+// User fields are not UI labels; protect exact matches in generated selectors and labels as well.
+let userTextCache=null;
+function isUserText(text){const k=String(text||'').trim();if(!k)return false;
+  if(!userTextCache){const values=new Set(),add=x=>{if(typeof x==='string'&&x.trim())values.add(x.trim())};
+    add(S.profile?.name);add(S.profile?.name?.trim().split(/\s+/)[0]);
+    for(const list of [S.expenses,S.debts,S.accounts,S.inflows,S.gold,S.goals,S.gams,S.fixed,S.incomes,S.plans,S.insts])
+      if(Array.isArray(list))for(const x of list)for(const p of ['person','name','src','party','byName'])add(x[p]);
+    for(const c of S.cats||[])if(!CATS.some(d=>d.id===c.id&&d.name===c.name))add(c.name);
+    userTextCache=values;
+  }
+  return userTextCache.has(k);
+}
 const TR_ATTRS=['placeholder','aria-label','title'];
-const TR_SEEN=new WeakMap(); // safety net: a text that keeps changing is left alone after 8 tries, so the page can never hang
 function trNode(n){
   if(n.nodeType===3){ const p=n.parentNode; if(!p||p.nodeName==='SCRIPT'||p.nodeName==='STYLE'||(p.closest&&p.closest('[data-notr]'))) return;
-    const v=trText(n.nodeValue); if(v!=null&&v!==n.nodeValue){ const c=(TR_SEEN.get(n)||0)+1; if(c>8) return; TR_SEEN.set(n,c); n.nodeValue=v } return }
+    if(isUserText(n.nodeValue)&&!p.closest('button,label,#cats,.cat-name,.set-item,.nav,.kind-pill'))return; const v=trText(n.nodeValue); if(v!=null&&v!==n.nodeValue){ n.nodeValue=v } return }
   if(n.nodeType!==1||n.nodeName==='SCRIPT'||n.nodeName==='STYLE'||n.hasAttribute('data-notr')) return;
+  if(n.closest('[data-notr]'))return;
   for(const a of TR_ATTRS){ const x=n.getAttribute(a); if(x){ const v=trText(x); if(v!=null&&v!==x) n.setAttribute(a,v) } }
   for(let c=n.firstChild;c;c=c.nextSibling) trNode(c);
 }
@@ -2662,14 +2686,7 @@ if(LANG!=='eg'){
 /* «الإعدادات ← اللغة» (round 52): the three languages side by side; picking one shows a sample of the home screen in it,
    with the person's own name, budget and days left, and nothing changes until «حفظ». */
 let langSel=null;
-const LANG_UI={
-  eg:{t:'العامية',s:'الافتراضية',dir:'rtl',loc:'ar-EG-u-nu-latn',hi:['صباح الخير','مساء الخير'],ya:n=>' يا '+n,bud:m=>'ميزانية '+m,month:'مصاريف الشهر',spent:'صرفت',left:d=>`فاضل ${d} يوم`,
-      tip:(x,c)=>`💡 تقدر تصرف حوالي ${x} ${c} في اليوم`,add:'＋ مصروف جديد',set:'الإعدادات',cap:'كده هتبان الصفحة الرئيسية',note:'دي اللغة اللي التطبيق متكتب بيها.',save:'احفظ وافتح بالعامية',cur:'دي اللغة الحالية'},
-  ar:{t:'الفصحى',s:'تجريبية',dir:'rtl',loc:'ar-EG-u-nu-latn',hi:['صباح الخير','مساء الخير'],ya:n=>' يا '+n,bud:m=>'ميزانية '+m,month:'مصروفات الشهر',spent:'أنفقت',left:d=>`متبقٍ ${d} يومًا`,
-      tip:(x,c)=>`💡 يمكنك إنفاق حوالي ${x} ${c} يوميًا`,add:'＋ مصروف جديد',set:'الإعدادات',cap:'هكذا ستظهر الصفحة الرئيسية',note:'تجريبية: الشاشات الأساسية مترجمة، وبعض الشاشات ما زالت بالعامية.',save:'احفظ وافتح بالفصحى',cur:'هذه هي اللغة الحالية'},
-  en:{t:'English',s:'Beta',dir:'ltr',loc:'en-GB',hi:['Good morning','Good evening'],ya:n=>', '+n,bud:m=>m+' budget',month:"This month's spending",spent:'Spent',left:d=>`${d} days left`,
-      tip:(x,c)=>`💡 You can spend about ${x} ${c} a day`,add:'＋ New expense',set:'Settings',cap:'This is how the home screen will look',note:'Beta: the main screens are translated, some screens are still in Egyptian Arabic.',save:'Save and switch to English',cur:'This is the current language'}
-};
+const LANG_UI=Object.fromEntries(['eg','ar','en'].map(k=>[k,I18N[k].ui]));
 function langPaint(sel){
   langSel=sel; const U=LANG_UI[sel];
   $('#langSeg').innerHTML=['eg','ar','en'].map(k=>`<button type="button" role="radio" aria-checked="${k===sel}" data-lang="${k}" dir="${LANG_UI[k].dir}"><b>${LANG_UI[k].t}</b><small>${LANG_UI[k].s}</small></button>`).join('');
@@ -2677,11 +2694,12 @@ function langPaint(sel){
   let name='', B=0, sp=0, days=0, fixed=false;
   try{ name=((S.profile&&S.profile.name)||'').trim().split(/\s+/)[0]||''; const P=periodOf(Date.now()); fixed=S.budgetMode==='fixed'&&S.budget>0; B=fixed?budOf(P):0; sp=sum(ofPeriod(P)); days=daysLeft(P) }catch(e){ B=10000; sp=2500; days=20; fixed=true }
   const cur= sel==='en'? S.currency : CS(), h=new Date().getHours(), month=new Date().toLocaleDateString(U.loc,{month:'long'});
-  const daily= fixed&&days>0? fmt(Math.max(0,Math.round((B-sp)/days))) : '';
+  const daily=fixed?fmt(dailyAllowance(B-sp,periodOf(Date.now())).per):'';
+  const periodTitle=S.payType==='weekly'?(sel==='en'?'Weekly budget':sel==='ar'?'ميزانية الأسبوع':'ميزانية الأسبوع'):S.payType==='biweekly'?(sel==='en'?'Two-week budget':'ميزانية الأسبوعين'):U.bud(month);
   const el=$('#langDemo'); el.dir=U.dir; el.lang= sel==='en'?'en':'ar';
   el.innerHTML=`<div class="ld-cap">${esc(U.cap)}</div>
     <div class="ld-greet">${esc(U.hi[h>=5&&h<12?0:1])}${name?esc(U.ya(name)):''}</div>
-    <div class="ld-bud"><span>${esc(fixed?U.bud(month):U.month)}</span><b>${fmt(fixed?B:sp)} <small>${esc(cur)}</small></b></div>
+    <div class="ld-bud"><span>${esc(fixed?periodTitle:U.month)}</span><b>${fmt(fixed?B:sp)} <small>${esc(cur)}</small></b></div>
     ${fixed?`<div class="ld-row"><span>${esc(U.spent)} ${fmt(sp)} ${esc(cur)}</span><span>${esc(U.left(days))}</span></div><div class="ld-tip">${esc(U.tip(daily,cur))}</div>`:''}
     <div class="ld-btns"><span class="ld-btn">${esc(U.add)}</span><span class="ld-chip">${esc(U.set)}</span></div>`;
   const n=$('#langNote'); n.dir=U.dir; n.textContent=U.note;
@@ -2762,8 +2780,8 @@ const idOr=v=>{v=v==null?'':String(v);return isId(v)?v:uid()};
 const numIn=(v,min,max,d)=>{v=+v;return Number.isFinite(v)&&v>=min&&v<=max?v:d};
 const intIn=(v,min,max,d)=>{v=+v;return Number.isInteger(v)&&v>=min&&v<=max?v:d};
 const str=(v,max)=>(v==null?'':String(v)).slice(0,max);
-const isDK=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v);
-const isMK=v=>typeof v==='string'&&/^\d{4}-\d{2}$/.test(v);
+const isDK=v=>{if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v))return false;const [y,m,d]=v.split('-').map(Number);if(y<1||m<1||m>12||d<1)return false;const t=new Date(0);t.setUTCFullYear(y,m-1,d);return t.getUTCFullYear()===y&&t.getUTCMonth()===m-1&&t.getUTCDate()===d};
+const isMK=v=>typeof v==='string'&&/^\d{4}-\d{2}$/.test(v)&&isDK(v+'-01');
 const isPhoto=v=>typeof v==='string'&&v.length<600000&&/^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/]+=*$/.test(v);
 const MAXAMT=1e10, MAXTS=9e15;
 const r2=n=>Math.round(n*100)/100;
@@ -2787,7 +2805,7 @@ function cleanDebt(x){
   if(!x||typeof x!=='object') return null;
   const amount=numIn(x.amount,0.01,MAXAMT,0); if(!amount) return null;
   const pays=(Array.isArray(x.payments)?x.payments:[]).map((p,i)=>p&&typeof p==='object'&&+p.amount>0&&+p.amount<MAXAMT?
-    {id:isId(p.id)?p.id:'p'+i+'_'+Math.round(numIn(p.ts,0,MAXTS,0)).toString(36),amount:r2(+p.amount),ts:numIn(p.ts,0,MAXTS,0),...(isId(p.acc)&&+p.accAmt>0&&+p.accAmt<MAXAMT?{acc:p.acc,accAmt:r2(+p.accAmt)}:{})}:null).filter(Boolean).slice(0,500);
+    {id:isId(p.id)?p.id:'p'+i+'_'+Math.round(numIn(p.ts,0,MAXTS,0)).toString(36),amount:r2(+p.amount),ts:numIn(p.ts,0,MAXTS,0),...(isId(p.acc)&&+p.accAmt>0&&+p.accAmt<MAXAMT?{acc:p.acc,accAmt:r2(+p.accAmt)}:{})}:null).filter(Boolean);
   /* extra amounts added to the same debt later: [{id,amount,ts,note}] */
   const adds=(Array.isArray(x.adds)?x.adds:[]).map((a,i)=>a&&typeof a==='object'&&+a.amount>0&&+a.amount<MAXAMT?
     {id:isId(a.id)?a.id:'a'+i+'_'+Math.round(numIn(a.ts,0,MAXTS,0)).toString(36),amount:r2(+a.amount),ts:numIn(a.ts,0,MAXTS,0),note:str(a.note,60),...(isId(a.acc)&&+a.accAmt>0&&+a.accAmt<MAXAMT?{acc:a.acc,accAmt:r2(+a.accAmt)}:{})}:null).filter(Boolean).slice(0,500);
@@ -3065,9 +3083,9 @@ try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',
 let toastT;
 function toast(msg,actLabel,act,ms){
   ms=ms||(actLabel?3000:2400);
-  $('#toastMsg').textContent=msg;
+  $('#toastMsg').textContent=TX(msg);
   const b=$('#toastAct'), bar=$('#tbar');
-  if(actLabel){b.hidden=false;b.textContent=actLabel;b.onclick=()=>{clearTimeout(toastT);$('#toast').classList.remove('show');act()}}
+  if(actLabel){b.hidden=false;b.textContent=TX(actLabel);b.onclick=()=>{clearTimeout(toastT);$('#toast').classList.remove('show');act()}}
   else b.hidden=true;
   bar.classList.remove('run');void bar.offsetWidth;
   bar.style.display=actLabel?'block':'none';
@@ -3086,7 +3104,7 @@ function itemRow(x){
     <div class="body">
       <div class="title">${esc(c.name)}: <span class="val">${money(x.amount)} <small>${CS()}</small></span></div>
       ${expenseReadOnly(x)?`<div class="xnote xby">${x.legacyReadOnly?'نسخة محلية قديمة · ':''}${x.byName?`👤 ${esc(x.byName)} · `:''}قراءة فقط</div>`:(x.byName&&x.by&&x.by!==spMe()?`<div class="xnote xby">👤 ${esc(x.byName)}</div>`:'')}
-      ${x.note?`<div class="xnote">${esc(x.note)}</div>`:''}
+      ${x.note?`<div class="xnote" data-notr dir="auto">${esc(x.note)}</div>`:''}
       <div class="time">${timeStr(x.ts)}<span class="pm" title="${esc(PAY[payOf(x)].name)}">· ${esc(PAY[payOf(x)].e)}</span>${ACC(x.acc)?`<span class="pm" title="الحساب">· ${esc(ACC(x.acc).name)}</span>`:''}${RC.ids.has(x.id)?`<button type="button" class="rc-ic" data-rc="${esc(x.id)}" aria-label="صورة الإيصال" title="صورة الإيصال">🧾</button>`:''}</div>
     </div>
     ${expenseReadOnly(x)?'':`<button class="more" data-more="${esc(x.id)}" aria-label="خيارات" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button>`}
@@ -3156,10 +3174,14 @@ function forecastLine(list,start,end,B){
   return `<p class="fc">📈 بالمعدل ده الميزانية هتخلص يوم ${shortDate(d.getTime())}</p>`;
 }
 /* "how much can I spend a day": what is left (minus fixed expenses still to come) over the days left, today included */
-function dailyLine(rem,P){
+function dailyAllowance(rem,P){
   const dl=Math.max(1,Math.round((P.next-todayStart())/864e5));
   let pend=0; try{pend=fixedPendingIn(P.start,P.next)||0}catch(e){}
   const per=Math.floor((rem-pend)/dl);
+  return {dl,pend,per:Math.max(0,per)};
+}
+function dailyLine(rem,P){
+  const {dl,pend,per}=dailyAllowance(rem,P);
   if(rem<=0||per<=0) return '';
   return `<p class="fc daily">💡 تقدر تصرف حوالي <b>${money(per)}</b> ${CS()} في اليوم${dl===1?' النهارده':' لحد '+endWord()}${pend>0?'، بعد المصاريف الثابتة الجاية':''}</p>`;
 }
@@ -3456,6 +3478,7 @@ function renderSettings(){
 }
 
 function renderAll(){
+  userTextCache=null;
   /* each screen renders on its own: a problem in one of them must not leave the whole app blank */
   [renderMe,renderMeHome,renderGold,paintIpFee,renderIncome,renderAccounts,renderHome,renderDebts,renderReports,()=>{if(!$('#reportsDetail').hidden)renderDetail()},()=>{if(!$('#reportsSearch').hidden)renderSearch()},renderSettings]
     .forEach(f=>{try{f()}catch(e){console.error(e)}});
@@ -3508,7 +3531,7 @@ $('#meBack').onclick=()=>go('expenses');
   document.addEventListener('touchend',e=>{ if(!ok) return; ok=false; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
     if(Date.now()-st>700||Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.55) return;
     if(busy()||inSub()||String(getSelection()).length) return;
-    const j=TABS.indexOf(tab)+(dx>0?1:-1); if(j>=0&&j<TABS.length) go(TABS[j]) },{passive:true});
+    const step=dx>0?1:-1, j=TABS.indexOf(tab)+(document.documentElement.dir==='ltr'?-step:step); if(j>=0&&j<TABS.length) go(TABS[j]) },{passive:true});
 })();
 
 /* Sheet */
@@ -3520,20 +3543,18 @@ const amtIn=$('#amountInput');
 const OPS=/[+\-×÷]/;
 function cleanExpr(v){
   v=v.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/(\d)[,،](?=\d{3}(?!\d))/g,'$1').replace(/[٫,،]/g,'.').replace(/[*xX]/g,'×').replace(/\//g,'÷').replace(/[−–]/g,'-').replace(/[^0-9.+\-×÷]/g,'');
-  v=v.replace(/^[+\-×÷]+/,'').replace(/[+\-×÷]+(?=[+\-×÷])/g,'');
+  v=v.replace(/^[+×÷]+/,'').replace(/[+\-×÷]+(?=[+\-×÷])/g,'');
   return v.replace(/[0-9.]+/g,n=>cleanMoney(n)).slice(0,60);
 }
 function evalExpr(s){
-  const t=String(s||'').match(/[0-9.]+|[+\-×÷]/g)||[];
-  while(t.length&&OPS.test(t[t.length-1])) t.pop();
-  if(!t.length) return NaN;
-  const terms=[parseFloat(t[0])], signs=[];
-  for(let i=1;i<t.length;i+=2){const op=t[i], n=parseFloat(t[i+1]);
-    if(op==='×') terms[terms.length-1]*=n;
-    else if(op==='÷') terms[terms.length-1]= n? terms[terms.length-1]/n : NaN;
-    else {signs.push(op);terms.push(n)}}
-  let r=terms[0]; signs.forEach((o,i)=>{r= o==='+'? r+terms[i+1] : r-terms[i+1]});
-  return Math.round(r*100)/100;
+  const raw=String(s??'').replace(/\s+/g,'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+  const t=raw.match(/(?:\d+(?:\.\d*)?|\.\d+)|[+\-×÷]/g)||[];
+  if(!t.length||t.join('')!==raw)return NaN;
+  let i=0;
+  const factor=()=>{let sign=1;if(t[i]==='-'||t[i]==='+')sign=t[i++]==='-'?-1:1;const v=t[i++];return v&&/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(v)?sign*Number(v):NaN};
+  const product=()=>{let v=factor();while(t[i]==='×'||t[i]==='÷'){const op=t[i++],n=factor();v=op==='×'?v*n:n===0?NaN:v/n}return v};
+  let result=product();while(t[i]==='+'||t[i]==='-'){const op=t[i++],n=product();result=op==='+'?result+n:result-n}
+  return i===t.length&&Number.isFinite(result)?Math.round(result*100)/100:NaN;
 }
 function readAmt(){return evalExpr(amtIn.value)}
 function setCalc(on){$('#calcRow').hidden=!on;$('#calcTg').setAttribute('aria-pressed',on)}
@@ -3565,7 +3586,7 @@ function buildPad(el,onKey,withDot){
   el.onclick=e=>{const b=e.target.closest('button');if(b)onKey(b.dataset.k)};
 }
 function renderCatGrid(keepScroll){const n=S.cats.length, cols=Math.max(6,Math.ceil(n/2)); $('#cats').style.setProperty('--cols',cols); $('#cats').classList.toggle('wide',cols>6); if(!keepScroll) $('#cats').scrollLeft=0;
-  $('#cats').innerHTML=S.cats.map(c=>`<button type="button" class="cat" data-cat="${esc(c.id)}" aria-pressed="false"><span class="e">${esc(c.e)}</span>${esc(c.name)}</button>`).join('')}
+  $('#cats').innerHTML=S.cats.map(c=>`<button type="button" class="cat" data-cat="${esc(c.id)}" aria-pressed="false"><span class="e">${esc(c.e)}</span><span class="cat-name"${CATS.some(d=>d.id===c.id&&d.name===c.name)?'':' data-notr'}>${esc(c.name)}</span></button>`).join('')}
 renderCatGrid(true); // at start: no scroll reset (it would force a full layout before the first frame)
 $('#cats').onclick=e=>{const b=e.target.closest('.cat');if(!b)return;selCat=b.dataset.cat;markCat();renderNoteSug();$('#cats').classList.remove('err');$('#sheetErr').textContent=''};
 /* Note suggestions: the notes you used most (and most recently) in the chosen category */
@@ -4186,7 +4207,7 @@ $('#instSave').onclick=()=>{
   const total=evalExpr($('#instTotal').value), n=+$('#instMonths').value, monthly=evalExpr($('#instMonthly').value), first=$('#instFirst').value;
   if(!(total>0&&total<MAXAMT)){E('اكتب إجمالي المبلغ');return}
   if(!(monthly>0&&monthly<MAXAMT)){E('اكتب القسط الشهري');return}
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(first)){E('اختار ميعاد أول قسط');return}
+  if(!isDK(first)){E('اختار ميعاد أول قسط');return}
   const last=r2(total-r2(monthly)*(n-1)); if(!(last>0)){E('القسط الشهري × عدد الشهور أكبر من الإجمالي');return}
   const items=[]; for(let i=0;i<n;i++) items.push({id:uid(),amount:i===n-1?last:r2(monthly),due:addMonthDK(first,i)});
   const id=uid(); justAddedOb=id; S.insts.push({id,name:name.slice(0,60),party:party.slice(0,40),rec:$('#instRec').checked,items,created:Date.now()});
@@ -4314,7 +4335,7 @@ $('#payTypeSeg').onclick=e=>{
   save();renderAll();setTimeout(checkAlerts,500);
   toast('اتغيّرت طريقة القبض: '+PT_TXT[S.payType]);
 };
-$('#payAnchor').onchange=e=>{ const v=e.target.value; if(!/^\d{4}-\d{2}-\d{2}$/.test(v)) return; S.payAnchor=v>todayKey()?todayKey():v; curMonth=periodOf(Date.now()).key; save();renderAll();toast('اتحدّدت بداية الفترة') };
+$('#payAnchor').onchange=e=>{ const v=e.target.value; if(!isDK(v)) return; S.payAnchor=v>todayKey()?todayKey():v; curMonth=periodOf(Date.now()).key; save();renderAll();toast('اتحدّدت بداية الفترة') };
 
 function renderIncome(){
   const box=$('#inList'); if(!box) return;
@@ -4769,7 +4790,28 @@ function learnedCat(note){
   return best&&best[1]>=2&&best[1]/tot>=.6?best[0]:null;
 }
 const vK2=t=>{let k=vNorm(t||'').replace(/[^\u0621-\u064Aa-z0-9]/g,''); return k.length>2&&k[0]==='و'?k.slice(1):k};
+
+function parseEnglishVoice(text){
+ const units={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+ const tokens=String(text).toLowerCase().replace(/(\d),(?=\d{3}\b)/g,'$1').replace(/([a-z])-([a-z])/g,'$1 $2').match(/[a-z]+|\d+(?:\.\d+)?/g)||[];
+ const numeric=w=>w in units||/^\d+(?:\.\d+)?$/.test(w||'');let amount=null,start=-1,end=-1;
+ for(let i=0;i<tokens.length;i++){if(!numeric(tokens[i]))continue;let current=0,total=0,j=i;
+  for(;j<tokens.length;j++){const w=tokens[j];if(numeric(w))current+=w in units?units[w]:+w;
+   else if(w==='hundred')current=(current||1)*100;
+   else if(w==='thousand'||w==='million'){total+=(current||1)*(w==='thousand'?1000:1000000);current=0}
+   else if(w==='and'&&numeric(tokens[j+1]))continue;
+   else if(w==='point'){let decimals='';while(numeric(tokens[j+1])&&+(tokens[j+1] in units?units[tokens[j+1]]:tokens[j+1])<10){j++;decimals+=String(tokens[j] in units?units[tokens[j]]:tokens[j])}current+=+(decimals?'0.'+decimals:0);j++;break}
+   else break;
+  }amount=r2(total+current);start=i;end=j;break;
+ }
+ const filler=new Set('spent spend paid pay bought buy on for at a an the pounds pound egp dollars dollar euros euro yesterday today received receive earned earn salary'.split(' '));
+ const note=tokens.filter((w,i)=>(i<start||i>=end)&&!filler.has(w)).join(' ').slice(0,200);
+ const aliases=I18N.en.voiceCategories||{};let cat=null;for(const [id,words]of Object.entries(aliases))if(CAT[id]&&words.some(w=>tokens.includes(w))){cat=id;break}
+ return {amount:amount>0&&amount<=10000000?amount:null,cat:learnedCat(note)||cat,note,yday:tokens.includes('yesterday')};
+}
+
 function parseVoice(text){
+  if(LANG==='en'&&/[a-z]/i.test(text)&&!/[\u0600-\u06ff]/.test(text))return parseEnglishVoice(text);
   const tok=String(text||'').trim().split(/\s+/).filter(Boolean), out={amount:null,cat:null,note:'',yday:false};
   if(!tok.length) return out;
   const nt=tok.map(t=>vNorm(t).replace(/(\d)[,،](?=\d{3}(?!\d))/g,'$1').replace(/[٫]/g,'.'));
@@ -4808,6 +4850,7 @@ const IN_VERB=/^(استلم|قبض|كسب|جالي|جالنا|جاتلي|جات�
 const OUT_VERB=/^(دفع|صرف|اشتر|سدد|عزم|شحن|ادي|حولت|بعت)/;
 const IN_NOUN=[[/^(مرتب|مرتبي|راتب|ماهيه|معاش)$/,'المرتب'],[/^(عيديه|عيدي|عيديات)$/,'عيدية'],[/^(هديه|هدايا)$/,'هدية'],[/^(فريلانس|فريلانسر)$/,'شغل حر'],[/^(مكافاه|مكافئه)$/,'مكافأة'],[/^(بونص|حافز|عموله)$/,'بونص']];
 function parseVoiceIn(text){
+  if(LANG==='en'&&/\b(received|earned|got paid)\b/i.test(text)&&!/\b(spent|paid for|bought)\b/i.test(text)){const p=parseEnglishVoice(text);return {amount:p.amount,src:/\bsalary\b/i.test(text)?'Salary':p.note,yday:p.yday}}
   const tok=String(text||'').trim().split(/\s+/).filter(Boolean); if(!tok.length) return null;
   const ks=tok.map(vK2);
   if(!ks.some(k=>IN_VERB.test(k))||ks.some(k=>OUT_VERB.test(k))) return null;
@@ -5244,7 +5287,7 @@ function showNotif(kind){
     $('#notifBody').textContent=`صرفت ${fmt(spent)} ${CS()} من ميزانية ${fmt(B)} ${CS()}، يعني زيادة ${fmt(Math.max(0,-rem))} ${CS()}.`;
   }else{
     $('#notifTitle').textContent=`وصلت ${Math.round(spent/B*100)}% من ميزانيتك`;
-    $('#notifBody').textContent=`فاضلك ${fmt(Math.max(0,rem))} ${CS()} لآخر الشهر${left>0?` (${daysTxt(left)})`:''}. خلي بالك من الصرف.`;
+    $('#notifBody').textContent=`فاضلك ${fmt(Math.max(0,rem))} ${CS()} لآخر الشهر${left>0?` (${LANG==='en'?dayCount(left,'en').replace(' left',''):daysTxt(left)})`:''}. خلي بالك من الصرف.`;
   }
   n.classList.remove('show');void n.offsetWidth;n.classList.add('show');
   clearTimeout(notifT);notifT=setTimeout(()=>n.classList.remove('show'),kind==='remind'?10000:7000);
@@ -5739,7 +5782,7 @@ const SET_IDX=[
   ['backup','اعمل نسخة احتياطية دلوقتي','نسخه جوجل درايف backup','backupBtn'],['backup','استعادة نسخة احتياطية','استرجاع رجوع النسخه من جوجل درايف','restoreBtn'],['backup','نسخ احتياطي تلقائي','تلقائي مده كل قد ايه','autoBkRow'],['backup','Google Drive','جوجل درايف ربط حساب رفع سحابه ايميل','bkAuto'],
   ['update','دوّر على تحديث','تحديث نسخه جديده اصدار ابديت update التحديثات',''],
   ['data','مسح كل المصاريف والالتزامات','حذف تصفير','']
-].map(([p,t,k,el])=>({p,t,el,n:normAr(t+' '+k+' '+(SET_T_NAMES[p]||''))}));
+].map(([p,t,k,el])=>({p,t,el,n:normAr(t+' '+TX(t)+' '+k+' '+(SET_T_NAMES[p]||'')+' '+TX(SET_T_NAMES[p]||''))}));
 function setVisiblePage(p){const r=$('#si-'+p); return !(r&&r.hidden)}
 function setSearch(){
   const q=normAr($('#setQ').value.trim()); $('#setQX').hidden=!q;
@@ -5772,7 +5815,10 @@ async function saveFile(filename,data){
   try{await downloads.save({filename,data});toast('اتحفظ الملف')}
   catch(err){ if(err&&err.code==='declined') return; toast(err&&err.code==='rate_limited'?'استنى ثانية وجرب تاني':'معرفناش نحفظ الملف') }
 }
-function monthsWithData(){return [...new Set(S.expenses.map(x=>periodAt(x.ts,repPd()).key))].sort()}
+function reportTimes(){return S.expenses.concat(S.inflows,S.transfers,S.instPays).map(x=>x.ts)
+  .concat(S.insts.flatMap(p=>p.items.map(i=>dkToTs(i.due)))).filter(t=>Number.isFinite(t)&&t>0)}
+function monthsWithData(){return [...new Set(reportTimes().map(t=>periodAt(t,repPd()).key))].sort()}
+function reportHasData(P){return reportTimes().some(t=>t>=P.start&&t<P.next)}
 /* Heavy export libraries are loaded only when needed (keeps app start fast) */
 const _ld={};
 function loadScript(src){return _ld[src]||(_ld[src]=new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>{delete _ld[src];no(new Error(src))};document.head.appendChild(s)}))}
@@ -5832,7 +5878,7 @@ const XL={
 };
 async function exportXlsx(all){
   const months= all? monthsWithData(): [repP(curMonth).key];
-  if(!months.length||(!all&&!ofPeriod(repP(curMonth)).length)){toast('مفيش مصاريف تتحفظ');return}
+  if(!months.length||(!all&&!reportHasData(repP(curMonth)))){toast('مفيش مصاريف تتحفظ');return}
   try{
     const amtH='المبلغ ('+CS()+')', per=months.map(mk=>{const P=repP(mk),l=ofPeriod(P);return {P,l,c:byCat(l)}});
     const usedCats=S.cats.filter(k=>per.some(x=>x.c[k.id]));
@@ -5880,14 +5926,14 @@ function pdfMoneyHtml(months){
 async function exportPdf(all){
   if(!window.html2canvas||!window.jspdf){toast('بيتجهز ملف PDF...'); try{await needLib()}catch(e){toast('مقدرتش أحمّل مكتبة PDF، جرب تاني');return}}
   const months= all? monthsWithData(): [repP(curMonth).key];
-  if(!months.length||(!all&&!ofPeriod(repP(curMonth)).length)){toast('مفيش مصاريف تتحفظ');return}
+  if(!months.length||(!all&&!reportHasData(repP(curMonth)))){toast('مفيش مصاريف تتحفظ');return}
   toast('بيتجهز ملف PDF...');
   const box=$('#pdfReport');
   box.innerHTML=`<h1>مليم</h1><div style="color:#53706F">تقرير ${all?repAllWord():repName(repP(curMonth))} · اتعمل ${shortDate(Date.now())}</div>`+(repPd()>1?`<div style="color:#53706F;font-size:12px">الفترة بتبدأ يوم ${repPd()} من كل شهر (يوم القبض)</div>`:'')+
    months.map(mk=>{const P=repP(mk), l=ofPeriod(P), c=byCat(l), t=sum(l);
      return `<h2>${repName(P)} · الإجمالي ${fmt(t)} ${CS()}</h2>
      <table><tr><th>الفئة</th><th>المبلغ (${CS()})</th><th>النسبة</th></tr>${Object.keys(c).sort((a,b)=>c[b]-c[a]).map(k=>`<tr><td>${esc((CAT[k]||CAT.other).name)}</td><td>${fmt(c[k])}</td><td>${Math.round(c[k]/t*100)}%</td></tr>`).join('')}</table>
-     <table style="margin-top:14px"><tr><th>التاريخ</th><th>الفئة</th><th>ملاحظة</th><th>الدفع</th><th>المبلغ (${CS()})</th></tr>${l.slice().sort((a,b)=>a.ts-b.ts).map(x=>`<tr><td>${dkToDMY(dayKey(x.ts))}</td><td>${esc((CAT[x.cat]||CAT.other).name)}</td><td>${esc(x.note||'')}</td><td>${esc(PAY[payOf(x)].name)}</td><td>${fmt(x.amount)}</td></tr>`).join('')}</table>`}).join('')+pdfMoneyHtml(months);
+     <table style="margin-top:14px"><tr><th>التاريخ</th><th>الفئة</th><th>ملاحظة</th><th>الدفع</th><th>المبلغ (${CS()})</th></tr>${l.slice().sort((a,b)=>a.ts-b.ts).map(x=>`<tr><td>${dkToDMY(dayKey(x.ts))}</td><td>${esc((CAT[x.cat]||CAT.other).name)}</td><td data-notr dir="auto">${esc(x.note||'')}</td><td>${esc(PAY[payOf(x)].name)}</td><td>${fmt(x.amount)}</td></tr>`).join('')}</table>`}).join('')+pdfMoneyHtml(months);
   await pdfRun(all?`${fileTag()} - ${repAllWord()}.pdf`:`${fileTag()} - ${repName(repP(curMonth))}.pdf`);
 }
 /* turns what is in #pdfReport into A4 pages (never cutting a row, table headers repeated) and saves the file */
@@ -5945,11 +5991,11 @@ function yearReportHtml(Y){
   const hi=rows.slice().sort((a,b)=>b.t-a.t)[0], lo=rows.slice().sort((a,b)=>a.t-b.t)[0], avg=rows.length?tExp/rows.length:0;
   let h=`<h1>مليم</h1><div style="color:#53706F">تقرير سنة ${Y} · اتعمل ${shortDate(Date.now())}</div>`;
   h+=`<h2>ملخص السنة · إجمالي المصاريف ${fmt(tExp)} ${cs}</h2>`;
-  h+=`<table><tr><th>${repPd()===1?'الشهر':'الفترة'}</th><th>عدد المصاريف</th><th>المصروف (${cs})</th><th>الدخل المستلم (${cs})</th><th>الصافي (${cs})</th></tr>${rows.map(r=>`<tr><td>${esc(repName(r.P))}</td><td>${r.l.length}</td><td>${fmt(r.t)}</td><td>${r.inc?fmt(r.inc):''}</td><td>${r.inc?fmt(r2(r.inc-r.t)):''}</td></tr>`).join('')}<tr><td><b>الإجمالي</b></td><td><b>${all.length}</b></td><td><b>${fmt(tExp)}</b></td><td><b>${tInc?fmt(tInc):''}</b></td><td><b>${tInc?fmt(r2(tInc-tExp)):''}</b></td></tr></table>`;
+  h+=`<table><tr><th>${repPd()===1?'الشهر':'الفترة'}</th><th>عدد المصاريف</th><th>المصروف (${cs})</th><th>الدخل المستلم (${cs})</th><th>الصافي (${cs})</th></tr>${rows.map(r=>`<tr><td>${esc(repName(r.P))}</td><td>${r.l.length}</td><td>${fmt(r.t)}</td><td>${fmt(r.inc)}</td><td>${fmt(r2(r.inc-r.t))}</td></tr>`).join('')}<tr><td><b>الإجمالي</b></td><td><b>${all.length}</b></td><td><b>${fmt(tExp)}</b></td><td><b>${fmt(tInc)}</b></td><td><b>${fmt(r2(tInc-tExp))}</b></td></tr></table>`;
   if(hi) h+=`<div style="margin-top:10px">متوسط الصرف ${fmt(r2(avg))} ${cs} ${repPd()===1?'في الشهر':'في الفترة'}. ${repPd()===1?'أكتر شهر صرفت فيه':'أكتر فترة صرفت فيها'}: ${esc(repName(hi.P))} (${fmt(hi.t)}).${rows.length>1?` وأقل ${repPd()===1?'شهر':'فترة'}: ${esc(repName(lo.P))} (${fmt(lo.t)}).`:''}</div>`;
   h+=`<h2>حسب الفئة</h2><table><tr><th>الفئة</th><th>المبلغ (${cs})</th><th>النسبة</th></tr>${Object.keys(c).sort((a,b)=>c[b]-c[a]).map(k=>`<tr><td>${esc((CAT[k]||CAT.other).name)}</td><td>${fmt(c[k])}</td><td>${tExp?Math.round(c[k]/tExp*100):0}%</td></tr>`).join('')}</table>`;
   const top=all.slice().sort((a,b)=>b.amount-a.amount).slice(0,10);
-  if(top.length) h+=`<h2>أكبر ${top.length} مصاريف</h2><table><tr><th>التاريخ</th><th>الفئة</th><th>ملاحظة</th><th>المبلغ (${cs})</th></tr>${top.map(x=>`<tr><td>${dkToDMY(dayKey(x.ts))}</td><td>${esc((CAT[x.cat]||CAT.other).name)}</td><td>${esc(x.note||'')}</td><td>${fmt(x.amount)}</td></tr>`).join('')}</table>`;
+  if(top.length) h+=`<h2>أكبر ${top.length} مصاريف</h2><table><tr><th>التاريخ</th><th>الفئة</th><th>ملاحظة</th><th>المبلغ (${cs})</th></tr>${top.map(x=>`<tr><td>${dkToDMY(dayKey(x.ts))}</td><td>${esc((CAT[x.cat]||CAT.other).name)}</td><td data-notr dir="auto">${esc(x.note||'')}</td><td>${fmt(x.amount)}</td></tr>`).join('')}</table>`;
   return h;
 }
 async function exportYearPdf(Y){
@@ -5983,11 +6029,13 @@ $('#expCancel').onclick=closeSheets;
 /* Cloud backup */
 let db=null, myId=null;
 async function backupDoc(){return db.collection('data/users/'+myId).doc(ME.id==='m1'?'backup':'backup-'+ME.id)}
-const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,plans:S.plans,closedP:S.closedP,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,bMoves:S.bMoves,insts:S.insts,instPays:S.instPays,inflows:S.inflows,gold:S.gold,goldPx:S.goldPx,manRates:S.manRates,payType:S.payType,payAnchor:S.payAnchor,prefs:{moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,curs:S.curs,press:S.press,trans:S.trans,haptic:S.haptic,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide,ipFee:S.ipFee}});
-function applyBackup(p,at){
+const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,plans:S.plans,closedP:S.closedP,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,bMoves:S.bMoves,insts:S.insts,instPays:S.instPays,inflows:S.inflows,gold:S.gold,goldPx:S.goldPx,manRates:S.manRates,payType:S.payType,payAnchor:S.payAnchor,prefs:{lang:S.lang||LANG,moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,curs:S.curs,press:S.press,trans:S.trans,haptic:S.haptic,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide,ipFee:S.ipFee}});
+let restoreReloadT;
+function applyBackup(p,at,onUndo){
+  clearTimeout(restoreReloadT);
+  const beforeRestore=JSON.parse(JSON.stringify(S));
   if(S.space) spDetach();
   curMerge(p.prefs&&typeof p.prefs==='object'?p.prefs.curs:[]); // custom currencies first: accounts and the currency check below use them
-  const old={mr:S.manRates,gd:S.gold,gp:S.goldPx,cp:S.closedP,pl:S.plans,ac:S.accounts,tr:S.transfers,bm:S.bMoves,ins:S.insts,ip:S.instPays,inf:S.inflows,pt:S.payType,pa:S.payAnchor,mv:S.moneyView,e:S.expenses,b:S.budget,c:S.cats,m:S.budgetMode,d:S.debts,g:S.gams,pd:S.payday,pr:S.profile,si:S.since,inc:S.incomes,go:S.goals,st:S.saveTarget,cu:S.currency,fx:S.fixed,fl:S.fixedLog,py:S.pays,lp:S.lastPay,pf:{theme:S.theme,accent:S.accent,style:S.style,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,ipFee:S.ipFee}};
   /* every record goes through the same cleaners used for stored data: a crafted file can't inject HTML or break the screens */
   {const seen=new Set(); S.expenses=(Array.isArray(p.expenses)?p.expenses:[]).map(x=>cleanExpense(x,false)).filter(Boolean)
     .map(e=>{if(seen.has(e.id)) e.id=uid(); seen.add(e.id); return e})}
@@ -6011,6 +6059,7 @@ function applyBackup(p,at){
   if(isId(p.lastPay)) S.lastPay=p.lastPay;
   syncPays();
   if(p.prefs&&typeof p.prefs==='object'){const f=p.prefs;
+    if(['eg','ar','en'].includes(f.lang)) S.lang=f.lang;
     if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look; if(FONTS.some(x=>x.id===f.font)) S.font=f.font; if(f.fontW==='bold'||f.fontW==='normal') S.fontW=f.fontW; if(PRESSES.some(x=>x.id===f.press)) S.press=f.press; if(TRANSES.some(x=>x.id===f.trans)) S.trans=f.trans; if(typeof f.haptic==='boolean') S.haptic=f.haptic;
     if(['off','sum','split'].includes(f.moneyView)) S.moneyView=f.moneyView;
     S.homeHide=f.homeHide&&typeof f.homeHide==='object'?Object.fromEntries(['upcoming','caps','summary','close','today'].filter(k=>f.homeHide[k]===true).map(k=>[k,true])):{};
@@ -6025,13 +6074,30 @@ function applyBackup(p,at){
   if(at&&isFinite(+at)) S.lastBackup=Math.max(S.lastBackup||0,+at); // the file you restored from is itself a backup
   S.onboarded=true; hideWelcome();
   save();syncCats();renderAll();
-  toast('اترجعت '+S.expenses.length+' مصروف من نسخة '+shortDate(at),'تراجع',()=>{S.accounts=old.ac;S.transfers=old.tr;S.bMoves=old.bm||[];S.insts=old.ins;S.instPays=old.ip;S.inflows=old.inf;S.gold=old.gd;S.goldPx=old.gp;S.manRates=old.mr;S.payType=old.pt;S.payAnchor=old.pa;S.moneyView=old.mv;S.expenses=old.e;S.budget=old.b;S.cats=old.c;S.budgetMode=old.m;S.debts=old.d;S.gams=old.g;S.payday=old.pd;S.profile=old.pr;S.since=old.si;S.incomes=old.inc;S.goals=old.go;S.saveTarget=old.st;S.currency=old.cu;S.fixed=old.fx;S.plans=old.pl;S.closedP=old.cp;S.fixedLog=old.fl;S.pays=old.py;S.lastPay=old.lp;Object.assign(S,old.pf);syncPays();save();syncCats();renderAll()},4000);
+  const langChanged=(S.lang||LANG)!==LANG;
+  if(langChanged) restoreReloadT=setTimeout(()=>location.reload(),8500);
+  toast('اترجعت '+S.expenses.length+' مصروف من نسخة '+shortDate(at)+(langChanged?' · اللغة هتتطبق بعد مهلة التراجع':''),'تراجع',()=>{
+    clearTimeout(restoreReloadT); if(S.space) spStop(); S=beforeRestore;
+    if(onUndo) Promise.resolve(onUndo()).catch(()=>toast('تعذر إرجاع بعض صور الإيصالات'));
+    syncPays();syncCats();save();renderAll(); if(S.space) spListen();
+  },8000);
 }
 /* a backup file's text -> {o, p} (file object and its data), or null when it isn't a Maleem backup */
 function bkParse(txt){try{const o=JSON.parse(txt), p=o&&(o.data||o); return p&&Array.isArray(p.expenses)?{o,p}:null}catch(e){return null}}
-function bkRestore(b,at){
-  applyBackup(b.p,at);
-  if(b.o.receipts) rcImport(b.o.receipts).then(n=>{if(n){renderAll();setTimeout(()=>toast(`ورجعت ${n} صورة إيصال`),3200)}});
+async function bkRestore(b,at){
+  let previous=null, importDone=Promise.resolve();
+  if(b.o.receipts){try{previous=new Map();const ids=await rcTx('readonly',st=>st.getAllKeys());
+    for(const id of ids) previous.set(id,await rcGet(id));
+  }catch(e){toast('تعذر قراءة الإيصالات الحالية؛ لم تبدأ الاستعادة');return}}
+  applyBackup(b.p,at,previous?async()=>{
+    await importDone;
+    const ids=await rcTx('readonly',st=>st.getAllKeys());
+    for(const id of ids) if(!previous.has(id)) await rcDel(id);
+    for(const [id,blob] of previous) if(blob) await rcPut(id,blob);
+    renderAll();
+  }:null);
+  if(b.o.receipts) importDone=rcImport(b.o.receipts);
+  await importDone;
 }
 $('#restoreFile').onchange=async e=>{
   const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
@@ -6677,12 +6743,13 @@ function parseDMY(v){const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(v.trim()); i
   const dt=new Date(y,mo-1,d); if(dt.getMonth()!==mo-1||dt.getDate()!==d) return undefined; return dayKey(dt)}
 function parseMY(v){const m=/^(\d{1,2})\/(\d{4})$/.exec(v.trim()); if(!m) return undefined; const mo=+m[1], y=+m[2]; if(mo<1||mo>12||y<2000||y>2100) return undefined; return `${y}-${pad(mo)}`}
 function cleanMoney(v){
+  if(/[\-−–]/.test(v)) return "";
   v=v.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/(\d)[,،](?=\d{3}(?!\d))/g,'$1').replace(/[٫,،]/g,'.').replace(/[^0-9.]/g,'');
   const p=v.split('.'); if(p.length>2) v=p[0]+'.'+p.slice(1).join('');
   let [i,d]=v.split('.'); i=(i||'').replace(/^0+(?=\d)/,'').slice(0,9);
   return d!==undefined? (i||'0')+'.'+d.slice(0,2) : i;
 }
-function bindMoney(el,box){el.addEventListener('input',()=>{const v=cleanMoney(el.value);if(el.value!==v)el.value=v;box&&box.classList.remove('err')});
+function bindMoney(el,box){el.addEventListener('input',()=>{if(/[\-−–]/.test(el.value))toast(TX('المبلغ السالب غير مسموح. اكتب مبلغًا موجبًا'));const v=cleanMoney(el.value);if(el.value!==v)el.value=v;box&&box.classList.remove('err')});
   el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el.blur()}})}
 const debtPaid=x=>(x.payments||[]).reduce((a,p)=>a+p.amount,0);
 const debtAdded=x=>(x.adds||[]).reduce((a,p)=>a+p.amount,0);
@@ -6740,7 +6807,7 @@ function debtCard(x){
   return `<div class="dc ${x.dir}${x.closed?' closed':''}${x.id===justAddedOb?' new':''}">
     <div class="av">${esc((x.person.trim()[0]||'؟'))}</div>
     <div class="body">
-      <div class="top"><b>${esc(x.person)}${spByTag(x)}</b><span class="dir">${isMine(x)?(x.dir==='in'?'ليك':'عليك'):(x.dir==='in'?'ليه':'عليه')}</span></div>
+      <div class="top"><b><span data-notr dir="auto">${esc(x.person)}</span>${spByTag(x)}</b><span class="dir">${isMine(x)?(x.dir==='in'?'ليك':'عليك'):(x.dir==='in'?'ليه':'عليه')}</span></div>
       <div class="arow">
         <div class="amt">${x.closed? money(debtTotal(x)) : money(rem)} <small>${CS()}</small>${!x.closed&&paid>0?` <small>من ${money(debtTotal(x))}</small>`:''}</div>
       <div class="side">
@@ -6749,7 +6816,7 @@ function debtCard(x){
       </div>
       </div>
       ${!x.closed&&paid>0?`<div class="mini"><i style="width:${Math.min(100,paid/debtTotal(x)*100)}%"></i></div>`:''}
-      <div class="meta">${x.closed?`<span class="due">اتقفلت ${shortDate(x.closedAt||Date.now())}</span>`: n!==null?`<span class="due ${dueCls(n)}">${relDay(n)}</span>`:''}${x.note?`<span class="nt">${esc(x.note)}</span>`:''}${(x.adds||[]).length?`<span class="nt">+${fmt(debtAdded(x))} زيادة</span>`:''}${(x.adds||[]).length||(x.payments||[]).length?`<button type="button" class="dlog" data-debtlog="${esc(x.id)}">السجل</button>`:''}${x.dir==='in'&&!x.closed&&isMine(x)?`<button type="button" class="dlog" data-debtremind="${esc(x.id)}">ذكّره</button>`:''}</div>
+      <div class="meta">${x.closed?`<span class="due">اتقفلت ${shortDate(x.closedAt||Date.now())}</span>`: n!==null?`<span class="due ${dueCls(n)}">${relDay(n)}</span>`:''}${x.note?`<span class="nt" data-notr dir="auto">${esc(x.note)}</span>`:''}${(x.adds||[]).length?`<span class="nt">+${fmt(debtAdded(x))} زيادة</span>`:''}${(x.adds||[]).length||(x.payments||[]).length?`<button type="button" class="dlog" data-debtlog="${esc(x.id)}">السجل</button>`:''}${x.dir==='in'&&!x.closed&&isMine(x)?`<button type="button" class="dlog" data-debtremind="${esc(x.id)}">ذكّره</button>`:''}</div>
     </div>
   </div>`;
 }
@@ -6885,7 +6952,7 @@ function openPaySheet(id,pre){
   const x=S.debts.find(d=>d.id===id); if(!x) return; payFor=id;
   const rem=debtRem(x);
   $('#payTitle').textContent= x.dir==='in'? `استلمت من ${x.person}` : `سددت لـ ${x.person}`;
-  $('#payInfo').textContent=`فاضل ${fmt(rem)} ${CS()} من ${fmt(x.amount)} ${CS()}`;
+  $('#payInfo').textContent=`فاضل ${fmt(rem)} ${CS()} من ${fmt(debtTotal(x))} ${CS()}`;
   $('#payAll').textContent=`المبلغ كله (${fmt(rem)} ${CS()})`;
   $('#payAmt').value=''; $('#payErr').textContent=''; $('#payAmtBox').classList.remove('err');
   $('#payAccRow').hidden=!S.accounts.length; $('#payAccLab').textContent= x.dir==='in'?'استلمته على':'اتدفع من';
@@ -6915,11 +6982,12 @@ $('#paySave').onclick=()=>{
   if(ac){aa=toAcc(v,ac); if(aa==null){$('#payErr').textContent='الحساب ده بعملة تانية ومفيش سعر صرف متاح دلوقتي. اختار حساب بنفس العملة، أو جرّب لما النت يشتغل'; ratesRefresh(false); return}}
   const pay={id:uid(),amount:v,ts:payCap&&payCap.ts>0?Math.min(payCap.ts,Date.now()):Date.now()}; if(ac){pay.acc=ac.id;pay.accAmt=aa} if(S.accounts.length) S.lastAcc=ac?ac.id:'';
   x.payments=(x.payments||[]).concat(pay);
+  const undoCapture=payCap?(S.capQ||[]).find(q=>q.id===payCap.id):null;
   if(payCap) S.capQ=(S.capQ||[]).filter(q=>q.id!==payCap.id);
   const closedNow= debtRem(x)<=0; if(closedNow){x.closed=true;x.closedAt=Date.now()}
   save();closeSheets();renderAll();
   toast(closedNow? (x.dir==='in'?`${x.person} رجعلك كل الفلوس 🎉`:`خلصت اللي عليك لـ ${x.person} 🎉`) : `اتسجل ${fmt(v)} ${CS()} · فاضل ${fmt(debtRem(x))} ${CS()}`,'تراجع',()=>{
-    x.payments=x.payments.filter(p=>p.id!==pay.id); x.closed=false; x.closedAt=null; save();renderAll()},3000);
+    x.payments=x.payments.filter(p=>p.id!==pay.id); if(undoCapture&&!(S.capQ||[]).some(q=>q.id===undoCapture.id)) S.capQ.unshift(undoCapture); x.closed=false; x.closedAt=null; save();renderAll()},3000);
 };
 
 /* --- adding to a debt, and the account (ledger) of one person --- */
@@ -7453,13 +7521,14 @@ function renderPayReport(list,total){
   const ids=Object.keys(by).sort((a,b)=>by[b]-by[a]);
   $('#payRep').innerHTML= !total? '<p class="hint" style="padding:8px 0">مفيش مصاريف في الشهر ده.</p>' :
     ids.map(id=>{const m=PAY[id], pct=by[id]/total*100;
-      return `<div class="pay-rep"><div class="ico">${esc(m.e)}</div><div class="txt"><div class="row"><span>${esc(m.name)}</span><span>${money(by[id])} <small>${CS()} · ${Math.round(pct)}%</small></span></div><div class="pbar"><i style="width:${pct}%"></i></div></div></div>`}).join('');
+      return `<div class="pay-rep"><div class="ico">${esc(m.e)}</div><div class="txt"><div class="row"><span>${esc(payLabel(m))}</span><span>${money(by[id])} <small>${CS()} · ${Math.round(pct)}%</small></span></div><div class="pbar"><i style="width:${pct}%"></i></div></div></div>`}).join('');
 }
+function payLabel(x){return PAYS.some(p=>p.id===x.id&&p.name===x.name)?TX(x.name):x.name}
 const PAY_EMOJIS=['💵','💳','📲','👛','🏦','💰','🪙','📱','🧾','💸','🏧','🎟️'];
 function renderPayList(){
   const counts={}; S.expenses.forEach(x=>{const k=payOf(x); counts[k]=(counts[k]||0)+1});
   {const n=S.pays.length; $('#payCount').textContent= n===1?'طريقة واحدة': n===2?'طريقتين': n<=10? n+' طرق' : n+' طريقة';}
-  $('#payList').innerHTML=S.pays.map(x=>`<div class="pay-cell${x.id===S.lastPay?' def':''}" data-defpay="${esc(x.id)}" role="button" tabindex="0" aria-label="${esc(x.name)}${x.id===S.lastPay?' (الافتراضية)':''}، ${counts[x.id]||0} مصروف. دوسة مطولة للتعديل أو الحذف"><span class="pe">${esc(x.e)}</span><span class="pn">${esc(x.name)}<small>${x.id===S.lastPay?'الافتراضية · ':''}${counts[x.id]?counts[x.id]+' مصروف':'مفيش مصاريف لسه'}</small></span><span class="pr" aria-hidden="true">✓</span><button class="more" type="button" data-obmore="pay:${esc(x.id)}" aria-label="خيارات ${esc(x.name)}" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button></div>`).join('');
+  $('#payList').innerHTML=S.pays.map(x=>`<div class="pay-cell${x.id===S.lastPay?' def':''}" data-defpay="${esc(x.id)}" role="button" tabindex="0" aria-label="${esc(x.name)}${x.id===S.lastPay?' (الافتراضية)':''}، ${counts[x.id]||0} مصروف. دوسة مطولة للتعديل أو الحذف"><span class="pe">${esc(x.e)}</span><span class="pn">${esc(payLabel(x))}<small>${x.id===S.lastPay?'الافتراضية · ':''}${counts[x.id]?counts[x.id]+' مصروف':'مفيش مصاريف لسه'}</small></span><span class="pr" aria-hidden="true">✓</span><button class="more" type="button" data-obmore="pay:${esc(x.id)}" aria-label="خيارات ${esc(x.name)}" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button></div>`).join('');
 }
 let lpTimer=null, lpFired=false, lpX=0, lpY=0;
 const lpClear=()=>{clearTimeout(lpTimer);lpTimer=null};
@@ -7955,13 +8024,13 @@ function syncWidget(){
   let top=null; for(const id in bc){ if(!top||bc[id]>top.a) top={id,a:bc[id]} }
   const d=new Date(now);
   AB.syncWidget(JSON.stringify({
-    day:dk,
+    day:dk,language:LANG,labels:I18N[LANG].native,
     end: fixed? P.next : new Date(d.getFullYear(),d.getMonth()+1,1).getTime(),
     label: fixed? periodLabel(P).replace(/^ميزانية\s*/,'') : monthOnly(mk),
     today: sum(S.expenses.filter(x=>dayKey(x.ts)===dk)),
     spent: sum(list),
     budget: fixed&&S.budget>0? budOf(P) : 0,
-    topName: top? ((CAT[top.id]&&CAT[top.id].name)||'') : '',
+    topName: top? TX((CAT[top.id]&&CAT[top.id].name)||'') : '',
     per: fixed? 'period' : 'month',
     cur: CS(),
     hide: !!S.wgHide
@@ -7997,7 +8066,7 @@ function syncNative(){ if(AB) try{syncWidget()}catch(e){}
   }
   let sn=null; try{sn=sumNotif(now)}catch(e){}
   const due=(sn?[sn]:[]).concat(out.filter(x=>x.at>now).sort((a,b)=>a.at-b.at).slice(0,sn?39:40));
-  try{AB.syncReminders(JSON.stringify({daily:!!S.remind,dailyAt:S.remindAt,due}))}catch(e){}
+  try{AB.syncReminders(JSON.stringify({language:LANG,labels:I18N[LANG].native,daily:!!S.remind,dailyAt:S.remindAt,due:due.map(x=>({...x,title:TX(x.title),body:TX(x.body)}))}))}catch(e){}
 }
 window.__onBack=()=>{
   if(!$('#updLock').hidden) return false;
@@ -8086,6 +8155,7 @@ const SP_EXTRA_TYPES=['reports','debts','gams','goals','incomes','fixed'];
 let spMemberIds=[], spRemoveArm=null, spRemoveT=null, spListening=false;
 let fbP=null, fb=null, spUnsub=null, spUnsubM=null, spUnsubR=null, spUnsubP=null, spJoinUnsub=null, spTimer=null, spHash={}, spOwners={}, spCloudExpenses={}, spReady=false, spMembers=0, spSt='off', spMode='create', spOwner=false, spRequests=[], spRequestsPrimed=false, spReqErr=false;
 const SP_RETRY_MS=10*60*1000; // keep in sync with firestore.rules (requesterRetriesRequest)
+const spCurrencyBlocked={};
 let spExtraUnsubs=[], spExtraData={reports:[],debts:[],gams:[],goals:[],incomes:[],fixed:[]}, spExtraCloud={reports:{},debts:{},gams:{},goals:{},incomes:{},fixed:{}}, spExtraReady={}, spMemberProfiles=[];
 const spMe=()=>(fb&&fb.uid)||(S.space&&S.space.uid)||'';
 function expenseCanManage(e){
@@ -8176,6 +8246,8 @@ function spRenderSharedData(){
   out.innerHTML=groups.length?groups.join(''):'<div class="sp-empty">لسه مفيش بيانات اتشاركت في المساحة. لما أي عضو يفعّل نوع بيانات، هتظهر هنا.</div>';
 }
 function renderSpace(){
+  const currencyNotice=document.getElementById('spCurrencyNotice'); if(currencyNotice) currencyNotice.remove();
+  if(S.space&&Object.values(spCurrencyBlocked).some(Boolean)){const n=document.createElement('p');n.id='spCurrencyNotice';n.className='hint';n.textContent='مشاركة السلف والجمعيات والأهداف والدخل والثوابت تحتاج نفس العملة عند كل الأعضاء. المزامنة متوقفة للأنواع المختلفة أو غير المحددة العملة لحماية الأرقام.';document.querySelector('#v-settings [data-page=space]').appendChild(n)}
   const on=!!S.space, waiting=!on&&!!S.spaceRequest;
   $('#spOff').hidden=on||waiting; $('#spWait').hidden=!waiting; $('#spOn').hidden=!on;
   const wipeNote=$('#wipeSpNote');if(wipeNote)wipeNote.hidden=!on;
@@ -8267,7 +8339,7 @@ function spPurgeOthers(code,me){
     S[t].forEach(x=>{delete x.by;delete x.byName})});
   return n;
 }
-function spDetach(){if(!S.space)return;const code=S.space.code,me=S.space.uid||spMe();spStop();spPurgeOthers(code,me);S.space=null;renderSpace()}
+function spDetach(){if(!S.space)return;Object.keys(spCurrencyBlocked).forEach(k=>delete spCurrencyBlocked[k]);const code=S.space.code,me=S.space.uid||spMe();spStop();spPurgeOthers(code,me);S.space=null;renderSpace()}
 /* the space was lost on this phone (removed by the owner, or the anonymous account changed): leave locally */
 function spLocalLeave(msg){
   if(!S.space)return;const code=S.space.code,me=S.space.uid||spMe();
@@ -8412,8 +8484,8 @@ function spReportRows(uid){
 }
 function spBuildLocalRows(type){
   if(type==='reports')return spReportRows(spMe());
-  if(type==='debts'||type==='gams'||type==='goals'||type==='incomes')return (Array.isArray(S[type])?S[type]:[]).filter(x=>x&&x.id!=null).map(x=>({localId:String(x.id),payload:spItemClean(x)}));
-  if(type==='fixed')return (Array.isArray(S.fixed)?S.fixed:[]).filter(x=>x&&x.id!=null).map(x=>{const prefix=String(x.id)+':',log=Object.fromEntries(Object.entries(S.fixedLog||{}).filter(([k])=>k.startsWith(prefix)));return {localId:String(x.id),payload:{...spItemClean(x),log}}});
+  if(type==='debts'||type==='gams'||type==='goals'||type==='incomes')return (Array.isArray(S[type])?S[type]:[]).filter(x=>x&&x.id!=null).map(x=>({localId:String(x.id),payload:{...spItemClean(x),currency:S.currency}}));
+  if(type==='fixed')return (Array.isArray(S.fixed)?S.fixed:[]).filter(x=>x&&x.id!=null).map(x=>{const prefix=String(x.id)+':',log=Object.fromEntries(Object.entries(S.fixedLog||{}).filter(([k])=>k.startsWith(prefix)));return {localId:String(x.id),payload:{...spItemClean(x),log,currency:S.currency}}});
   return [];
 }
 function spDocId(uid,id){return encodeURIComponent(String(uid)+'__'+String(id))}
@@ -8448,6 +8520,8 @@ function spMerge3(b,l,c){
 function spApplyShared(type,rows){
   if(!S.space||!spNormPrefs(S.space.sharePrefs,true)[type])return false;
   const clean=CLEAN[type];if(!clean)return false;
+  spCurrencyBlocked[type]=rows.some(r=>r.payload.currency!==S.currency);
+  if(spCurrencyBlocked[type]){spExtraReady[type]=false;renderSpace();return false}
   if(!Array.isArray(S[type]))S[type]=[];
   const arr=S[type],prev=spExtraCloud[type]||{},seen=new Set(),base=spBase(type);let changed=false,baseChanged=false;
   rows.forEach(r=>{
@@ -8485,7 +8559,7 @@ async function spPushTypes(){
   try{
     for(const type of SP_EXTRA_TYPES){
       if(!S.space||S.space.code!==code)break;
-      if(!spExtraReady[type]||!spNormPrefs(S.space.sharePrefs,true)[type])continue;
+      if(spCurrencyBlocked[type]||!spExtraReady[type]||!spNormPrefs(S.space.sharePrefs,true)[type])continue;
       const isEdit=type!=='reports',records=spBuildLocalRows(type),current=new Map(),known=spExtraCloud[type]||{},writes=[],ownerName=String(S.space.name||(S.profile&&S.profile.name)||'عضو').slice(0,40);
       records.forEach(r=>{const id=String(r.localId);current.set(id,r);const k=known[id],hash=isEdit?spStable(r.payload):spStable([r.payload,ownerName]);if(!k||k.hash!==hash)writes.push({op:'set',id,docId:k?k.docId:(isEdit?encodeURIComponent(id):spDocId(uid,id)),hash,payload:r.payload,ownerUid:(isEdit&&k)?k.ownerUid:uid,ownerName:(isEdit&&k)?k.ownerName:ownerName})});
       Object.entries(known).forEach(([id,v])=>{if(!current.has(id)&&(!isEdit||v.fromSnap))writes.push({op:'delete',id,docId:v.docId})});
@@ -8522,7 +8596,7 @@ async function spListenInner(){
       spExtraData[type]=rows;
       if(type==='reports'){const own={};rows.forEach(d=>{if(d.ownerUid===f.uid)own[String(d.localId)]={docId:d.docId,hash:spStable([d.payload||{},d.ownerName||''])}});spExtraCloud[type]=own}
       else{const prefOn=!!spNormPrefs(S.space.sharePrefs,true)[type];spApplyShared(type,rows);const all={};rows.forEach(d=>{all[String(d.localId)]={docId:d.docId,hash:spStable(d.payload||{}),ownerUid:d.ownerUid,ownerName:d.ownerName||'',fromSnap:prefOn}});spExtraCloud[type]=all}
-      spExtraReady[type]=true;renderSpace();spPushTypes();
+      spExtraReady[type]=!spCurrencyBlocked[type];renderSpace();spPushTypes();
     },err=>{if(err&&err.code==='permission-denied')spSetStatus('denied');else spSetStatus('err')});spExtraUnsubs.push(unsub);
   });
   spUnsubP=F.onSnapshot(F.collection(db,'spaces',code,'members'),snap=>{if(!S.space||S.space.code!==code)return;spMemberProfiles=snap.docs.map(d=>({uid:d.id,...(d.data()||{})}));renderSpace()},()=>{});
@@ -8854,7 +8928,7 @@ function capPull(){
   const add=[]; (Array.isArray(arr)?arr:[]).map(cleanCap).forEach(c=>{
     if(!c||have.has(c.id)) return;
     if(c.dir==='in'&&!S.accounts.length) return; // incoming money is only offered to people who track accounts
-    const dupOf=(S.capQ||[]).concat(add).some(o=>o.dir===c.dir&&o.amount===c.amount&&Math.abs(o.at-c.at)<3*6e4&&(o.pkg!==c.pkg||o.text===c.text)); // the same operation reported twice
+    const dupOf=(S.capQ||[]).concat(add).some(o=>o.dir===c.dir&&o.amount===c.amount&&o.at===c.at&&o.pkg===c.pkg&&o.text===c.text&&capCurrency(o)===capCurrency(c)); // the same operation reported twice
     if(!dupOf) add.push(c) });
   if(!add.length) return false;
   S.capQ=add.concat(S.capQ||[]).sort((a,b)=>b.at-a.at).slice(0,30); save(); return true;
@@ -8864,7 +8938,13 @@ window.__captures=show=>{
   if(show){capWanted=true; setTimeout(runQuickAdd,150)}
   else if(got) renderHome();
 };
-const capCur=c=>!c.cur||/^(egp|le|l\.e\.?|جنيه|جنية|جنيها|جنيهات|ج\.?م?\.?|جم)$/i.test(c.cur)? CS() : esc(c.cur);
+const capCurrency=c=>!c.cur||/^(egp|le|l\.e\.?|جنيه|جنية|جنيها|جنيهات|ج\.?م?\.?|جم)$/i.test(c.cur)?'EGP':String(c.cur).toUpperCase();
+const capCur=c=>esc(curSym(capCurrency(c)));
+function capAmount(c,cur=S.currency){const from=capCurrency(c), k=from===cur?1:rateFor(from,cur);
+  if(!(k>0)){toast('مفيش سعر صرف للعملية دي. اتصل بالنت وحاول تاني');ratesRefresh(false);return null}
+  return r2(c.amount*k);
+}
+function capReference(c){return capDigits(c.text||'').match(/(?:\bref(?:erence)?|رقم العملية|مرجع العملية)\s*[:#-]?\s*([a-z0-9-]{6,})/i)?.[1]?.toLowerCase()||''}
 const capAgo=at=>{const m=Math.round((Date.now()-at)/6e4); return m<1?'دلوقتي':m<60?`من ${m} دقيقة`:dayKey(at)===todayKey()?'النهارده '+timeStr(at):dayKey(at)===yestKey()?'امبارح '+timeStr(at):shortDate(at)+' '+timeStr(at)};
 function capPay(c){
   if(c.method&&PAY[c.method]) return c.method;
@@ -8909,7 +8989,7 @@ var capNoPair=new Set();
 function capView(){
   const q=S.capQ||[], used=new Set(), list=[];
   q.forEach(c=>{ if(used.has(c.id)) return; used.add(c.id);
-    const mate= S.accounts.length>1&&!capNoPair.has(c.id)&&!capIsCash(c)? q.find(o=>!used.has(o.id)&&!capNoPair.has(o.id)&&!capIsCash(o)&&o.dir!==c.dir&&o.amount===c.amount&&Math.abs(o.at-c.at)<=5*6e4) : null; // a cash withdrawal is never one half of a move between my accounts
+    const mate= S.accounts.length>1&&!capNoPair.has(c.id)&&!capIsCash(c)? q.find(o=>!used.has(o.id)&&!capNoPair.has(o.id)&&!capIsCash(o)&&o.dir!==c.dir&&o.amount===c.amount&&capCurrency(o)===capCurrency(c)&&!!capReference(c)&&capReference(o)===capReference(c)&&Math.abs(o.at-c.at)<=5*6e4) : null; // a cash withdrawal is never one half of a move between my accounts
     if(mate){used.add(mate.id); const o=c.dir==='out'?c:mate, i=c.dir==='out'?mate:c; list.push({pair:true,id:c.id,o,i,mo:capMatch(o),mi:capMatch(i)})}
     else list.push({pair:false,id:c.id,c,m:capMatch(c)}) });
   return list;
@@ -8926,8 +9006,9 @@ function capIsCash(c){
 /* open loans to someone (ليك عند حد) that money coming in may be paying back: only the same amount (what is left, the loan, or one addition) */
 function capDebtCands(){ return S.debts.filter(d=>d.dir==='in'&&!d.closed&&debtRem(d)>0) }
 function capDebtMatch(c){
-  const v=+c.amount, same=a=>Math.abs(a-v)<0.01;
-  const hit=capDebtCands().filter(d=>{const r=debtRem(d); return v<=r+0.01&&(same(r)||same(d.amount)||(d.adds||[]).some(a=>same(a.amount)))});
+  const k=capCurrency(c)===S.currency?1:rateFor(capCurrency(c),S.currency); if(!(k>0)) return null;
+  const v=r2(c.amount*k), same=a=>Math.abs(a-v)<0.01, sender=capNorm(c.merchant||'').trim(); if(!sender) return null;
+  const hit=capDebtCands().filter(d=>{const r=debtRem(d); return capNorm(d.person).trim()===sender&&v<=r+0.01&&(same(r)||same(d.amount)||(d.adds||[]).some(a=>same(a.amount)))});
   return hit.sort((a,b)=>(same(debtRem(a))?0:1)-(same(debtRem(b))?0:1)||(b.created||0)-(a.created||0))[0]||null;
 }
 /* the message itself says it is a refund / a reversal */
@@ -8935,7 +9016,7 @@ const CAP_REFUND=/refund|reversal|reversed|استرداد|مسترد|مرتجع|
 /* what to do with it: kind = expense | income | transfer | cash | cashx | debtback | refund | ask (never guess when the account or the kind of operation is unclear) */
 function capPlan(e){
   if(!S.accounts.length) return {kind:e.pair?'ask':(e.c.dir==='in'?'ask':capIsCash(e.c)?'cashx':'expense')};
-  if(e.pair){ const from=e.mo.src||e.mi.src, to=e.mi.dst||e.mo.dst; return from&&to&&from.id!==to.id&&!e.mo.amb&&!e.mi.amb? {kind:'transfer',from,to} : {kind:'ask',from,to,mode:'transfer'} }
+  if(e.pair){ const from=e.mo.src||e.mi.src, to=e.mi.dst||e.mo.dst; return {kind:'ask',from,to,mode:'transfer'} }
   const c=e.c, m=e.m, cash=capIsCash(c);
   if(m.amb) return {kind:'ask',mode:cash?'cash':''};
   if(c.dir==='out'){ if(m.src&&m.dst&&m.src.id!==m.dst.id) return {kind:'transfer',from:m.src,to:m.dst}; if(m.dst&&!m.src) return {kind:'ask',to:m.dst,mode:'transfer'};
@@ -8943,8 +9024,8 @@ function capPlan(e){
     if(m.src) return {kind:'expense',acc:m.src}; return {kind:'ask',weak:m.weak} }
   if(m.src&&m.dst&&m.src.id!==m.dst.id) return {kind:'transfer',from:m.src,to:m.dst};
   if(m.src&&!m.dst) return {kind:'ask',from:m.src,mode:'transfer'};
-  if(m.dst){ const d=capDebtMatch(c); if(d) return {kind:'debtback',acc:m.dst,debt:d};
-    if(CAP_REFUND.test(capDigits((c.text||'')+' '+(c.merchant||'')))&&rfCands().length) return {kind:'refund',acc:m.dst};
+  if(m.dst){ if(CAP_REFUND.test(capDigits((c.text||'')+' '+(c.merchant||'')))) return {kind:'refund',acc:m.dst};
+    const d=capDebtMatch(c); if(d) return {kind:'ask',was:'debtback',acc:m.dst,debt:d};
     return {kind:'income',acc:m.dst} }
   return {kind:'ask',weak:m.weak};
 }
@@ -8992,13 +9073,15 @@ function capIpFee(c){
 function capConfirm(e){
   const pl=capPlan(e), c=e.pair?e.o:e.c;
   if(pl.kind==='ask'){ openCapAsk(e,pl); return }
-  if(pl.kind==='cash'){ openCashMove(pl.from.id,'wd',{out:c.amount,day:dayKey(c.at),caps:[c.id]}); return }
   if(pl.kind==='cashx'){ capRemove(c.id,'اتشال السحب: مش هيتحسب مصروف'); return }
-  if(pl.kind==='debtback'){ openPaySheet(pl.debt.id,{amount:c.amount,acc:pl.acc.id,cap:c.id,ts:c.at}); return }
-  if(pl.kind==='refund'){ openRefund({amount:c.amount,acc:pl.acc.id,cap:c.id,ts:c.at}); return }
-  if(pl.kind==='transfer'){ openTrSheet(null,{from:pl.from.id,to:pl.to.id,out:c.amount,day:dayKey(c.at),caps:e.pair?[e.o.id,e.i.id]:[c.id],fee:pl.from.cur==='EGP'?capIpFee(c):0}); return }
-  if(pl.kind==='income'){ openInSheet(null,{amount:c.amount,src:c.merchant||c.source,acc:pl.acc.id,day:dayKey(c.at),cap:c.id}); return }
-  openSheet(null,{amount:c.amount,cat:capCat(c),note:c.merchant,pay:capPay(c),day:dayKey(c.at),cap:c.id,ts:c.at,acc:pl.acc?pl.acc.id:undefined,ipf:capIpFee(c)>0});
+  const dest=['cash','transfer'].includes(pl.kind)?pl.from.cur:pl.kind==='refund'&&pl.acc?pl.acc.cur:S.currency;
+  const value=capAmount(c,dest); if(value==null) return;
+  if(pl.kind==='cash'){ openCashMove(pl.from.id,'wd',{out:value,day:dayKey(c.at),caps:[c.id]}); return }
+  if(pl.kind==='debtback'){ openPaySheet(pl.debt.id,{amount:value,acc:pl.acc.id,cap:c.id,ts:c.at}); return }
+  if(pl.kind==='refund'){ openRefund({amount:value,acc:pl.acc.id,cap:c.id,ts:c.at}); return }
+  if(pl.kind==='transfer'){ openTrSheet(null,{from:pl.from.id,to:pl.to.id,out:value,day:dayKey(c.at),caps:e.pair?[e.o.id,e.i.id]:[c.id],fee:pl.from.cur==='EGP'?capIpFee(c):0}); return }
+  if(pl.kind==='income'){ openInSheet(null,{amount:value,src:c.merchant||c.source,acc:pl.acc.id,day:dayKey(c.at),cap:c.id}); return }
+  openSheet(null,{amount:value,cat:capCat(c),note:c.merchant,pay:capPay(c),day:dayKey(c.at),cap:c.id,ts:c.at,acc:pl.acc?pl.acc.id:undefined,ipf:capIpFee(c)>0});
 }
 /* --- "which account / what kind?" when the app is not sure --- */
 var caFor=null, caMode='';
@@ -9051,16 +9134,18 @@ $('#caIgnore').onclick=()=>{ const en=capView().find(x=>x.id===caFor); closeShee
 $('#caGo').onclick=()=>{
   const en=capView().find(x=>x.id===caFor); if(!en){closeSheets();return} const c=en.pair?en.o:en.c, E=m=>{$('#caErr').textContent=m};
   const a=$('#caAcc').value, o=$('#caOther').value;
+  const dest=['cash','transfer'].includes(caMode)&&ACC(a)?ACC(a).cur:caMode==='refund'&&ACC(a)?ACC(a).cur:S.currency;
+  const value=capAmount(c,dest); if(value==null) return;
   if(caMode==='transfer'){ if(!a||!o){E('اختار الحسابين');return} if(a===o){E('اختار حسابين مختلفين');return}
-    const caps=en.pair?[en.o.id,en.i.id]:[c.id]; closeSheets(); setTimeout(()=>openTrSheet(null,{from:a,to:o,out:c.amount,day:dayKey(c.at),caps,fee:ACC(a)&&ACC(a).cur==='EGP'?capIpFee(c):0}),260); return }
-  if(caMode==='cash'){ if(!a){E('اختار الحساب اللي سحبت منه');return} closeSheets(); setTimeout(()=>openCashMove(a,'wd',{out:c.amount,day:dayKey(c.at),caps:[c.id]}),260); return }
+    const caps=en.pair?[en.o.id,en.i.id]:[c.id]; closeSheets(); setTimeout(()=>openTrSheet(null,{from:a,to:o,out:value,day:dayKey(c.at),caps,fee:ACC(a)&&ACC(a).cur==='EGP'?capIpFee(c):0}),260); return }
+  if(caMode==='cash'){ if(!a){E('اختار الحساب اللي سحبت منه');return} closeSheets(); setTimeout(()=>openCashMove(a,'wd',{out:value,day:dayKey(c.at),caps:[c.id]}),260); return }
   if(caMode==='cashx'){ closeSheets(); capRemove(c.id,'اتشال السحب: مش هيتحسب مصروف'); return }
-  if(caMode==='debtback'){ if(!o){E('اختار السلفة');return} closeSheets(); setTimeout(()=>openPaySheet(o,{amount:c.amount,acc:a,cap:c.id,ts:c.at}),260); return }
-  if(caMode==='refund'){ closeSheets(); setTimeout(()=>openRefund({amount:c.amount,acc:a,cap:c.id,ts:c.at}),260); return }
-  if(caMode==='loan'){ closeSheets(); setTimeout(()=>openDebtSheet(null,{dir:'in',amount:c.amount,acc:a,cap:c.id,ts:c.at}),260); return }
+  if(caMode==='debtback'){ if(!o){E('اختار السلفة');return} closeSheets(); setTimeout(()=>openPaySheet(o,{amount:value,acc:a,cap:c.id,ts:c.at}),260); return }
+  if(caMode==='refund'){ closeSheets(); setTimeout(()=>openRefund({amount:value,acc:a,cap:c.id,ts:c.at}),260); return }
+  if(caMode==='loan'){ closeSheets(); setTimeout(()=>openDebtSheet(null,{dir:'in',amount:value,acc:a,cap:c.id,ts:c.at}),260); return }
   closeSheets();
-  if(!en.pair&&en.c.dir==='in') setTimeout(()=>openInSheet(null,{amount:c.amount,src:c.merchant||c.source,acc:a,day:dayKey(c.at),cap:c.id}),260);
-  else setTimeout(()=>openSheet(null,{amount:c.amount,cat:capCat(c),note:c.merchant,pay:capPay(c),day:dayKey(c.at),cap:c.id,ts:c.at,acc:a,ipf:capIpFee(c)>0}),260);
+  if(!en.pair&&en.c.dir==='in') setTimeout(()=>openInSheet(null,{amount:value,src:c.merchant||c.source,acc:a,day:dayKey(c.at),cap:c.id}),260);
+  else setTimeout(()=>openSheet(null,{amount:value,cat:capCat(c),note:c.merchant,pay:capPay(c),day:dayKey(c.at),cap:c.id,ts:c.at,acc:a,ipf:capIpFee(c)>0}),260);
 };
 function capDrop(en){
   const ids=en.pair?[en.o.id,en.i.id]:[en.c.id], old=(S.capQ||[]).filter(q=>ids.includes(q.id));
@@ -9089,7 +9174,7 @@ function openRefund(o){
   $('#rfExp').innerHTML=(sure?'':'<option value="" disabled>اختار المصروف</option>')+L.map(e=>`<option value="${esc(String(e.id))}">${esc(rfLabel(e))}</option>`).join(''); $('#rfExp').value=sure?String(L[0].id):'';
   $('#rfExpRow').hidden=!!fixedE;
   $('#rfTitle').textContent= fixedE? 'رجعتلي فلوس من المصروف ده' : 'فلوس رجعتلك من مصروف';
-  $('#rfInfo').textContent= fixedE? rfLabel(fixedE)+'. اللي رجع بيقلل المصروف، ومش بيتحسب دخل.' : RF.cap? `وصلك ${fmt(want)} ${CS()} ${capAgo(RF.ts)}. اختار المصروف اللي الفلوس دي رجعت منه: هيقل، ومش هتتحسب دخل.` : 'اللي رجع بيقلل المصروف، ومش بيتحسب دخل.';
+  $('#rfInfo').textContent= fixedE? rfLabel(fixedE)+'. اللي رجع بيقلل المصروف، ومش بيتحسب دخل.' : RF.cap? `وصلك ${fmt(want)} ${B0?curSym(B0.cur):CS()} ${capAgo(RF.ts)}. اختار المصروف اللي الفلوس دي رجعت منه: هيقل، ومش هتتحسب دخل.` : 'اللي رجع بيقلل المصروف، ومش بيتحسب دخل.';
   $('#rfAmt').value= want>0? String(want) : ''; $('#rfErr').textContent=''; $('#rfAmtBox').classList.remove('err');
   rfAccOpts(true); rfPaint();
   openSheetEl('rfSheet'); if(!want) setTimeout(()=>$('#rfAmt').focus({preventScroll:true}),300);

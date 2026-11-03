@@ -117,9 +117,13 @@ object PayParser {
         if (ignoredPackage(pkg)) return null
         val t = normDigits("$title\n$text").trim()
         if (t.length < 8) return null
-        if (OTP.containsMatchIn(t) || FAILED.containsMatchIn(t)) return null
+        if (OTP.containsMatchIn(t)) return null
+        val returnFailed = Regex("(?i)\\b(?:not|never)\\s+(?:been\\s+)?(?:refunded|reversed)\\b|لم يتم (?:رد|استرداد|عكس)|فشل (?:رد|استرداد|عكس)").containsMatchIn(t)
+        if (returnFailed) return null
+        val returned = Regex("(?i)\\b(?:refunded|reversed)\\b|(?:^|\\s)تم (?:رد|استرداد|عكس) (?:مبلغ|العملية|العمليه)").containsMatchIn(t)
+        if (FAILED.containsMatchIn(t) && !returned) return null
         // "تم تحويل 500 جنيه إلى حسابك" is money coming in, even though it says تحويل
-        val incoming = INCOMING.containsMatchIn(t)
+        val incoming = returned || INCOMING.containsMatchIn(t)
         if (!incoming && !OUTGOING.containsMatchIn(t)) return null
         val (amount, cur) = pickAmount(t) ?: return null
         return Result(amount, cur, if (incoming) sender(t) else merchant(t), method(pkg, t), if (incoming) "in" else "out")

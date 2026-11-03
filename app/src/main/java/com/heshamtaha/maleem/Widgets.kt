@@ -66,6 +66,8 @@ object WidgetData {
 
     private fun build(c: Context, medium: Boolean): RemoteViews {
         val d = load(c)
+        val labels = d.optJSONObject("labels") ?: JSONObject()
+        fun tr(key: String, fallback: String) = labels.optString(key, fallback)
         val hide = d.optBoolean("hide", false)
         val cur = d.optString("cur", "ج.م")
         val hasData = d.has("day")
@@ -79,7 +81,7 @@ object WidgetData {
         val topName = if (live) d.optString("topName", "") else ""
         val label = if (live) d.optString("label", "") else ""
         // "month" = calendar-month spending, "period" = a budget period that may start on any day
-        val perWord = if (d.optString("per", "month") == "period") "الفترة" else "الشهر"
+        val perWord = if (d.optString("per", "month") == "period") tr("period", "الفترة") else tr("month", "الشهر")
         val pct = if (budget > 0) Math.round(spent / budget * 100).toInt() else -1
         val dots = "\u2022\u2022\u2022\u2022"
         fun money(v: Double): String = if (hide) dots else fmt(v)
@@ -90,19 +92,23 @@ object WidgetData {
         rv.setOnClickPendingIntent(R.id.wg_add, act(c, 11, MainActivity.ACTION_ADD_EXPENSE))
         rv.setOnClickPendingIntent(R.id.wg_mic, act(c, 12, MainActivity.ACTION_ADD_VOICE))
 
+        rv.setInt(R.id.wg_root, "setLayoutDirection", if (d.optString("language") == "en") View.LAYOUT_DIRECTION_LTR else View.LAYOUT_DIRECTION_RTL)
+        rv.setContentDescription(R.id.wg_add, tr("add", "إضافة مصروف"))
+        rv.setContentDescription(R.id.wg_mic, tr("voice", "مصروف بالصوت"))
         if (!medium) {
+            rv.setTextViewText(R.id.wg_today_label, tr("today", "اليوم"))
             rv.setTextViewText(R.id.wg_today, if (hasData) money(today) else "\u2014")
             rv.setTextViewText(R.id.wg_cur, if (hasData && !hide) cur else "")
             val sub = when {
-                !hasData -> "افتح مليم مرة"
-                !live -> "فترة جديدة"
-                budget > 0 -> "$perWord: $pct% من الميزانية"
+                !hasData -> tr("open", "افتح مليم مرة")
+                !live -> tr("newPeriod", "فترة جديدة")
+                budget > 0 -> "$perWord: $pct% ${tr("budget", "من الميزانية")}"
                 else -> "$perWord: " + money(spent) + curTxt
             }
             rv.setTextViewText(R.id.wg_sub, sub)
         } else {
-            rv.setTextViewText(R.id.wg_period, if (!hasData) "مليم" else if (live) label else "فترة جديدة")
-            rv.setTextViewText(R.id.wg_todaysm, "اليوم: " + (if (hasData) money(today) else "\u2014"))
+            rv.setTextViewText(R.id.wg_period, if (!hasData) tr("app", "مليم") else if (live) label else tr("newPeriod", "فترة جديدة"))
+            rv.setTextViewText(R.id.wg_todaysm, tr("today", "اليوم") + ": " + (if (hasData) money(today) else "\u2014"))
             rv.setTextViewText(R.id.wg_big, if (hasData) money(spent) else "\u2014")
             val ofTxt = when {
                 !hasData -> ""
@@ -123,8 +129,8 @@ object WidgetData {
 
             val rem = budget - spent
             val parts = ArrayList<String>()
-            if (showBar) parts.add((if (rem >= 0) "باقي " else "متجاوز بـ ") + money(Math.abs(rem)) + curTxt)
-            if (topName.isNotEmpty()) parts.add("أكتر فئة: $topName")
+            if (showBar) parts.add((if (rem >= 0) tr("left", "باقي") + " " else tr("over", "متجاوز بـ") + " ") + money(Math.abs(rem)) + curTxt)
+            if (topName.isNotEmpty()) parts.add("${tr("top", "أكتر فئة")}: $topName")
             rv.setTextViewText(R.id.wg_foot, parts.joinToString(" \u00B7 "))
         }
         return rv

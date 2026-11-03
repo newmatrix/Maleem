@@ -384,6 +384,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** Voice entry: Android's own speech service (ar-EG) turns speech into text; the web app parses it. */
+    private fun speechLocale(): String = NativeLanguage.speechLocale(getSharedPreferences("maleem_language", MODE_PRIVATE).getString("language", "eg"))
+
     private fun beginListening() {
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
             voiceWanted = false
@@ -421,8 +423,8 @@ class MainActivity : AppCompatActivity() {
         })
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ar-EG")
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "ar-EG")
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, speechLocale())
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, speechLocale())
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
             putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
@@ -720,6 +722,10 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun syncWidget(json: String) {
             if (!pageOk || json.length > 20_000) return
+            try {
+                val language = JSONObject(json).optString("language", "eg").let { if (it in listOf("eg", "ar", "en")) it else "eg" }
+                getSharedPreferences("maleem_language", MODE_PRIVATE).edit().putString("language", language).apply()
+            } catch (_: Exception) { }
             WidgetData.save(this@MainActivity, json)
             WidgetData.updateAll(this@MainActivity)
         }
