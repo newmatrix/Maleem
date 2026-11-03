@@ -1,0 +1,47 @@
+name: Web regression tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix tests --ignore-scripts
+      - run: npx --prefix tests playwright install --with-deps chromium
+      - run: node tests/regression.cjs
+      - run: node tests/full-audit.cjs
+      - run: node tests/journeys.cjs
+      - run: node tests/language-dialogs.cjs
+      - run: node tests/layout-static.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-test-results
+          path: |
+            tests/results.json
+            tests/full-audit-results.json
+            tests/journey-results.json
+            tests/layout-static-results.json
+            dynamic-language-results.json
+  native-parser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile and test notification parsing
+        run: |
+          curl -fsSL --retry 3 https://github.com/JetBrains/kotlin/releases/download/v2.1.21/kotlin-compiler-2.1.21.zip -o "$RUNNER_TEMP/kotlin.zip"
+          unzip -q "$RUNNER_TEMP/kotlin.zip" -d "$RUNNER_TEMP/kotlin"
+          "$RUNNER_TEMP/kotlin/kotlinc/bin/kotlinc" app/src/main/java/com/heshamtaha/maleem/PayParser.kt app/src/main/java/com/heshamtaha/maleem/CaptureIdentity.kt app/src/main/java/com/heshamtaha/maleem/NativeLanguage.kt tests/NativeRegression.kt -include-runtime -d "$RUNNER_TEMP/native-tests.jar"
+          java -jar "$RUNNER_TEMP/native-tests.jar"
