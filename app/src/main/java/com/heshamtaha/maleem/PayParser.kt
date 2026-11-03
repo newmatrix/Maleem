@@ -32,8 +32,8 @@ object PayParser {
             "مرفوض|رفض|فشل|لم تتم|غير ناجح|رصيد غير كاف|غير كافي|تم الغاء|تم إلغاء|ملغا|عكس العملية"
     )
     private val INCOMING = Regex(
-        "(?i)\\b(received|credited|deposit(ed)?|refund(ed)?|cash ?back|incoming|added to your|into your|to your (account|wallet)|sent you)\\b|" +
-            "استلام|استلمت|تم استلام|وارد|واردة|إيداع|ايداع|تم إضافة|تم اضافة|أضيف|اضيف|استرداد|مرتجع|كاش باك|" +
+        "(?i)\\b(received|credited|deposit(ed)?|refund(ed)?|incoming|added to your|into your|to your (account|wallet)|sent you)\\b|" +
+            "استلام|استلمت|تم استلام|إستقبال|استقبال|وارد|واردة|إيداع|ايداع|تم إضافة|تم اضافة|أضيف|اضيف|استرداد|مرتجع|" +
             "إلى حسابك|الى حسابك|لحسابك|إلى محفظتك|الى محفظتك|لمحفظتك|حوالة واردة"
     )
     private val OUTGOING = Regex(
@@ -90,6 +90,14 @@ object PayParser {
         return null
     }
 
+    /** Incoming money: the sender's name, from «المسجل بإسم X» / «باسم X» or «من X» (not «من رقم 010...» / «من حسابك»). */
+    private val SENDER_NAMED = Regex("(?i)(?:بإسم|باسم|بأسم|name)\\s*:?\\s+([^\\d\\n,.،؛:]{2,40}?)(?=\\s+(?:على|علي|في|يوم|بتاريخ|رقم)(?:\\s|$)|\\s*[\\n,.،؛:]|\\s+\\d|$)")
+    private val SENDER_FROM = Regex("(?i)(?:(?<![\\u0600-\\u06FF])من|\\bfrom)\\s+(?!رقم|حساب|محفظ|بطاق|كارت|البنك|بنك|account|card|wallet|number)([^\\d\\n,.،؛:]{2,40}?)(?=\\s+(?:في|يوم|بتاريخ|رقم|برقم|على|علي|الى|إلى|on|at|ref)(?:\\s|$)|\\s*[\\n,.،؛:]|\\s+\\d|$)")
+    private fun sender(t: String): String {
+        val m = SENDER_NAMED.find(t) ?: SENDER_FROM.find(t) ?: return ""
+        return m.groupValues[1].trim().trim('-', '*', '.', ' ').take(40)
+    }
+
     private fun merchant(t: String): String {
         val m = MERCHANT_EN.find(t) ?: MERCHANT_AR.find(t) ?: MERCHANT_TO_EN.find(t) ?: return ""
         return m.groupValues[1].trim().trim('-', '*', '.', ' ').take(40)
@@ -114,6 +122,6 @@ object PayParser {
         val incoming = INCOMING.containsMatchIn(t)
         if (!incoming && !OUTGOING.containsMatchIn(t)) return null
         val (amount, cur) = pickAmount(t) ?: return null
-        return Result(amount, cur, merchant(t), method(pkg, t), if (incoming) "in" else "out")
+        return Result(amount, cur, if (incoming) sender(t) else merchant(t), method(pkg, t), if (incoming) "in" else "out")
     }
 }

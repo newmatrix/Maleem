@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">مليم</string>
-    <string name="shortcut_add">مصروف جديد</string>
-    <string name="shortcut_add_long">سجل مصروف جديد</string>
-    <string name="shortcut_voice">تسجيل مصروف بالصوت</string>
-    <string name="shortcut_voice_long">سجل مصروف بالصوت</string>
-    <string name="widget_small_label">مليم (صغيرة)</string>
-    <string name="widget_medium_label">مليم (متوسطة)</string>
-    <string name="widget_small_desc">مصروف النهارده وزرارين للتسجيل السريع</string>
-    <string name="widget_medium_desc">الصرف مقابل الميزانية وزرارين للتسجيل السريع</string>
-    <string name="tile_voice">مصروف بالصوت</string>
-    <string name="capture_label">مليم: تسجيل المصروفات من إشعارات البنك والمحافظ</string>
+    <!-- Default (any language that is not Arabic). The Arabic names are in values-ar/strings.xml. -->
+    <string name="app_name">Maleem</string>
+    <string name="shortcut_add">New expense</string>
+    <string name="shortcut_add_long">Add a new expense</string>
+    <string name="shortcut_voice">Voice expense</string>
+    <string name="shortcut_voice_long">Add an expense by voice</string>
+    <string name="widget_small_label">Maleem (small)</string>
+    <string name="widget_medium_label">Maleem (medium)</string>
+    <string name="widget_small_desc">Today\'s spending and two quick-add buttons</string>
+    <string name="widget_medium_desc">Spending against the budget and two quick-add buttons</string>
+    <string name="tile_voice">Voice expense</string>
+    <string name="capture_label">Maleem: record expenses from bank and wallet notifications</string>
 </resources>
