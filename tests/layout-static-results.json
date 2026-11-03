@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Me accounts page: card title is shown and not pushed to the end side",
+    "pass": true
+  },
+  {
+    "name": "Me budget page: card title is shown and not pushed to the end side",
+    "pass": true
+  }
+]
