@@ -20,6 +20,7 @@ jobs:
       - run: node tests/full-audit.cjs
       - run: node tests/journeys.cjs
       - run: node tests/language-dialogs.cjs
+      - run: node tests/layout-static.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -28,6 +29,7 @@ jobs:
             tests/results.json
             tests/full-audit-results.json
             tests/journey-results.json
+            tests/layout-static-results.json
             dynamic-language-results.json
   native-parser:
     runs-on: ubuntu-latest
