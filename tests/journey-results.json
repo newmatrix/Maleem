@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Human journey: account, transfer with fee, edit, delete, undo, restart",
+    "pass": true
+  },
+  {
+    "name": "Human journey: partial refund to a different account, undo and full refund",
+    "pass": true
+  },
+  {
+    "name": "Reconciliation records only the difference and can be undone",
+    "pass": true
+  },
+  {
+    "name": "Negative opening balance is supported without changing its sign",
+    "pass": true
+  },
+  {
+    "name": "Invalid arithmetic characters are not silently ignored",
+    "pass": true
+  },
+  {
+    "name": "Expense leading minus is rejected rather than recorded positive",
+    "pass": true
+  },
+  {
+    "name": "Expense add, edit, delete, undo and account reconciliation",
+    "pass": true
+  },
+  {
+    "name": "User note markup is displayed as text without executing",
+    "pass": true
+  },
+  {
+    "name": "Calculator signed balance, precedence and invalid input boundaries",
+    "pass": true
+  }
+]
