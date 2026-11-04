@@ -3,7 +3,6 @@ window.I18N = window.I18N || {};
 window.I18N.en = {
   "name": "English",
   "x": {
-  "متاح:": "Available:",
   "أهلاً بيك في مليم": "Welcome to Maleem",
   "سجّل مصاريفك بسهولة وتابع ميزانيتك. بياناتك بتفضل على موبايلك.": "Track your spending easily and keep an eye on your budget. Your data stays on your phone.",
   "اسمك (اختياري)": "Your name (optional)",
@@ -1080,9 +1079,3 @@ window.I18N.en.voiceCategories={"food": ["food", "lunch", "dinner", "breakfast"]
 Object.assign(window.I18N.en.native,{"app": "Maleem", "add": "Add expense", "voice": "Voice expense"});
 window.I18N.en.x["سجله في مليم"]="Record it in Maleem";
 window.I18N.en.p.unshift(...[["بكرة ميعاد سلفة", "Loan due tomorrow"], ["النهارده ميعاد سلفة", "Loan due today"], ["بكرة قسط (.+)", "$1 installment due tomorrow"], ["النهارده قسط (.+)", "$1 installment due today"], ["النهارده دورك تقبض (.+)", "Your turn to collect from $1 today"], ["بكرة ميعاد (.+)", "$1 due tomorrow"], ["النهارده ميعاد (.+)", "$1 due today"], ["القسط (.+)", "Installment: $1"], ["(.+) يرجعلك (.+)", "$1 owes you $2"], ["ترد لـ (.+) (.+) (.+)", "Repay $2 $3 to $1"], ["(.+)، سجله في مليم", "Record $1 in Maleem"]]);
-
-/* Income allocation, 2026-11-04. */
-Object.assign(window.I18N.en.x,{"💼 المرتب / الميزانية": "💼 Salary / Budget", "✨ الدخل الحر": "✨ Extra income", "المصروف ده يتخصم منين؟": "Which balance should pay for this expense?", "تضمّ الدخل ده للميزانية؟": "Add this income to your budget?", "أيوه، ضيفه للمرتب / الميزانية": "Yes, add it to the salary budget", "لأ، خليه دخل حر مستقل": "No, keep it as extra income", "الفترة دي بس": "This period only", "كل فترة تلقائيًا": "Every period", "رجوع": "Back", "الزيادة دي لمرة ولا كل فترة؟": "Apply this amount once or every period?", "خليه دخل حر دلوقتي": "Keep as extra income for now", "الاختيار المتكرر بيزود الميزانية المخططة كل فترة، لكنه مش بيسجل دخل مستلم جديد ولا بيضيف فلوس في حساباتك تلقائيًا.": "Recurring increases the planned budget in future periods; it does not record another payment or increase your actual account balance.", "تغيير وجهة الدخل (احفظ أي تعديل في المبلغ الأول)": "Change income allocation (save amount changes first)", "✨ من الدخل الحر": "✨ Paid from extra income", " · ✨ دخل حر": " · ✨ Extra income", " · 💼 داخل الميزانية للفترة دي": " · 💼 Added to this period budget", " · 🔁 زيادة ثابتة للميزانية": " · 🔁 Recurring budget increase"});
-window.I18N.en.p.unshift(...[["^✨ دخل حر: (.+)$", "✨ Extra income: $1"], ["^الدخل الحر المتاح: (.+)$", "Extra income available: $1"], ["^الفترة دي بس \\((.+)\\)$", "This period only ($1)"], ["^كل (أسبوع|أسبوعين|شهر) من هنا ورايح$", "Every $1 from now on"], ["^دخل حر متاح (.+)$", "Extra income available: $1"], ["^استلمت (.+) من (.+)\\. تضيفه على ميزانية (.+)، ولا يفضل دخل حر تصرف منه لوحده\\?$", "You received $1 from $2. Add it to your $3 budget, or keep it separate?"]]);
-
-window.I18N.en.x[" · 💼 مرتب مستلم"]=" · 💼 Salary received";
