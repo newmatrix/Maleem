@@ -1204,9 +1204,18 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .lang-demo .ld-btn{background:#fff;color:var(--brand);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.85rem}
 .lang-demo .ld-chip{background:rgba(255,255,255,.18);border-radius:999px;padding:6px 12px;font-size:.85rem}
 html[dir="ltr"] #mPrev svg,html[dir="ltr"] #mNext svg,html[dir="ltr"] .chev,html[dir="ltr"] .back-ic{transform:scaleX(-1)}
+/* Floating actions rest half outside the LEFT app edge in every language.
+   Clip the outer half on wide screens too; transparent space must not intercept card controls. */
+#fab,#micFab{right:auto;opacity:.38;transition:left .25s ease,opacity .25s ease;transform:none;clip-path:inset(-30px -30px -30px 50%)}
+html #fab{left:max(-31px,calc(50% - 291px))}
+html #micFab{left:max(-24px,calc(50% - 284px))}
+html.fab-awake #fab{left:max(18px,calc(50% - 242px))}
+html.fab-awake #micFab{left:max(25px,calc(50% - 235px))}
+html.fab-awake #fab,html.fab-awake #micFab{opacity:1;clip-path:none}
+#v-expenses::after,#v-debts::after{content:"";display:block;height:130px}
+@media(prefers-reduced-motion:reduce){#fab,#micFab{transition:none}}
 /* English reads left to right: mirror the few places the layout pins to a side (round 51) */
-html[dir="ltr"] .fab{left:auto;right:max(18px,calc(50% - 260px + 18px))}
-html[dir="ltr"] .mic-fab{left:auto;right:max(25px,calc(50% - 260px + 25px))}
+/* Floating action buttons intentionally stay on the left in English too. */
 html[dir="ltr"] .head-pills{left:auto;right:0}
 html[dir="ltr"] .switch i::after{right:auto;left:3px}
 html[dir="ltr"] .switch input:checked + i::after{transform:translateX(22px)}
@@ -1247,6 +1256,34 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 .me-page[data-mepage="budget"]>.card+.card{margin-top:14px}
 /* section titles on the budget and accounts pages sit at the reading-direction start: right in Arabic, left in English (flex-end above was the opposite side) */
 .me-page[data-mepage="budget"]>.card>.card-h,.me-page[data-mepage="accounts"]>.card>.card-h{justify-content:space-between}
+/* Separated salary budget and free income — 2026-11-04 */
+.home-date-line{display:flex;gap:7px;align-items:center;flex-wrap:wrap;max-width:260px}
+.home-date-line .sub{min-width:0}
+.free-income-pill{border:1px solid color-mix(in srgb,var(--ok) 34%,transparent);border-radius:999px;padding:3px 9px;background:color-mix(in srgb,var(--ok) 10%,var(--surface));color:var(--ok);font-size:.74rem;font-weight:700;white-space:nowrap;max-width:100%;cursor:pointer}
+.free-income-pill[hidden]{display:none!important}
+/* When free income is available, the payment/date/pool choices share one compact row
+   directly under the sheet title. On very small screens/account selection they wrap. */
+.head-pills.has-pool,.head-pills.has-pool.three{position:static;inset:auto;display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:5px;max-width:none;width:100%;margin:0 0 11px}
+.head-pills.has-pool .pay-pill,.head-pills.has-pool.three .pay-pill{padding:6px 8px;min-height:33px;gap:4px;font-size:.76rem;flex:0 1 auto;white-space:nowrap}
+.head-pills.has-pool .pay-pill svg{width:12px;height:12px;display:block}
+.head-pills.has-pool #accPill{max-width:118px;min-width:0;flex:0 1 auto}
+.head-pills.has-pool #accPill .acc-pn{max-width:65px}
+#poolPill{border:1px solid color-mix(in srgb,var(--brand) 36%,var(--line));background:color-mix(in srgb,var(--brand) 9%,var(--surface-2))}
+#poolPill[data-pool="free"]{border-color:color-mix(in srgb,var(--ok) 48%,var(--line));background:color-mix(in srgb,var(--ok) 11%,var(--surface-2));color:var(--ok)}
+#poolPill[hidden]{display:none!important}
+#poolMenu{min-width:215px;max-width:calc(100vw - 16px)}
+#poolMenu button[aria-checked="true"]{color:var(--brand);background:color-mix(in srgb,var(--brand) 11%,transparent)}
+#poolMenu button{align-items:flex-start;gap:8px}
+#poolMenu .pool-name{display:block;font-weight:700}
+#poolMenu .pool-sub{display:block;font-weight:400;font-size:.77rem;color:var(--muted);margin-top:3px}
+@media(max-width:340px){.head-pills.has-pool,.head-pills.has-pool.three{margin-bottom:10px}}
+
+#incomeBudgetSheet .income-choices{display:grid;gap:9px;margin-top:14px}
+#incomeBudgetSheet .income-choices button{width:100%;text-align:start;padding:12px;border-radius:12px}
+#incomeBudgetSheet .income-choices .btn{min-height:44px}
+#incomeBudgetSheet .income-heading{font-weight:800;font-size:1.08rem;margin:6px 0}
+#incomeBudgetSheet .income-explain{color:var(--muted);font-size:.89rem;line-height:1.7}
+#incomeBudgetManage{margin:8px 0 0;width:100%;font-size:.86rem}
 </style>
 </head>
 <body>
@@ -1257,7 +1294,7 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
   <section class="view active" id="v-expenses" aria-label="المصروفات">
     <div class="topbar home">
       <button class="home-av" id="homeAv" type="button" aria-label="صفحتي (أنا)"></button>
-      <div><h1 id="greet"></h1><div class="sub" id="todayLabel"></div></div>
+      <div><h1 id="greet"></h1><div class="home-date-line"><div class="sub" id="todayLabel"></div><button type="button" class="free-income-pill" id="freeIncomePill" aria-label="رصيد الدخل الحر" hidden></button></div></div>
       <button class="eye-btn" id="eyeBtn" type="button" aria-pressed="false" aria-label="إخفاء المبالغ"></button>
     </div>
     <div class="hero" id="hero"></div>
@@ -1863,7 +1900,7 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
   <div class="grab"></div>
-  <div class="sheet-head"><h2 id="sheetTitle">مصروف جديد</h2><button type="button" class="kind-pill" id="kindPill" aria-haspopup="menu" aria-expanded="false" aria-label="نوع العملية: مصروف"><span>مصروف</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="head-pills"><button type="button" class="pay-pill date-pill" id="datePill" aria-haspopup="menu" aria-expanded="false" aria-label="تاريخ المصروف"></button><button type="button" class="pay-pill" id="payPill" aria-haspopup="menu" aria-expanded="false" aria-label="طريقة الدفع"></button><button type="button" class="pay-pill" id="accPill" aria-haspopup="menu" aria-expanded="false" aria-label="الحساب اللي اتخصم منه المبلغ" hidden></button></div></div>
+  <div class="sheet-head"><h2 id="sheetTitle">مصروف جديد</h2><button type="button" class="kind-pill" id="kindPill" aria-haspopup="menu" aria-expanded="false" aria-label="نوع العملية: مصروف"><span>مصروف</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="head-pills"><button type="button" class="pay-pill date-pill" id="datePill" aria-haspopup="menu" aria-expanded="false" aria-label="تاريخ المصروف"></button><button type="button" class="pay-pill" id="payPill" aria-haspopup="menu" aria-expanded="false" aria-label="طريقة الدفع"></button><button type="button" class="pay-pill" id="poolPill" data-pool="budget" aria-haspopup="menu" aria-expanded="false" aria-label="مصدر الخصم" hidden></button><button type="button" class="pay-pill" id="accPill" aria-haspopup="menu" aria-expanded="false" aria-label="الحساب اللي اتخصم منه المبلغ" hidden></button></div></div>
   <label class="amount-box" id="amountBox" for="amountInput"><button type="button" class="calc-tg" id="calcTg" aria-label="آلة حاسبة" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01"/></svg></button><input id="amountInput" class="v" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" placeholder="0" aria-label="المبلغ" dir="ltr"><span class="c cur">ج.م</span></label>
   <div class="calc-row" id="calcRow" hidden><span class="calc-res" id="calcRes"></span><div class="calc-ops" id="calcOps" aria-label="آلة حاسبة"><button type="button" data-op="+" aria-label="زائد">+</button><button type="button" data-op="-" aria-label="ناقص">−</button><button type="button" data-op="×" aria-label="ضرب">×</button><button type="button" data-op="÷" aria-label="قسمة">÷</button><button type="button" class="eq" data-op="=" aria-label="يساوي">=</button></div></div>
   <div class="cats" id="cats" role="group" aria-label="الفئة"></div>
@@ -2098,6 +2135,23 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 </div>
 
 <!-- Income received -->
+<!-- Prompt: whether received extra money grows the salary budget or remains free -->
+<div class="sheet" id="incomeBudgetSheet" role="dialog" aria-modal="true" aria-labelledby="incomeBudgetTitle">
+  <div class="grab"></div>
+  <h2 id="incomeBudgetTitle" class="income-heading">تضيف الدخل ده للميزانية؟</h2>
+  <p id="incomeBudgetInfo" class="income-explain"></p>
+  <div id="incomeBudgetStepOne" class="income-choices">
+    <button type="button" class="btn primary" id="incomeBudgetYes">أيوه، ضيفه للمرتب / الميزانية</button>
+    <button type="button" class="btn" id="incomeBudgetNo">لأ، خليه دخل حر مستقل</button>
+  </div>
+  <div id="incomeBudgetStepTwo" class="income-choices" hidden>
+    <button type="button" class="btn primary" id="incomeBudgetOnce">الفترة دي بس</button>
+    <button type="button" class="btn" id="incomeBudgetRecurring">كل فترة تلقائيًا</button>
+    <p class="income-explain" id="incomeBudgetRepeatHint">الاختيار المتكرر بيزود الميزانية المخططة كل فترة، لكنه مش بيسجل دخل مستلم جديد ولا بيضيف فلوس في حساباتك تلقائيًا.</p>
+    <button type="button" class="linkbtn" id="incomeBudgetBack">رجوع</button>
+  </div>
+  <button type="button" class="btn" id="incomeBudgetLater" style="width:100%;margin-top:12px">خليه دخل حر دلوقتي</button>
+</div>
 <div class="sheet" id="inSheet" role="dialog" aria-modal="true" aria-labelledby="inTitle">
   <div class="grab"></div>
   <h2 id="inTitle">استلمت دخل</h2>
@@ -2119,6 +2173,7 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
     <p class="hint" style="margin:8px 0 0">ده تقسيم لنفس الفلوس: مش بيزوّد رصيد ومش بيتحسب دخل تاني.</p>
   </details>
   <input class="note" id="inNote" type="text" placeholder="ملاحظة (اختياري)" maxlength="80" style="margin-top:10px">
+  <button type="button" class="btn" id="incomeBudgetManage" hidden>تغيير وجهة الدخل (احفظ أي تعديل في المبلغ الأول)</button>
   <p class="err-msg" id="inErr"></p>
   <div class="sheet-actions"><button class="btn primary" id="inSave">حفظ</button><button class="btn" id="inCancel">إلغاء</button></div>
   <button class="btn danger sheet-del" id="inDel" hidden>حذف</button>
@@ -2424,6 +2479,7 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 </div>
 
 <div class="menu" id="payMenu" role="menu" aria-label="طريقة الدفع"></div>
+<div class="menu" id="poolMenu" role="menu" aria-label="اختيار مصدر خصم المصروف"></div>
 <div class="menu" id="accMenu" role="menu" aria-label="الحساب"></div>
 <div class="menu" id="kindMenu" role="menu" aria-label="نوع العملية"></div>
 <div class="menu" id="dateMenu" role="menu" aria-label="تاريخ المصروف">
@@ -2693,7 +2749,7 @@ function langPaint(sel){
   $('#langSeg').innerHTML=['eg','ar','en'].map(k=>`<button type="button" role="radio" aria-checked="${k===sel}" data-lang="${k}" dir="${LANG_UI[k].dir}"><b>${LANG_UI[k].t}</b><small>${LANG_UI[k].s}</small></button>`).join('');
   // a sample built from his own numbers (falls back to round figures if anything is missing)
   let name='', B=0, sp=0, days=0, fixed=false;
-  try{ name=((S.profile&&S.profile.name)||'').trim().split(/\s+/)[0]||''; const P=periodOf(Date.now()); fixed=S.budgetMode==='fixed'&&S.budget>0; B=fixed?budOf(P):0; sp=sum(ofPeriod(P)); days=daysLeft(P) }catch(e){ B=10000; sp=2500; days=20; fixed=true }
+  try{ name=((S.profile&&S.profile.name)||'').trim().split(/\s+/)[0]||''; const P=periodOf(Date.now()); fixed=S.budgetMode==='fixed'&&S.budget>0; B=fixed?budOf(P):0; sp=budgetSpent(P); days=daysLeft(P) }catch(e){ B=10000; sp=2500; days=20; fixed=true }
   const cur= sel==='en'? S.currency : CS(), h=new Date().getHours(), month=new Date().toLocaleDateString(U.loc,{month:'long'});
   const daily=fixed?fmt(dailyAllowance(B-sp,periodOf(Date.now())).per):'';
   const periodTitle=S.payType==='weekly'?(sel==='en'?'Weekly budget':sel==='ar'?'ميزانية الأسبوع':'ميزانية الأسبوع'):S.payType==='biweekly'?(sel==='en'?'Two-week budget':'ميزانية الأسبوعين'):U.bud(month);
@@ -2792,6 +2848,7 @@ function cleanExpense(x,keepSpace){
   const amount=+x.amount, ts=+x.ts; if(!(amount>0&&amount<MAXAMT)||!(ts>=0&&ts<MAXTS)) return null;
   const e={id:idOr(x.id),amount:r2(amount),cat:isId(x.cat)?x.cat:'other',note:str(x.note,200),ts};
   if(isId(x.pay)) e.pay=x.pay; if(isId(x.fx)) e.fx=x.fx;
+  if(x.pool==='free') e.pool='free'; // absent field means the legacy salary/budget pool
   /* acc = the account it was paid from; accAmt = what left that account, in THAT account's currency (it never changes when the app currency does) */
   if(isId(x.acc)){const aa=+x.accAmt; if(aa>0&&aa<MAXAMT){e.acc=x.acc;e.accAmt=r2(aa)}}
   if(isId(x.inst)) e.inst=x.inst; // the installment this expense paid
@@ -2881,7 +2938,18 @@ function cleanBMove(x){
   return {id:x.id,ts:numIn(x.ts,0,MAXTS,0),pk:String(x.pk),amt:r2(amt),dir:x.dir==='out'?'out':'in',acc:isId(x.acc)?x.acc:'',...(isId(x.tr)?{tr:x.tr}:{})};
 }
 /* what one period really has to spend: the budget + what was moved in - what was moved out, for that period only */
-function budOf(P){ const k=P&&P.key; let b=+S.budget||0; (S.bMoves||[]).forEach(m=>{ if(m.pk===k) b+= m.dir==='in'?m.amt:-m.amt }); return r2(Math.max(0,b)) }
+function budOf(P){
+  const k=P&&P.key; let b=+S.budget||0;
+  (S.bMoves||[]).forEach(m=>{ if(m.pk===k) b+=m.dir==='in'?m.amt:-m.amt });
+  // An income classified as "once" adds to its own period only. "recurring" is a budget plan,
+  // not a fabricated bank deposit: it extends future budget periods without creating inflow records.
+  (S.inflows||[]).forEach(x=>{
+    const start=x.budgetKey||periodOf(x.ts).key;
+    if(x.budgetUse==='once'&&k===start) b+=x.amount;
+    if(x.budgetUse==='recurring'&&k>=start) b+=x.amount;
+  });
+  return r2(Math.max(0,b));
+}
 /* Installments: a plan has a list of installments (each with its own amount and due day). What was paid is NOT stored on the plan:
    it is always counted from the expenses that point at the installment (e.inst) plus S.instPays (payments for a purchase that was already recorded as an expense) */
 function cleanInst(x){
@@ -2897,6 +2965,7 @@ function cleanInflow(x){
   const a=+x.amount, ts=+x.ts; if(!(a>0&&a<MAXAMT)||!(ts>0&&ts<MAXTS)) return null;
   const o={id:x.id,amount:r2(a),ts,src:str(x.src,40).trim(),note:str(x.note,80)};
   if(isId(x.acc)){const aa=+x.accAmt; if(aa>0&&aa<MAXAMT){o.acc=x.acc;o.accAmt=r2(aa)}}
+  if(['salary','free','once','recurring'].includes(x.budgetUse)){o.budgetUse=x.budgetUse; if(isDK(x.budgetKey)) o.budgetKey=x.budgetKey}
   if(x.alloc&&typeof x.alloc==='object'){const al={spend:numIn(x.alloc.spend,0,MAXAMT,0),bills:numIn(x.alloc.bills,0,MAXAMT,0),save:numIn(x.alloc.save,0,MAXAMT,0)}; if(al.spend+al.bills+al.save>0) o.alloc={spend:r2(al.spend),bills:r2(al.bills),save:r2(al.save)}}
   return o;
 }
@@ -3106,6 +3175,7 @@ function itemRow(x){
       <div class="title">${esc(c.name)}: <span class="val">${money(x.amount)} <small>${CS()}</small></span></div>
       ${expenseReadOnly(x)?`<div class="xnote xby">${x.legacyReadOnly?'نسخة محلية قديمة · ':''}${x.byName?`👤 ${esc(x.byName)} · `:''}قراءة فقط</div>`:(x.byName&&x.by&&x.by!==spMe()?`<div class="xnote xby">👤 ${esc(x.byName)}</div>`:'')}
       ${x.note?`<div class="xnote" data-notr dir="auto">${esc(x.note)}</div>`:''}
+      ${x.pool==='free'?'<div class="xnote" style="color:var(--ok)">✨ من الدخل الحر</div>':''}
       <div class="time">${timeStr(x.ts)}<span class="pm" title="${esc(PAY[payOf(x)].name)}">· ${esc(PAY[payOf(x)].e)}</span>${ACC(x.acc)?`<span class="pm" title="الحساب">· ${esc(ACC(x.acc).name)}</span>`:''}${RC.ids.has(x.id)?`<button type="button" class="rc-ic" data-rc="${esc(x.id)}" aria-label="صورة الإيصال" title="صورة الإيصال">🧾</button>`:''}</div>
     </div>
     ${expenseReadOnly(x)?'':`<button class="more" data-more="${esc(x.id)}" aria-label="خيارات" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button>`}
@@ -3139,6 +3209,10 @@ function periodAt(now,pd){
 }
 const daysTxt=n=> n===1?'يوم واحد': n===2?'يومين': n<=10? n+' أيام' : n+' يوم';
 const ofPeriod=P=>S.expenses.filter(x=>x.ts>=P.start&&x.ts<P.next);
+const budgetSpent=P=>r2(sum(ofPeriod(P).filter(e=>e.pool!=='free')));
+const freeIncomeTotal=P=>r2(S.inflows.filter(x=>x.budgetUse==='free'&&x.ts>=P.start&&x.ts<P.next).reduce((a,x)=>a+x.amount,0));
+const freeExpenseTotal=P=>r2(sum(ofPeriod(P).filter(e=>e.pool==='free')));
+const freeBalance=P=>r2(freeIncomeTotal(P)-freeExpenseTotal(P));
 function daysLeft(P){const t=new Date();return Math.max(0,Math.round((P.next-new Date(t.getFullYear(),t.getMonth(),t.getDate()).getTime())/864e5)-1)}
 function periodRange(P){
   const f=ts=>new Date(ts).toLocaleDateString(LOC,{day:'numeric',month:'long'});
@@ -3193,7 +3267,7 @@ function paintEye(){ const h=!!S.hideAmt, b=$('#eyeBtn'); if(!b) return; $('#v-e
 function cleanClosed(o){const r={}; if(o&&typeof o==='object') Object.keys(o).slice(0,60).forEach(k=>{ if(/^[A-Za-z0-9:_-]{1,40}$/.test(k)&&o[k]&&typeof o[k]==='object') r[k]={ts:numIn(o[k].ts,0,MAXTS,0),amt:r2(numIn(o[k].amt,0,MAXAMT,0)),goal:isId(o[k].goal)?o[k].goal:'',skip:o[k].skip===true} }); return r}
 function closeInfo(){
   if(S.budgetMode!=='fixed'||!(S.budget>0)) return null;
-  const P=periodOf(Date.now()), Pp=periodOf(P.start-1), sp=sum(ofPeriod(Pp));
+  const P=periodOf(Date.now()), Pp=periodOf(P.start-1), sp=budgetSpent(Pp);
   if(!(sp>0)||(S.closedP||{})[Pp.key]) return null;
   if(Date.now()-P.start>15*864e5) return null;
   const left=r2(budOf(Pp)-sp); if(!(left>=1)) return null;
@@ -3227,7 +3301,9 @@ function renderHome(){
   const now=Date.now(), mk=monKey(now), tk=dayKey(now);
   greet(); paintEye(); try{renderCloseCard()}catch(e){console.error(e)}
   $('#todayLabel').textContent=new Date().toLocaleDateString(LOC,{weekday:'long',day:'numeric',month:'long'});
-  const fixed=S.budgetMode==='fixed', P=periodOf(now), spent= fixed? sum(ofPeriod(P)) : sum(ofMonth(mk)), B=fixed&&S.budget>0?budOf(P):0;
+  const FP=periodOf(now), free=freeIncomeTotal(FP), fButton=$('#freeIncomePill');
+  fButton.hidden=!(free>0); if(free>0){fButton.textContent='✨ دخل حر: '+fmt(freeBalance(FP))+' '+CS();fButton.setAttribute('aria-label','دخل حر متاح '+fmt(freeBalance(FP))+' '+CS()+'، اضغط لتسجيل مصروف منه')}
+  const fixed=S.budgetMode==='fixed', P=periodOf(now), spent= fixed? budgetSpent(P) : sum(ofMonth(mk)), B=fixed&&S.budget>0?budOf(P):0;
   let h='';
   if(B>0){
     const rem=B-spent, sp=spent/B, w=Math.min(1,sp), pct=Math.round(sp*100);
@@ -3237,7 +3313,7 @@ function renderHome(){
          <span class="chip">${daysLeft(P)?'فاضل '+daysTxt(daysLeft(P)):'آخر يوم'}</span></div>
        <div class="bar ${cls}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.min(100,pct)}" aria-label="نسبة الصرف من الميزانية"><i id="heroFill" style="width:0"></i><span class="pct${w>.84?' dark':''}">${pct}%</span></div>
        <div class="meta"><div class="m"><small>صرفت</small><b>${money(spent)}</b> <small style="display:inline">${CS()}</small></div>
-         <div class="m left${rem<0?' over':''}"><small>${rem<0?'متجاوز الميزانية':'المتبقي'}</small><b>${money(Math.abs(rem))}</b> <small style="display:inline">${CS()}</small></div></div>${dailyLine(rem,P)}${forecastLine(ofPeriod(P),P.start,P.next,B)}`;
+         <div class="m left${rem<0?' over':''}"><small>${rem<0?'متجاوز الميزانية':'المتبقي'}</small><b>${money(Math.abs(rem))}</b> <small style="display:inline">${CS()}</small></div></div>${dailyLine(rem,P)}${forecastLine(ofPeriod(P).filter(e=>e.pool!=='free'),P.start,P.next,B)}`;
   }else if(fixed){
     h=`<div class="label">${periodLabel(P)}</div><div class="big">—</div>
        <p class="ctxt">اخترت تحديد ميزانية بس لسه مكتبتش الرقم.</p>
@@ -3254,6 +3330,7 @@ function renderHome(){
   $('#hero').innerHTML=h;
   if(!fixed) countUp($('#heroBig'),spent);
   if(B>0){countUp($('#heroBig'),B);requestAnimationFrame(()=>requestAnimationFrame(()=>{const f=$('#heroFill');if(f)f.style.width=Math.min(100,spent/B*100)+'%'}))}
+  const fb=$('#freeIncomePill'); fb.onclick=()=>openSheet(null,{pool:'free'});
   const cta=$('#setBudgetCta'); if(cta) cta.onclick=()=>{go('me');meGo('budget');setTimeout(()=>$('#budgetInput').focus(),350)};
 
   try{renderMoney()}catch(e){console.error(e)}
@@ -3487,6 +3564,21 @@ function renderAll(){
 
 /* Navigation */
 let tab='expenses';
+let fabIdleTimer;
+function fabRest(){clearTimeout(fabIdleTimer);document.documentElement.classList.remove('fab-awake')}
+function fabWake(){
+  document.documentElement.classList.add('fab-awake');
+  clearTimeout(fabIdleTimer);fabIdleTimer=setTimeout(fabRest,3000);
+}
+['fab','micFab'].forEach(id=>{
+  $('#'+id).addEventListener('click',e=>{
+    const asleep=!document.documentElement.classList.contains('fab-awake');
+    fabWake();
+    if(asleep){e.preventDefault();e.stopImmediatePropagation()}
+  },true);
+  $('#'+id).addEventListener('keydown',e=>{if(e.key==='Escape')fabRest()});
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)fabRest()});
 const TABS=['expenses','reports','debts','me','settings'];
 /* Each tab remembers how far down its main screen you were (until the app closes). A page opened inside a tab
    (a settings section, managing the shared space, a report's details, search) closes when you leave the tab,
@@ -3501,7 +3593,7 @@ function go(t){
   if(tab==='me'&&mePage){tabY.me=meHomeY; meGo(null,true)}
   if(tab==='settings'){ if(spManageOn) spManage(false); if(setPage){tabY.settings=setHomeY; setGo(null,true)} }
   if(tab==='reports'&&$('#reportsMain').hidden){tabY.reports=repMainY; showSub('main',true)}
-  const dir=TABS.indexOf(t)-TABS.indexOf(tab); tab=t;
+  const dir=TABS.indexOf(t)-TABS.indexOf(tab); tab=t; fabRest();
   closeMenu();
   document.querySelectorAll('.view').forEach(v=>{
     const on=v.id==='v-'+t;
@@ -3613,7 +3705,7 @@ let fxPending=null, plPending=null, selPay='cash';
 /* expense date: today / yesterday / any past day */
 const todayKey=()=>dayKey(Date.now());
 const yestKey=()=>{const d=new Date();d.setDate(d.getDate()-1);return dayKey(d)};
-let selDay=dayKey(Date.now());
+let selDay=dayKey(Date.now()), selPool='budget';
 /* Expense date: a pill next to the payment pill. Any day other than today colours the pill, so it is not missed. */
 const CHEV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>';
 function paintDate(){
@@ -3626,12 +3718,13 @@ function paintDate(){
   $('#dateMenu .dm-other').setAttribute('aria-checked',String(other));
   $('#dateOtherTxt').textContent= other? dkToDMY(selDay) : 'تاريخ تاني…';
   $('#dateIn').max=t; $('#dateIn').value=selDay;
+  if($('#sheet').classList.contains('open')) paintExpensePool();
 }
 function closeDateMenu(){$('#dateMenu').classList.remove('open');$('#datePill').setAttribute('aria-expanded','false')}
 $('#datePill').addEventListener('mousedown',e=>e.preventDefault());
 $('#datePill').onclick=e=>{e.stopPropagation(); const m=$('#dateMenu');
   if(m.classList.contains('open')){closeDateMenu();return}
-  closePayMenu(); paintDate();
+  closePayMenu(); closeExpensePoolMenu(); paintDate();
   m.classList.add('open'); $('#datePill').setAttribute('aria-expanded','true');
   const r=$('#datePill').getBoundingClientRect(); m.style.left=Math.max(8,r.left)+'px'; m.style.top=(r.bottom+6)+'px'};
 $('#dateMenu').addEventListener('mousedown',e=>{if(!e.target.closest('.dm-other')) e.preventDefault()});
@@ -3672,13 +3765,51 @@ function closePayMenu(){$('#payMenu').classList.remove('open');$('#payPill').set
 $('#payPill').addEventListener('mousedown',e=>e.preventDefault());
 $('#payPill').onclick=e=>{e.stopPropagation(); const m=$('#payMenu');
   if(m.classList.contains('open')){closePayMenu();return}
-  closeDateMenu();
+  closeDateMenu(); closeExpensePoolMenu();
   m.innerHTML=S.pays.map(x=>`<button type="button" role="menuitemradio" aria-checked="${x.id===selPay}" data-pay="${esc(x.id)}"><span class="pe">${esc(x.e)}</span>${esc(x.name)}</button>`).join('');
   m.classList.add('open'); m.classList.remove('up'); $('#payPill').setAttribute('aria-expanded','true');
   const r=$('#payPill').getBoundingClientRect(); m.style.left=Math.max(8,r.left)+'px'; m.style.top=(r.bottom+6)+'px'};
 $('#payMenu').addEventListener('mousedown',e=>e.preventDefault());
 $('#payMenu').onclick=e=>{const b=e.target.closest('[data-pay]'); if(!b) return; selPay=b.dataset.pay; paintPay(); closePayMenu()};
 document.addEventListener('click',e=>{if(!e.target.closest('#payMenu,#payPill')) closePayMenu()});
+function closeExpensePoolMenu(){
+  const m=$('#poolMenu'); m.classList.remove('open'); $('#poolPill').setAttribute('aria-expanded','false');
+}
+function paintExpensePool(){
+  const P=periodOf(tsForDay(selDay)), hasFree=freeIncomeTotal(P)>0;
+  // Preserve a historic free-income allocation when its source was later deleted.
+  // New expenses on a date without free income silently default to the usual budget.
+  if(!hasFree&&!editId&&selPool==='free') selPool='budget';
+  const pill=$('#poolPill'), show=hasFree||(!!editId&&selPool==='free');
+  pill.hidden=!show;
+  pill.closest('.head-pills').classList.toggle('has-pool',show);
+  pill.dataset.pool=selPool;
+  pill.innerHTML=(selPool==='free'?'✨ <span>الدخل الحر</span>':'💼 <span>المرتب</span>')+CHEV;
+  const left=freeBalance(P);
+  pill.setAttribute('aria-label','مصدر الخصم: '+(selPool==='free'?'الدخل الحر':'المرتب / الميزانية')+'، الدخل الحر المتاح: '+fmt(left)+' '+CS());
+  pill.title='الدخل الحر المتاح: '+fmt(left)+' '+CS();
+  if(!show)closeExpensePoolMenu();
+}
+$('#poolPill').addEventListener('mousedown',e=>e.preventDefault());
+$('#poolPill').onclick=e=>{
+  e.stopPropagation(); const m=$('#poolMenu');
+  if(m.classList.contains('open')){closeExpensePoolMenu();return}
+  closePayMenu();closeDateMenu();closeKindMenu();
+  const left=freeBalance(periodOf(tsForDay(selDay)));
+  m.innerHTML=`<button type="button" role="menuitemradio" aria-checked="${selPool==='budget'}" data-pool="budget"><span class="pe">💼</span><span><span class="pool-name">المرتب / الميزانية</span></span></button>
+    <button type="button" role="menuitemradio" aria-checked="${selPool==='free'}" data-pool="free"><span class="pe">✨</span><span><span class="pool-name">الدخل الحر</span><span class="pool-sub">متاح: ${fmt(left)} ${CS()}</span></span></button>`;
+  m.classList.add('open');$('#poolPill').setAttribute('aria-expanded','true');
+  const r=$('#poolPill').getBoundingClientRect();
+  m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px';
+  m.style.top=Math.max(8,Math.min(r.bottom+6,innerHeight-m.offsetHeight-8))+'px';
+};
+$('#poolMenu').addEventListener('mousedown',e=>e.preventDefault());
+$('#poolMenu').onclick=e=>{
+  const b=e.target.closest('[data-pool]');if(!b)return;
+  selPool=b.dataset.pool==='free'?'free':'budget';closeExpensePoolMenu();paintExpensePool();
+};
+$('#poolMenu').addEventListener('keydown',e=>{if(e.key==='Escape'){closeExpensePoolMenu();$('#poolPill').focus()}});
+document.addEventListener('click',e=>{if(!e.target.closest('#poolMenu,#poolPill'))closeExpensePoolMenu()});
 function openSheet(id,pre){
   const target=id?S.expenses.find(e=>e.id===id):null;
   if(target&&!expenseCanManage(target)){toast('مصروفات الأعضاء الآخرين للقراءة فقط');return}
@@ -3693,7 +3824,8 @@ function openSheet(id,pre){
   $('#fxSkip').hidden=!(fxPending||plPending); $('#fxSkip').textContent= plPending? 'مش هسجله، شيله من المصروفات الجاية' : 'مش هسجله الشهر ده'; setCalc(false); showCalc(); renderNoteSug();
   selPay= x? payOf(x) : pre&&PAY[pre.pay]? pre.pay : (PAY[S.lastPay]?S.lastPay:'cash'); paintPay(); closePayMenu();
   selAcc= x? (x.acc||'') : pre&&typeof pre.acc==='string'? (ACC(pre.acc)?pre.acc:'') : (ACC(S.lastAcc)?S.lastAcc:''); paintAccRow();
-  selDay= x? dayKey(x.ts) : pre&&isDK(pre.day)&&pre.day<=todayKey()? pre.day : todayKey(); paintDate();
+  selPool=x&&x.pool==='free'?'free':pre&&pre.pool==='free'?'free':'budget';
+  selDay= x? dayKey(x.ts) : pre&&isDK(pre.day)&&pre.day<=todayKey()? pre.day : todayKey(); paintDate(); paintExpensePool();
   $('#rcRow').hidden=!RC.can; rcPaint();
   $('#sheetTitle').textContent= x?'تعديل مصروف':'مصروف جديد';
   $('#kindPill').hidden=!!(x||fxPending||plPending||capOpen); $('#sheetTitle').hidden=!$('#kindPill').hidden;
@@ -3711,8 +3843,8 @@ function closeSheets(){
   $('#scrim').classList.remove('hi'); if(RS){RS.seq++; RS.busy=false; RS.hold=null}
   wpCloseAll();
   rcStage=null; capOpen=null; trCaps=null; inCap=null; dCap=null; payCap=null; RF=null;
-  closePayMenu(); closeDateMenu(); closeKindMenu();
-  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','curSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet','rsSheet','accSheet','trSheet','mvSheet','instSheet','iiSheet','ipSheet','inSheet','caSheet','pkSheet','curAddSheet','dAddSheet','dLogSheet','sugSheet','rcnSheet','clsSheet','gdSheet','rfSheet'].forEach(i=>$('#'+i).classList.remove('open'));
+  closePayMenu(); closeDateMenu(); closeKindMenu(); closeExpensePoolMenu();
+  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','curSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet','rsSheet','accSheet','trSheet','mvSheet','instSheet','iiSheet','ipSheet','inSheet','incomeBudgetSheet','caSheet','pkSheet','curAddSheet','dAddSheet','dLogSheet','sugSheet','rcnSheet','clsSheet','gdSheet','rfSheet'].forEach(i=>$('#'+i).classList.remove('open'));
   $('#noteInput').blur();$('#catName').blur();amtIn.blur();
   if(pinMode){pinMode=null;$('#pinToggle').checked=!!hasPin()}
 }
@@ -3729,17 +3861,17 @@ $('#saveBtn').onclick=()=>{
     accAmt= x0&&x0.acc===ac.id&&x0.accAmt&&x0.amount===v? x0.accAmt : toAcc(v,ac);
     if(accAmt==null){$('#sheetErr').textContent='الحساب ده بعملة تانية ومفيش سعر صرف متاح دلوقتي. اختار حساب بنفس العملة، أو جرّب لما النت يشتغل'; ratesRefresh(false); return} }
   let savedId=editId, feeAdded=0;
-  if(editId){const x=S.expenses.find(e=>e.id===editId); if(x&&!expenseCanManage(x)){closeSheets();toast('مصروفات الأعضاء الآخرين للقراءة فقط');return} if(x){x.amount=v;delete x.o;x.cat=selCat;x.note=note;x.pay=selPay;x.ts=tsForDay(selDay,x.ts); if(ac){x.acc=ac.id;x.accAmt=accAmt}else{delete x.acc;delete x.accAmt}}}
+  if(editId){const x=S.expenses.find(e=>e.id===editId); if(x&&!expenseCanManage(x)){closeSheets();toast('مصروفات الأعضاء الآخرين للقراءة فقط');return} if(x){x.amount=v;delete x.o;x.cat=selCat;x.note=note;x.pay=selPay;x.ts=tsForDay(selDay,x.ts); if(selPool==='free')x.pool='free';else delete x.pool; if(ac){x.acc=ac.id;x.accAmt=accAmt}else{delete x.acc;delete x.accAmt}}}
   else {const id=uid();justAdded=id;savedId=id;
     const ts= capOpen&&capOpen.ts&&dayKey(capOpen.ts)===selDay? capOpen.ts : tsForDay(selDay); // a captured payment keeps its real time
-    const e={id,amount:v,cat:selCat,note,pay:selPay,ts}; S.lastPay=selPay; if(S.accounts.length) S.lastAcc=ac?ac.id:''; if(ac){e.acc=ac.id;e.accAmt=accAmt}
+    const e={id,amount:v,cat:selCat,note,pay:selPay,ts}; if(selPool==='free')e.pool='free'; S.lastPay=selPay; if(S.accounts.length) S.lastAcc=ac?ac.id:''; if(ac){e.acc=ac.id;e.accAmt=accAmt}
     if(fxPending){e.fx=fxPending.id;S.fixedLog[fxPending.id+':'+fxPending.mk]='done'}
     if(plPending) S.plans=S.plans.filter(x=>x.id!==plPending); // the planned expense became a real one
     if(capOpen) S.capQ=(S.capQ||[]).filter(q=>q.id!==capOpen.id);
     S.expenses.push(e)
     if(!$('#ipFeeRow').hidden&&$('#ipFeeChk').checked){ const fee=ipFeeOf(v), fa=ac&&fee>0?toAcc(fee,ac):null;
       if(fee>0){ if(!CAT.bank){const k=S.cats.findIndex(c=>c.id==='other'); S.cats.splice(k<0?S.cats.length:k,0,{id:'bank',name:'رسوم بنكية',e:'🏦',c:'#0F766E'}); syncCats()}
-        const fe={id:uid(),amount:fee,cat:CAT.bank?'bank':'other',note:'رسوم إنستاباي',pay:selPay,ts}; if(ac&&fa!=null){fe.acc=ac.id;fe.accAmt=fa} S.expenses.push(fe); feeAdded=fee } } }
+        const fe={id:uid(),amount:fee,cat:CAT.bank?'bank':'other',note:'رسوم إنستاباي',pay:selPay,ts}; if(selPool==='free')fe.pool='free'; if(ac&&fa!=null){fe.acc=ac.id;fe.accAmt=fa} S.expenses.push(fe); feeAdded=fee } } }
   fxPending=null; plPending=null; capOpen=null;
   rcCommit(savedId);
   save();closeSheets();renderAll();justAdded=null;
@@ -3791,7 +3923,7 @@ function accEnsureRates(){
 function mvState(){
   const {tot,missing}=moneyTotals(), fixed=S.budgetMode==='fixed'&&S.budget>0;
   if(!fixed) return {tot,missing,fixed,rem:0,forB:0,sav:0};
-  const rem=Math.max(0,r2(budOf(periodOf(Date.now()))-sum(ofPeriod(periodOf(Date.now()))))), pos=Math.max(0,tot), forB=Math.min(rem,pos);
+  const rem=Math.max(0,r2(budOf(periodOf(Date.now()))-budgetSpent(periodOf(Date.now())))), pos=Math.max(0,tot), forB=Math.min(rem,pos);
   return {tot,missing,fixed,rem,forB:r2(forB),sav:r2(pos-forB)};
 }
 var selAcc='';
@@ -3807,7 +3939,7 @@ $('#accPill').addEventListener('mousedown',e=>e.preventDefault());
 $('#accMenu').addEventListener('mousedown',e=>e.preventDefault());
 $('#accPill').onclick=e=>{ e.stopPropagation(); const m=$('#accMenu');
   if(m.classList.contains('open')){closeAccMenu();return}
-  closePayMenu(); closeDateMenu();
+  closePayMenu(); closeDateMenu(); closeExpensePoolMenu();
   m.innerHTML=`<button type="button" role="menuitemradio" aria-checked="${!selAcc}" data-accpick=""><span class="pe">🧾</span><span class="acc-mi">من غير حساب<small>${ACC_NONE_NOTE}</small></span></button>`+
     S.accounts.map(a=>`<button type="button" role="menuitemradio" aria-checked="${a.id===selAcc}" data-accpick="${esc(a.id)}"><span class="pe">${esc(ACC_TYPES[a.type].e)}</span><span class="acc-mi">${esc(accDisp(a))}<small>${fmt(accBal(a.id))} ${esc(curSym(a.cur))}</small></span></button>`).join('');
   m.classList.add('open'); $('#accPill').setAttribute('aria-expanded','true');
@@ -4092,7 +4224,7 @@ function openMv(dir){
 }
 function mvPaint(resetVia){
   document.querySelectorAll('#mvDir button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===mvDir?'true':'false'));
-  const P=periodOf(Date.now()), B=budOf(P), rem=r2(B-sum(ofPeriod(P))), adj=r2(B-S.budget), inn=mvDir==='in', a=ACC($('#mvAcc').value);
+  const P=periodOf(Date.now()), B=budOf(P), rem=r2(B-budgetSpent(P)), adj=r2(B-S.budget), inn=mvDir==='in', a=ACC($('#mvAcc').value);
   $('#mvInfo').textContent=`ميزانية الفترة دي ${fmt(B)} ${CS()}${adj?` (الأساسية ${fmt(S.budget)} ${adj>0?'+':'-'} ${fmt(Math.abs(adj))} نقلتهم)`:''}، والمتبقي منها ${fmt(Math.max(0,rem))} ${CS()}.`;
   $('#mvAccLab').textContent= inn?'من':'إلى';
   $('#mvViaLab').innerHTML= inn? 'هتصرفهم من<small>الفلوس بتتنقل للحساب ده عشان تصرف منها</small>' : 'الفلوس دي موجودة في<small>بتتنقل منه للحساب اللي فوق</small>';
@@ -4122,7 +4254,7 @@ $('#mvSave').onclick=()=>{
   const E=t=>{$('#mvErr').textContent=t}, P=periodOf(Date.now()), a=ACC($('#mvAcc').value), X=evalExpr($('#mvAmt').value), inn=mvDir==='in', via=$('#mvVia').value;
   if(!a){E('اختار الحساب');return}
   if(!(X>0&&X<MAXAMT)){E('اكتب المبلغ');$('#mvAmtBox').classList.add('err');return}
-  if(!inn){ const rem=r2(budOf(P)-sum(ofPeriod(P))); if(X>rem+0.004){E(rem>0?`المتبقي من ميزانية الفترة دي ${fmt(rem)} ${CS()} بس`:'مفيش متبقي في ميزانية الفترة دي');return} }
+  if(!inn){ const rem=r2(budOf(P)-budgetSpent(P)); if(X>rem+0.004){E(rem>0?`المتبقي من ميزانية الفترة دي ${fmt(rem)} ${CS()} بس`:'مفيش متبقي في ميزانية الفترة دي');return} }
   let tr=null, made=null;
   if(via){
     const v=via===NEWCASH?{id:NEWCASH,name:'كاش',type:'cash',cur:a.cur,virt:true}:ACC(via); if(!v){E('اختار الحساب التاني');return}
@@ -4364,13 +4496,17 @@ function renderIncome(){
   const rows=[...S.inflows].sort((a,b)=>b.ts-a.ts).slice(0,6);
   box.innerHTML=rows.map(x=>{ const a=ACC(x.acc), al=x.alloc;
     const sub=[dkToDMY(dayKey(x.ts)),a?a.name:'',x.note].filter(Boolean).join(' · ');
-    return `<button type="button" class="acc-row" data-in="${esc(x.id)}"><span class="ai">💰</span><span class="an">${esc(x.src||'دخل')}<small>${esc(sub)}${al?'<br>'+esc(`للمصاريف ${fmt(al.spend)} · أقساط وفواتير ${fmt(al.bills)} · ادخار ${fmt(al.save)}`):''}</small></span><span class="ab" style="color:var(--ok)">+${money(x.amount)}<small>${CS()}</small></span></button>` }).join('');
+    const budgetTag=x.budgetUse==='free'?' · ✨ دخل حر':x.budgetUse==='once'?' · 💼 داخل الميزانية للفترة دي':x.budgetUse==='recurring'?' · 🔁 زيادة ثابتة للميزانية':x.budgetUse==='salary'?' · 💼 مرتب مستلم':'';
+    return `<button type="button" class="acc-row" data-in="${esc(x.id)}"><span class="ai">💰</span><span class="an">${esc(x.src||'دخل')}<small>${esc(sub)}${esc(budgetTag)}${al?'<br>'+esc(`للمصاريف ${fmt(al.spend)} · أقساط وفواتير ${fmt(al.bills)} · ادخار ${fmt(al.save)}`):''}</small></span><span class="ab" style="color:var(--ok)">+${money(x.amount)}<small>${CS()}</small></span></button>` }).join('');
 }
 $('#inList').onclick=e=>{const b=e.target.closest('[data-in]'); if(b) openInSheet(b.dataset.in)};
 $('#inRec').onclick=e=>{const b=e.target.closest('[data-recpay]'); if(!b) return; const t=S.incomes.find(i=>i.id===b.dataset.recpay); if(t) openInSheet(null,{src:t.name,amount:t.amount,rec:1})};
 $('#addIn').onclick=()=>openInSheet();
 
 var inEdit=null;
+/* A salary is already represented by the fixed budget. Receiving it must never increase that budget
+   or create a second free-income balance. Explicit extra sources keep the choice prompt. */
+const isSalarySource=src=>/^(?:ال)?(?:مرتب|راتب|أجر|اجور|أجور)(?:ي|ك)?(?:\s+(?:الشهري|الاسبوعي|الأسبوعي|الشهر|الأسبوع))?$|^(?:salary|wages?|weekly pay|monthly pay)$/i.test(String(src||'').trim());
 const inNum=el=>{const v=evalExpr(el.value); return Number.isFinite(v)?v:0};
 function openInSheet(id,pre){
   const x=id?S.inflows.find(z=>z.id===id):null; inEdit=x?x.id:null; inCap=null;
@@ -4387,6 +4523,7 @@ function openInSheet(id,pre){
   if(!x&&pre){ if(pre.amount) $('#inAmt').value=String(pre.amount); if(pre.src) $('#inSrc').value=String(pre.src).slice(0,40); if(typeof pre.acc==='string') $('#inAcc').value=ACC(pre.acc)?pre.acc:''; if(isDK(pre.day)&&pre.day<=todayKey()) $('#inDay').value=pre.day; inCap=pre.cap||null }
   $('#inRepeat').checked=false; $('#inRepeatChip').setAttribute('aria-pressed','false'); $('#inRepeatRow').hidden=!(S.payType==='monthly'&&!x&&!(pre&&pre.rec));
   $('#inKindPill').hidden=!!(x||inCap||(pre&&pre.rec)); $('#inTitle').hidden=!$('#inKindPill').hidden; $('#inNoAcc').hidden=!!S.accounts.length; paintInChips();
+  $('#incomeBudgetManage').hidden=!x;
   $('#inErr').textContent=''; $('#scrim').classList.add('open'); $('#inSheet').classList.add('open');
 }
 $('#inCancel').onclick=closeSheets;
@@ -4411,7 +4548,7 @@ const KIND_ITEMS=[['exp','💸','مصروف'],['inc','💰','دخل']];
 function closeKindMenu(){ $('#kindMenu').classList.remove('open'); ['kindPill','inKindPill'].forEach(i=>$('#'+i).setAttribute('aria-expanded','false')) }
 function openKindMenu(btn,cur){
   const m=$('#kindMenu'); if(m.classList.contains('open')){closeKindMenu();return}
-  closePayMenu(); closeDateMenu();
+  closePayMenu(); closeDateMenu(); closeExpensePoolMenu();
   m.innerHTML=KIND_ITEMS.concat(S.accounts.some(a=>a.type!=='cash')?[['cash','💵','سحب كاش من حساب']]:[]).map(([k,e,n])=>`<button type="button" role="menuitemradio" aria-checked="${k===cur}" data-kind="${k}"><span class="pe">${e}</span>${n}</button>`).join('');
   m.dataset.cur=cur; m.classList.add('open'); btn.setAttribute('aria-expanded','true');
   const r=btn.getBoundingClientRect(); m.style.left=Math.max(8,Math.min(r.right-m.offsetWidth,innerWidth-m.offsetWidth-8))+'px'; m.style.top=(r.bottom+6)+'px';
@@ -4445,6 +4582,8 @@ $('#inSave').onclick=()=>{
   if(sp<0||bi<0||sv<0){E('التوزيع مش مظبوط');return}
   if(sp+bi+sv>v+EPS){E(`التوزيع (${fmt(r2(sp+bi+sv))}) أكبر من المبلغ`);return}
   const rec={id:old?old.id:uid(),amount:r2(v),ts:tsForDay(dk,old&&old.ts),src:$('#inSrc').value.trim().slice(0,40),note:$('#inNote').value.trim().slice(0,80)};
+  if(old&&old.budgetUse)rec.budgetUse=old.budgetUse; else if(!old)rec.budgetUse=isSalarySource(rec.src)?'salary':'free';
+  if(rec.budgetUse)rec.budgetKey=periodOf(rec.ts).key;
   if(ac){rec.acc=ac.id;rec.accAmt=accAmt}
   if(sp+bi+sv>0) rec.alloc={spend:r2(sp),bills:r2(bi),save:r2(sv)};
   if(old) S.inflows[S.inflows.indexOf(old)]=rec; else S.inflows.push(rec);
@@ -4454,12 +4593,43 @@ $('#inSave').onclick=()=>{
   if(rpt){ const t=S.incomes.find(i=>String(i.name).trim()===srcN); if(t) t.amount=rec.amount; else if(S.incomes.length<30) S.incomes.push({id:uid(),name:srcN,amount:rec.amount}) }
   save();closeSheets();renderAll();setTimeout(checkAlerts,450);
   toast(`اتسجّل دخل ${fmt(rec.amount)} ${CS()}${ac?' على '+ac.name:''}${rpt?' · هيتكرر كل شهر':''}`);
+  if(!old&&rec.budgetUse==='free'&&S.budgetMode==='fixed'&&S.budget>0) setTimeout(()=>openIncomeBudgetPrompt(rec.id),100);
 };
 $('#inDel').onclick=()=>{
   const i=S.inflows.findIndex(z=>z.id===inEdit); if(i<0) return; const [x]=S.inflows.splice(i,1); save();closeSheets();renderAll();
   toast('اتحذف الدخل','تراجع',()=>{S.inflows.splice(Math.min(i,S.inflows.length),0,x);save();renderAll()},5000);
 };
 
+/* Incoming extra money: two-step choice. Cancel defaults to free; no automatic salary or bank deposits. */
+let budgetPromptIncomeId=null;
+function openIncomeBudgetPrompt(id){
+  const x=S.inflows.find(i=>i.id===id); if(!x)return;
+  closeSheets(); budgetPromptIncomeId=id;
+  clearTimeout(toastT); $('#toast').classList.remove('show');
+  $('#incomeBudgetStepOne').hidden=false;$('#incomeBudgetStepTwo').hidden=true;
+  $('#incomeBudgetLater').hidden=true;
+  $('#incomeBudgetTitle').textContent='تضمّ الدخل ده للميزانية؟';
+  $('#incomeBudgetInfo').textContent='استلمت '+fmt(x.amount)+' '+CS()+(x.src?' من '+x.src:'')+'. تضيفه على ميزانية '+(S.payType==='weekly'?'الأسبوع':S.payType==='biweekly'?'الأسبوعين':'الشهر')+'، ولا يفضل دخل حر تصرف منه لوحده؟';
+  $('#incomeBudgetOnce').textContent='الفترة دي بس ('+(S.payType==='weekly'?'الأسبوع ده':S.payType==='biweekly'?'الأسبوعين دول':'الشهر ده')+')';
+  $('#incomeBudgetRecurring').textContent='كل '+(S.payType==='weekly'?'أسبوع':S.payType==='biweekly'?'أسبوعين':'شهر')+' من هنا ورايح';
+  $('#scrim').classList.add('open');$('#incomeBudgetSheet').classList.add('open');
+}
+function chooseIncomeBudget(mode){
+  const x=S.inflows.find(i=>i.id===budgetPromptIncomeId);
+  if(x){x.budgetUse=mode;x.budgetKey=periodOf(x.ts).key;save();renderAll()}
+  budgetPromptIncomeId=null;closeSheets();
+  if(x)toast(mode==='free'?'الدخل فضل مستقل في رصيد الدخل الحر':mode==='once'?'اتضاف '+fmt(x.amount)+' '+CS()+' لميزانية الفترة دي':'الميزانية هتزيد '+fmt(x.amount)+' '+CS()+' كل فترة، من غير إضافة دخل مستلم وهمي',null,null,5000);
+}
+$('#incomeBudgetYes').onclick=()=>{
+  $('#incomeBudgetStepOne').hidden=true;$('#incomeBudgetStepTwo').hidden=false;$('#incomeBudgetLater').hidden=false;
+  $('#incomeBudgetTitle').textContent='الزيادة دي لمرة ولا كل فترة؟';
+};
+$('#incomeBudgetNo').onclick=()=>chooseIncomeBudget('free');
+$('#incomeBudgetOnce').onclick=()=>chooseIncomeBudget('once');
+$('#incomeBudgetRecurring').onclick=()=>chooseIncomeBudget('recurring');
+$('#incomeBudgetBack').onclick=()=>{$('#incomeBudgetStepTwo').hidden=true;$('#incomeBudgetStepOne').hidden=false;$('#incomeBudgetLater').hidden=true;$('#incomeBudgetTitle').textContent='تضمّ الدخل ده للميزانية؟'};
+$('#incomeBudgetLater').onclick=()=>chooseIncomeBudget('free');
+$('#incomeBudgetManage').onclick=()=>{if(!inEdit)return;const id=inEdit;openIncomeBudgetPrompt(id)};
 /* InstaPay fee settings (Settings ▸ التسجيل من إشعارات البنك) */
 function paintIpFee(){
   const t=$('#ipFeeToggle'); if(!t) return; const f=S.ipFee;
@@ -4612,7 +4782,7 @@ function forecastEnd(){
   const rate=sum(vs)/span, vspend=r2(rate*(left-0.5));
   let base=null, label='';
   if(S.accounts.length){ const m=moneyTotals(); base=m.tot; label='الفلوس اللي معاك دلوقتي' }
-  else if(S.budgetMode==='fixed'&&S.budget>0){ base=r2(budOf(P)-sum(ofPeriod(P))); label='المتبقي في الميزانية' }
+  else if(S.budgetMode==='fixed'&&S.budget>0){ base=r2(budOf(P)-budgetSpent(P)); label='المتبقي في الميزانية' }
   if(base===null) return null;
   return {P,left,base,label,obl,nObl:outs.length,inc,rate:r2(rate),vspend,end:r2(base-obl-vspend)};
 }
@@ -4645,7 +4815,7 @@ function renderMoneyReport(P,list,total){
     h+=`<div class="mny-split"><div><small>دخل مستلم</small><b style="color:var(--ok)">${money(income)} ${CS()}</b></div><div><small>مصروف</small><b>${money(total)} ${CS()}</b></div></div>`;
     h+=`<div class="mny-acc"><span>الصافي</span><b style="color:${net<0?'var(--bad)':'var(--ok)'}">${net<0?'-':''}${money(Math.abs(net))} ${CS()}</b></div>`;
     if(st&&(S.payType!=='monthly'||st.n>=2)) h+=`<div class="mny-acc"><span>متوسط دخلك (أسبوع / شهر)</span><b>${money(st.week)} / ${money(st.month)} ${CS()}</b></div>`;
-    if(cur&&S.budgetMode==='fixed'&&S.budget>0){ const rem=r2(budOf(P)-total); h+=`<div class="mny-acc"><span>المتبقي من الميزانية</span><b${rem<0?' style="color:var(--bad)"':''}>${rem<0?'-':''}${money(Math.abs(rem))} ${CS()}</b></div>` }
+    if(cur&&S.budgetMode==='fixed'&&S.budget>0){ const rem=r2(budOf(P)-budgetSpent(P)); h+=`<div class="mny-acc"><span>المتبقي من الميزانية</span><b${rem<0?' style="color:var(--bad)"':''}>${rem<0?'-':''}${money(Math.abs(rem))} ${CS()}</b></div>` }
     if(S.insts.length){
       let due=0, left=0; const paidP=r2(iexp.reduce((a,e)=>a+e.amount,0)+ipR.reduce((a,x)=>a+x.amount,0));
       S.insts.forEach(p=>p.items.forEach(i=>{ const t=dkToTs(i.due); if(t>=P.start&&t<P.next) due+=i.amount; left+=itemRem(i) }));
@@ -5266,7 +5436,7 @@ $('#pctSave').onclick=()=>{S.alertPct=pctPaint($('#pctRange').value); save(); cl
 let notifT;
 let notifKind=null;
 function showNotif(kind){
-  const P=periodOf(Date.now()), spent=sum(ofPeriod(P)), B=budOf(P), rem=B-spent, left=daysLeft(P);
+  const P=periodOf(Date.now()), spent=budgetSpent(P), B=budOf(P), rem=B-spent, left=daysLeft(P);
   const n=$('#notif'); notifKind=kind; n.classList.toggle('over',kind==='over'); n.classList.toggle('remind',kind==='remind');
   $('#notifIco').textContent= kind==='over'?'🚨': kind==='remind'?'🌙':'⚠️';
   n.classList.toggle('ndue',kind==='due'||kind==='low');
@@ -5296,7 +5466,7 @@ function showNotif(kind){
 $('#notifClose').onclick=()=>{clearTimeout(notifT);$('#notif').classList.remove('show')};
 $('#notif').onclick=e=>{if(e.target.closest('#notifClose'))return;$('#notif').classList.remove('show');
   if(notifKind==='remind'){go('expenses');setTimeout(()=>openSheet(),250)} else if(notifKind==='due') go('debts'); else if(notifKind==='low'){go('me');setTimeout(()=>{try{meGo('accounts')}catch(e){}},200)} else go('reports')};
-$('#previewNotif').onclick=()=>{const sp=sum(ofPeriod(periodOf(Date.now())))/budOf(periodOf(Date.now()));showNotif(sp>=1?'over':'warn')};
+$('#previewNotif').onclick=()=>{const sp=budgetSpent(periodOf(Date.now()))/budOf(periodOf(Date.now()));showNotif(sp>=1?'over':'warn')};
 $('#previewRemind').onclick=()=>showNotif('remind');
 const fmtRemAt=m=>{const h=Math.floor(m/60),mi=m%60;return `${h%12||12}:${String(mi).padStart(2,'0')} ${h>=12?'م':'ص'}`};
 /* Android 13+: the notification permission is asked when reminders are turned on, not on first launch */
@@ -5359,7 +5529,7 @@ function checkAlerts(){
   try{checkCatAlerts()}catch(e){console.error(e)}
   try{checkLow()}catch(e){console.error(e)}
   if(S.budgetMode!=='fixed'||!(S.budget>0)) return;
-  const P=periodOf(Date.now()), sp=sum(ofPeriod(P))/budOf(P);
+  const P=periodOf(Date.now()), sp=budgetSpent(P)/budOf(P);
   const a=S.alerted[P.key]=S.alerted[P.key]||{}, before=JSON.stringify(a);
   const th=S.alertPct/100;
   /* separate flags: reaching the warning % and going over 100% each alert once per period */
@@ -5652,7 +5822,7 @@ function runQuickAdd(){
   if($('#lock').classList.contains('open')||$('#mbPick').classList.contains('open')) return;
   if(capWanted){capWanted=false; capPull(); go('expenses'); renderHome(); setTimeout(()=>{const b=$('#capBox'); if(b&&b.firstChild) b.scrollIntoView({behavior:'smooth',block:'center'})},200)}
   if(quickAddWanted){quickAddWanted=false; quickVoiceWanted=false; go('expenses'); openSheet(); return}
-  if(quickVoiceWanted){quickVoiceWanted=false; go('expenses'); try{closeSheets()}catch(e){} setTimeout(()=>{if(!voiceOn) $('#micFab').click()},250)}
+  if(quickVoiceWanted){quickVoiceWanted=false; go('expenses'); try{closeSheets()}catch(e){} setTimeout(()=>{if(!voiceOn){fabWake();$('#micFab').click()}},250)}
 }
 window.__quickAdd=()=>{quickAddWanted=true; setTimeout(runQuickAdd,150)};
 /* Launcher shortcut "تسجيل مصروف بالصوت": opens the voice card straight away (after unlocking if the app is locked) */
@@ -8029,7 +8199,7 @@ function syncWidget(){
     end: fixed? P.next : new Date(d.getFullYear(),d.getMonth()+1,1).getTime(),
     label: fixed? periodLabel(P).replace(/^ميزانية\s*/,'') : monthOnly(mk),
     today: sum(S.expenses.filter(x=>dayKey(x.ts)===dk)),
-    spent: sum(list),
+    spent: fixed?budgetSpent(P):sum(list),
     budget: fixed&&S.budget>0? budOf(P) : 0,
     topName: top? TX((CAT[top.id]&&CAT[top.id].name)||'') : '',
     per: fixed? 'period' : 'month',
@@ -8419,7 +8589,7 @@ function spApply(snap){
     spOwners[id]=d.by||'';spCloudExpenses[id]={...e};
     const h=hashE(e);
     if(i>=0&&hashE(S.expenses[i])===h){spHash[id]=h;if(S.expenses[i].by!==d.by||S.expenses[i].byName!==d.byName||S.expenses[i].sp!==code||S.expenses[i].legacyReadOnly){S.expenses[i].by=d.by;S.expenses[i].byName=d.byName;S.expenses[i].sp=code;delete S.expenses[i].legacyReadOnly;changed=true}stateChanged=spClearOldId(id)||stateChanged;return}
-    if(i>=0){const l0=S.expenses[i]; if(l0&&l0.acc){e.acc=l0.acc;e.accAmt=l0.accAmt} if(l0&&l0.inst) e.inst=l0.inst; S.expenses[i]=e}else S.expenses.push(e);spHash[id]=h;changed=true;stateChanged=spClearOldId(id)||stateChanged;
+    if(i>=0){const l0=S.expenses[i]; if(l0&&l0.acc){e.acc=l0.acc;e.accAmt=l0.accAmt} if(l0&&l0.inst) e.inst=l0.inst; if(l0&&l0.pool==='free'&&d.by===spMe())e.pool='free'; S.expenses[i]=e}else S.expenses.push(e);spHash[id]=h;changed=true;stateChanged=spClearOldId(id)||stateChanged;
   });
   if(changed||stateChanged)save();if(changed){renderAll();setTimeout(checkAlerts,500)}else if(stateChanged)renderSpace();
 }
@@ -9366,7 +9536,7 @@ function renderSummary(){
   const B= S.budgetMode==='fixed'&&S.budget>0? budOf(P) : 0;
   let h=`<div class="sum-card"><div class="sum-h"><span class="sum-ic" aria-hidden="true">📊</span><div><b>ملخص ${P.pd===1?'شهر '+esc(repShort(P)):unitPrev()}</b><small>${esc(repRange(P,true))} · ${d.list.length} مصروف</small></div><button type="button" class="sum-x" data-sumx aria-label="إخفاء الملخص">✕</button></div>
     <p class="sum-total">صرفت <b>${money(d.total)} ${CS()}</b>${esc(sumDiffTxt(d))}.</p>`;
-  if(B) h+=`<p class="sum-note">${d.total<=B? `فضل من الميزانية ${money(B-d.total)} ${CS()} 👏` : `عديت الميزانية بـ ${money(d.total-B)} ${CS()}`}</p>`;
+  if(B){const salarySpent=budgetSpent(P);h+=`<p class="sum-note">${salarySpent<=B? `فضل من الميزانية ${money(B-salarySpent)} ${CS()} 👏` : `عديت الميزانية بـ ${money(salarySpent-B)} ${CS()}`}</p>`;}
   if(d.cats.length){
     h+=`<div class="sum-sec"><h4>أكتر حاجات اتغيرت</h4>${d.cats.map(c=>{const k=CAT[c.id], pc=sumPct(c.now,c.prev), up=pc>0;
       return `<div class="sum-cat"><span aria-hidden="true">${esc(k.e)}</span><div class="n">${esc(k.name)}<small>${money(c.now)} بدل ${money(c.prev)} ${CS()}</small></div><span class="pc ${up?'up':'down'}">${up?'↑':'↓'} ${Math.abs(pc)}%</span></div>`}).join('')}</div>`;
