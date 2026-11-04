@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Floating actions eg 320px: reveal, routes, timeout, voice and shortcut",
+    "pass": true
+  },
+  {
+    "name": "Floating actions ar 390px: reveal, routes, timeout, voice and shortcut",
+    "pass": true
+  },
+  {
+    "name": "Floating actions en 360px: reveal, routes, timeout, voice and shortcut",
+    "pass": true
+  },
+  {
+    "name": "Floating actions en 800px: reveal, routes, timeout, voice and shortcut",
+    "pass": true
+  }
+]
