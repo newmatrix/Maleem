@@ -1,0 +1,110 @@
+[
+  {
+    "name": "goal create/edit/delete/undo/reload",
+    "pass": true
+  },
+  {
+    "name": "recurring expense create/edit/delete/undo/reload",
+    "pass": true
+  },
+  {
+    "name": "planned expense create/edit/delete/undo/reload",
+    "pass": true
+  },
+  {
+    "name": "recurring income create/edit/delete/undo/reload",
+    "pass": true
+  },
+  {
+    "name": "Account create/edit/delete/undo/reload",
+    "pass": true
+  },
+  {
+    "name": "Account balance ledger: expenses, income and transfer fees",
+    "pass": true
+  },
+  {
+    "name": "Expense arithmetic calculator and invalid expression rejection",
+    "pass": true
+  },
+  {
+    "name": "Invalid calendar dates rejected by data validators",
+    "pass": true
+  },
+  {
+    "name": "Negative pasted money is not silently made positive",
+    "pass": true
+  },
+  {
+    "name": "All Me and Settings subpages open without runtime errors",
+    "pass": true
+  },
+  {
+    "name": "Theme and appearance changes persist after restart",
+    "pass": true
+  },
+  {
+    "name": "Backup serialize and restore preserves personal data collections",
+    "pass": true
+  },
+  {
+    "name": "Arabic personal notes remain unmodified after English rendering",
+    "pass": true
+  },
+  {
+    "name": "Local catalogs loaded for all languages",
+    "pass": true
+  },
+  {
+    "name": "CSV quoted delimiters, embedded newlines and numeric values",
+    "pass": true
+  },
+  {
+    "name": "Arabic voice text parser extracts numeric amount",
+    "pass": true
+  },
+  {
+    "name": "English voice text parser understands number words",
+    "pass": true
+  },
+  {
+    "name": "Imported planned expenses reject nonexistent dates",
+    "pass": true
+  },
+  {
+    "name": "Loan creation, deletion and undo through controls",
+    "pass": true
+  },
+  {
+    "name": "Savings circle create, delete and undo",
+    "pass": true
+  },
+  {
+    "name": "Installment schedule totals and restart",
+    "pass": true
+  },
+  {
+    "name": "Gold purchase, sale and persistent records",
+    "pass": true
+  },
+  {
+    "name": "Leap years, month boundaries and invalid dates",
+    "pass": true
+  },
+  {
+    "name": "English voice compound amounts, decimals, category and income",
+    "pass": true
+  },
+  {
+    "name": "Native language payload eg",
+    "pass": true
+  },
+  {
+    "name": "Native language payload ar",
+    "pass": true
+  },
+  {
+    "name": "Native language payload en",
+    "pass": true
+  }
+]
