@@ -1079,3 +1079,39 @@ window.I18N.en.voiceCategories={"food": ["food", "lunch", "dinner", "breakfast"]
 Object.assign(window.I18N.en.native,{"app": "Maleem", "add": "Add expense", "voice": "Voice expense"});
 window.I18N.en.x["سجله في مليم"]="Record it in Maleem";
 window.I18N.en.p.unshift(...[["بكرة ميعاد سلفة", "Loan due tomorrow"], ["النهارده ميعاد سلفة", "Loan due today"], ["بكرة قسط (.+)", "$1 installment due tomorrow"], ["النهارده قسط (.+)", "$1 installment due today"], ["النهارده دورك تقبض (.+)", "Your turn to collect from $1 today"], ["بكرة ميعاد (.+)", "$1 due tomorrow"], ["النهارده ميعاد (.+)", "$1 due today"], ["القسط (.+)", "Installment: $1"], ["(.+) يرجعلك (.+)", "$1 owes you $2"], ["ترد لـ (.+) (.+) (.+)", "Repay $2 $3 to $1"], ["(.+)، سجله في مليم", "Record $1 in Maleem"]]);
+
+/* Income funding choices. */
+Object.assign(window.I18N.en.x,{
+  "يتخصم من": "Deduct from",
+  "ميزانية المرتب": "Salary budget",
+  "الدخل الحر": "Free income",
+  "أضيف الدخل للميزانية؟": "Add this income to the budget?",
+  "لا، يفضل دخل حر": "No, keep as free income",
+  "أيوه، أضيفه للميزانية": "Yes, add to the budget",
+  "مرتب محسوب أصلًا في الميزانية": "Salary already included in the budget",
+  "مدة الزيادة": "Increase duration",
+  "الفترة دي بس": "This pay period only",
+  "كل فترات القبض": "Every pay period",
+  "دخل حر": "Free income",
+  "زيادة للفترة دي بس": "Increase for this period only",
+  "زيادة دائمة للميزانية": "Permanent budget increase",
+  "الدخل الحر اتصرف منه؛ عدّل مصدر المصاريف الأول قبل تقليل الدخل أو نقله.": "Some free income has been spent. Change the expense funding first before reducing or reallocating it.",
+  "التعديل ده هيخلي الميزانية الأساسية غير صالحة. راجع مبلغ الميزانية الأول.": "This change would make the base budget invalid. Check the budget amount first.",
+  "المتاح من الدخل الحر": "Available free income",
+  "المتبقي من ميزانية الفترة": "Remaining period budget",
+  "يفضل رصيد مستقل وتختار تصرف منه وقت تسجيل المصروف.": "Keep a separate balance and choose it when recording an expense.",
+  "تسجيل استلام فقط؛ الميزانية مش هتزيد.": "Record receipt only; the budget will not increase.",
+  "الزيادة لفترة تاريخ الاستلام بس؛ الفترة الجاية ترجع للميزانية الأساسية.": "Applies only to the pay period of the receipt date. The next period uses the base budget.",
+  "الميزانية الأساسية هتزيد للمستقبل حتى لو الدخل مجاش تاني. تعديل أو حذف الدخل ده يعكس زيادته.": "The base budget increases for future periods even if this income does not recur. Editing or deleting this income adjusts its increase.",
+  "رصيد الدخل الحر": "Free income balance",
+  "منفصل عن ميزانية المرتب؛ الرصيد الباقي بيكمل للفترات الجاية.": "Separate from the salary budget; the balance carries over to future periods.",
+  "رصيد الدخل الحر مش كفاية للمصروف ورسومه. اختار ميزانية المرتب أو زوّد الدخل الحر.": "Free income is insufficient for this expense and its fees. Choose the salary budget or add free income.",
+  "اختار الدخل يروح فين.": "Choose where this income goes.",
+  "حدد ميزانية أساسية الأول، أو احتفظ بالدخل كدخل حر.": "Set a base budget first, or keep this as free income.",
+  "تبس": "Tips",
+  "الدخل بيتسجل مرة واحدة، ومصدر الصرف منفصل عن الحساب البنكي أو المحفظة.": "Income is recorded once. Funding is separate from your bank account or wallet.",
+  "غيّر مصدر مصاريف الدخل الحر أو امسحها مع الدخل.": "Change the funding of free-income expenses or delete them along with the income."
+});
+
+Object.assign(window.I18N.en.x,{"تكرار المصروف": "Repeat expense", "اختار عدد الشهور من 1 إلى 120": "Choose an interval from 1 to 120 months"});
+
