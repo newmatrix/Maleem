@@ -66,6 +66,7 @@ html.splash-out #splash{animation:spOut .22s ease forwards}
 .upd-ico{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;font-size:1.6rem;margin:4px auto 10px;background:color-mix(in srgb,var(--brand) 14%,transparent)}
 .upd-notes{white-space:pre-line;background:var(--surface-2);border-radius:14px;padding:10px 12px;margin:10px 0 0;font-size:.88rem;line-height:1.6;max-height:34vh;overflow-y:auto;text-align:start}
 .upd-notes:empty{display:none}
+.upd-never{display:block;margin:12px auto 0;background:none;border:0;color:var(--muted);font:inherit;font-size:.8rem;text-decoration:underline;cursor:pointer;padding:4px 8px}
 .upd-bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin:12px 0 0}
 .upd-bar i{display:block;height:100%;width:0;background:var(--brand);border-radius:inherit;transition:width .2s}
 .upd-lock{position:fixed;inset:0;z-index:75;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));text-align:center;overflow-y:auto}
@@ -2428,6 +2429,7 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
   <div class="upd-bar" id="updBar" hidden><i></i></div>
   <p class="hint center" id="updMsg"></p>
   <div class="sheet-actions"><button class="btn primary" id="updGo">تحديث</button><button class="btn" id="updLater">بعدين</button></div>
+  <button type="button" class="upd-never" id="updNever" hidden>مش عايز أشوف دي تاني</button>
 </div>
 
 <div class="upd-lock" id="updLock" hidden role="dialog" aria-modal="true" aria-labelledby="updLockTitle">
@@ -2805,7 +2807,7 @@ const LANG= S.lang || (/^ar\b/i.test(navigator.language||'')?'eg':'en');
 /* The dictionary is its own <script> before this one. If it is ever missing or broken (on Android a script the page does not know is
    blocked), the app must still open: it just shows Egyptian Arabic. */
 
-const I18D= LANG==='eg'? null : (()=>{ try{ const d=(typeof I18N!=='undefined'&&I18N[LANG])||{x:{},p:[]}; return {x:new Map(Object.entries(d.x||{})), p:(d.p||[]).map(([s,r])=>[new RegExp('^'+s+'$'),r])} }catch(e){ return null } })();
+const I18D= LANG==='eg'? null : (()=>{ try{ const d=(typeof I18N!=='undefined'&&I18N[LANG])||{x:{},p:[]}; return {x:new Map(Object.entries(d.x||{})), p:(d.p||[]).map(([s,r])=>[new RegExp('^'+s+'$'),r]), sym:d.sym||null, symRe:d.sym?new RegExp('(?<![\\u0600-\\u06FF])('+Object.keys(d.sym).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')(?![\\u0600-\\u06FF])','g'):null} }catch(e){ return null } })();
 const HAS_AR=/[\u0600-\u06FF]/;
 function dayCount(n,lang){return I18N[lang||LANG].days(+n)}
 function trText(s){
@@ -2813,6 +2815,7 @@ function trText(s){
   const k=s.replace(/\u200E/g,'').replace(/\s+/g,' ').trim();
   const dayMatch=k.match(/^فاضل (\d+) يوم$/); if(dayMatch) return dayCount(dayMatch[1],LANG);
   let v=trKey(k,0); // marks this code added earlier are dropped first, so the result is the same every time
+  if(v!=null&&I18D.symRe) v=v.replace(I18D.symRe,m=>I18D.sym[m]||m); // a currency symbol inside a translated sentence: ج.م -> EGP
   if(v==null||v===k) return null;
   const lead=s.match(/^\s*/)[0], tail=s.match(/\s*$/)[0]; return lead+v+tail;
 }
@@ -4080,6 +4083,7 @@ function openSheet(id,pre){
 function ipFeePaint(){ if($('#ipFeeRow').hidden) return; const v=readAmt(), f=v>0?ipFeeOf(v):0; $('#ipFeeTxt').innerHTML=`سجّل رسوم إنستاباي كمان${f?': '+fmt(f)+' '+CS():''}<small>مصروف منفصل بفئة «رسوم بنكية»، على نفس الحساب وطريقة الدفع</small>` }
 amtIn.addEventListener('input',ipFeePaint);
 function closeSheets(){
+  $('#updNever').hidden=true;
   closeDebtCurrency();
   if($('#expenseDatePopup').open)$('#expenseDatePopup').close();
   closeFundMenu();
@@ -8314,7 +8318,7 @@ window.__updInfo=json=>{ // (json|null, errorCode): only whether it came matters
   }
   if(json&&!updForced()) afterSplash(()=>updOffer(0));
 };
-$('#updGo').onclick=()=>updStart();
+$('#updGo').onclick=()=>{ if($('#updSheet').dataset.mode==='nudge') nudgeGo(); else updStart() };
 /* «بعدين» only hides the sheet: nothing is skipped. It comes back the next time the app opens, and the «التحديثات» row in
    settings opens it any time. While downloading the button says «إخفاء» and the download carries on. */
 $('#updLater').onclick=()=>closeSheets();
@@ -8328,6 +8332,51 @@ function updBoot(){
   if(UPD.st&&UPD.st.curName){const v=document.querySelector('.dev2 .dv-ver'); if(v) v.textContent='v'+UPD.st.curName}
   paintUpd();
   if(UPD.st&&UPD.st.enabled) AB.updateCheck(false);
+}
+
+/* A gentle reminder now and then (support / suggestions), inside the same sheet as «رسالة من مليم».
+   Only after 10 days of use and 15 expenses, then every 14 to 30 days at random, at most 3 times in all, never while anything else
+   is on screen or an update / developer message is waiting, and «مش عايز أشوف دي تاني» stops it for good.
+   Its state lives under its own key, so it is not part of backups or shared spaces. */
+const NUDGE_KEY='maleem.nudge', NUDGE_MAX=3, NUDGE_AFTER_DAYS=10, NUDGE_MIN_EXPENSES=15, NUDGE_GAP=[14,30];
+const NUDGES=[
+  {ico:'❤️',title:'مليم مجاني وبدون إعلانات',text:'لو مليم فادك وعاجبك، تقدر تدعمه من الإعدادات. أي مبلغ بيساعده يكمّل.',go:'support',btn:'ادعم مليم'},
+  {ico:'💡',title:'عندك فكرة أو لقيت مشكلة؟',text:'ابعتلنا اقتراحك أو مشكلتك من «اقتراحات وملاحظات»، وبنقراها كلها.',go:'feedback',btn:'ابعت ملاحظة'}
+];
+let NUDGE_CUR=null;
+function nudgeState(){try{const o=JSON.parse(lsGet(NUDGE_KEY)||'{}'); return o&&typeof o==='object'?o:{}}catch(e){return {}}}
+function nudgeSave(o){lsSet(NUDGE_KEY,JSON.stringify(o))}
+function nudgeDue(now,st,expenses){
+  return !st.off&&(+st.shown||0)<NUDGE_MAX&&+st.first>0&&now-st.first>=NUDGE_AFTER_DAYS*864e5&&expenses>=NUDGE_MIN_EXPENSES&&now>=(+st.next||0);
+}
+function nudgeBusy(){
+  return $('#lock').classList.contains('open')||$('#mbPick').classList.contains('open')||!$('#welcome').hidden||!!document.querySelector('.sheet.open')||!$('#updLock').hidden||voiceOn||!$('#rcView').hidden;
+}
+function nudgeOffer(tries){
+  const now=Date.now(), st=nudgeState();
+  if(!nudgeDue(now,st,S.expenses.length)) return;
+  const info=(UPD.st&&UPD.st.info)||{}, m=info.message||{};
+  if(updLatest()||(m.id&&m.text&&updLocal().seen!==String(m.id).slice(0,60))) return; // an update or a message from the developer comes first
+  if(nudgeBusy()){ if((tries||0)<60) setTimeout(()=>nudgeOffer((tries||0)+1),5000); return }
+  let i=Math.floor(Math.random()*NUDGES.length); if(NUDGES.length>1&&i===st.lastIdx) i=(i+1)%NUDGES.length;
+  st.shown=(+st.shown||0)+1; st.last=now; st.lastIdx=i;
+  st.next=now+(NUDGE_GAP[0]+Math.random()*(NUDGE_GAP[1]-NUDGE_GAP[0]))*864e5;
+  nudgeSave(st);
+  const n=NUDGES[i], sh=$('#updSheet'); NUDGE_CUR=n;
+  sh.dataset.mode='nudge'; $('#updIco').textContent=n.ico; $('#updTitle').textContent=n.title; $('#updSub').textContent='';
+  $('#updNotes').textContent=n.text; $('#updBar').hidden=true; $('#updMsg').textContent='';
+  $('#updGo').hidden=false; $('#updGo').disabled=false; $('#updGo').textContent=n.btn; $('#updLater').textContent='مش دلوقتي'; $('#updNever').hidden=false;
+  openSheetEl('updSheet');
+}
+function nudgeGo(){
+  const n=NUDGE_CUR; closeSheets(); if(!n) return;
+  go('settings'); setGo(n.go==='feedback'?'feedback':null);
+  if(n.go==='support') setTimeout(()=>{const c=$('#supportCard'); if(c&&!c.hidden) c.scrollIntoView({behavior:'smooth',block:'center'})},400);
+}
+$('#updNever').onclick=()=>{const st=nudgeState(); st.off=true; nudgeSave(st); closeSheets(); toast('تمام، مش هنظهرلك الرسايل دي تاني')};
+function nudgeBoot(){
+  const st=nudgeState(); if(!(+st.first>0)){st.first=Date.now(); nudgeSave(st)}
+  afterSplash(()=>setTimeout(()=>nudgeOffer(0),4000));
 }
 
 /* fixed expenses */
@@ -9920,7 +9969,7 @@ document.documentElement.classList.remove('booting');
   setTimeout(window.__splashGo, AB?1800:60); // Android calls __splashGo itself as soon as its own splash is gone
 })();
 requestAnimationFrame(()=>setTimeout(renderRest,0));
-setTimeout(()=>{try{updBoot()}catch(e){}},2500);
+setTimeout(()=>{try{updBoot()}catch(e){}try{nudgeBoot()}catch(e){}},2500);
 setTimeout(()=>{try{curFixPending(); if(S.space) ratesRefresh(false)}catch(e){}},3500);
 })();
 </script>

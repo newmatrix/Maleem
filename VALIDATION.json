@@ -1,6 +1,6 @@
 {
  "date": "2026-11-08",
- "scope": "Final source package after full code review and the home-chips change; historical suites rerun separately (see CHANGES-2026-11-08.md)",
+ "scope": "Final source package: code review fixes, home chips, periodic reminder and the full English / Modern Standard Arabic translation pass; historical suites rerun separately (see CHANGES-2026-11-08.md)",
  "test_suites": {
   "restore-recurring": 5,
   "review-plan-bug": 4,
@@ -15,9 +15,11 @@
   "income-history": 7,
   "debt-currency": 8,
   "post-review-fixes": 6,
-  "home-chips": 8
+  "home-chips": 8,
+  "nudge": 18,
+  "i18n-coverage": 2
  },
- "scenarios_passed": 97,
+ "scenarios_passed": 117,
  "xml_files_parsed": 32,
  "android_apk_built": false,
  "device_tested": false,
@@ -64,7 +66,7 @@
   },
   {
    "file": ".github/workflows/test-web.yml",
-   "sha256": "3540e80bf0f070d2f22c662ea0a3347a5bdb63cf1fef23c3f4bc00c1fb815fba"
+   "sha256": "eab2e51c94c164b066d13bbc00a266a13e3107d13722d3a5ca460c92056304b7"
   },
   {
    "file": ".github/workflows/update-rates.yml",
@@ -84,7 +86,7 @@
   },
   {
    "file": "CHANGES-2026-11-08.md",
-   "sha256": "ee9cc76fc0b46d51275f6510f35c293083fcb36219b5e298ed0457ef4b91d2f1"
+   "sha256": "a98cc3ce3c8bb64212501022e67c34477c80f65ca9695ce474c623d0242df8aa"
   },
   {
    "file": "DEEP-REVIEW-2026-11-03.md",
@@ -128,7 +130,7 @@
   },
   {
    "file": "RELEASE-CHECKS.json",
-   "sha256": "4df00dfa0944525facf7d32726a139bb4f451f71379f42bbbeb5f8225a5253ad"
+   "sha256": "4c8fc2ccb13cfc39d16bed78bcc18a9b47cef00c6ea15c854beb1a06a784c94c"
   },
   {
    "file": "RESTORE-RECURRING-2026-11-05.md",
@@ -292,7 +294,7 @@
   },
   {
    "file": "app/src/main/assets/www/index.html",
-   "sha256": "473018493603f1a234a1ccdb5a3805cbc246eb8cbd60259cabf597cacc1fb181"
+   "sha256": "a2be982822049d98409f157379f0d701b7633345858fd09131ad23d6fc582e6f"
   },
   {
    "file": "app/src/main/assets/www/libs/THIRD_PARTY_LICENSES.txt",
@@ -328,7 +330,7 @@
   },
   {
    "file": "app/src/main/assets/www/locales/ar.js",
-   "sha256": "a6f9ac36c180e1cfcf056d011b95724271e2583b5b82ef1f2e3ac8e89e221cbf"
+   "sha256": "c97a81b929a56809e43791e17a38411ecc112c64db9f41a48f54d8b64db67b4c"
   },
   {
    "file": "app/src/main/assets/www/locales/eg.js",
@@ -336,7 +338,7 @@
   },
   {
    "file": "app/src/main/assets/www/locales/en.js",
-   "sha256": "2be9fa9ea3d4e9aec15e8b6277670f063d7dc3a1edc008f2dfae7fc7f6c61d9b"
+   "sha256": "fa5810550e93e510469bda0d258b73c7312a8f3898ecb9dbd7af21d98261c011"
   },
   {
    "file": "app/src/main/java/com/heshamtaha/maleem/CaptureIdentity.kt",
@@ -683,6 +685,14 @@
    "sha256": "98172fc8d492302b79b8ecfce927d408e9ed3b2145f1e0c1171818863eb4bc15"
   },
   {
+   "file": "tests/i18n-baseline.json",
+   "sha256": "2b8cac1feb4c7874144f6e92599cf770022a3d0a74eddcdbea5045be6ccdd949"
+  },
+  {
+   "file": "tests/i18n-coverage.cjs",
+   "sha256": "29d0b28deda9296e3c7020e65a019d9eaa8736d953d6d8cba2c408888b17fcef"
+  },
+  {
    "file": "tests/income-funding-results.json",
    "sha256": "7c2c1d5b790bb5667d153ab5e95cab4fd7d25bc8c9729c2f864e7c357d4c52de"
   },
@@ -723,8 +733,16 @@
    "sha256": "6893e2e4060176225a7a76b830bf7d5473566b95c45b9b269da736f57544fe08"
   },
   {
+   "file": "tests/nudge-results.json",
+   "sha256": "173c89943f9c4d16ac60959684955d5fe0494658ee6a038157df2cb0a8d7c72c"
+  },
+  {
+   "file": "tests/nudge.cjs",
+   "sha256": "f30a95cc8191fcda0ba3daacd5a6a27f2d682a3f15235e8805bd2595328be331"
+  },
+  {
    "file": "tests/package.json",
-   "sha256": "577a7487c783f87795bba99041110de501889f90b4a806694d5e9ba2f79d7b97"
+   "sha256": "e37c8325ef0817494f781082871503659bd3f2095db58fd82a441b0c794e2dce"
   },
   {
    "file": "tests/post-review-fixes-results.json",

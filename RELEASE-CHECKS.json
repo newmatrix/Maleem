@@ -70,6 +70,16 @@
    "suite": "home-chips",
    "exitCode": 0,
    "output": "PASS Home chips and pop-ups eg 320\nPASS Home chips and pop-ups eg 390\nPASS Home chips and pop-ups ar 320\nPASS Home chips and pop-ups ar 390\nPASS Home chips and pop-ups en 320\nPASS Home chips and pop-ups en 390\nPASS Chips hide when there is nothing to show\nPASS English chip labels are translated\n"
+  },
+  {
+   "suite": "nudge",
+   "exitCode": 0,
+   "output": "PASS Rules: 10 days, 15 expenses, 3 times, off, next date\nPASS Reminder sheet content and state eg 320\nPASS Reminder sheet content and state eg 390\nPASS Reminder sheet content and state ar 320\nPASS Reminder sheet content and state ar 390\nPASS Reminder sheet content and state en 320\nPASS Reminder sheet content and state en 390\nPASS Next gap stays between 14 and 30 days\nPASS Different message than last time\nPASS Not shown while another sheet is open, or an update or developer message is waiting\nPASS Not shown with fewer than 15 expenses or before 10 days\nPASS Stops after three times\nPASS Do not show again turns it off for good and hides the link\nPASS Not now closes it and keeps counting\nPASS Support button opens the support card in settings\nPASS Feedback button opens the feedback page\nPASS First launch stamp is kept\nPASS The reminder state is not inside the app data\n"
+  },
+  {
+   "suite": "i18n-coverage",
+   "exitCode": 0,
+   "output": "PASS English coverage: no new untranslated message (322 known non-UI or fragment entries)\nPASS Modern Standard Arabic coverage: no new untranslated message (40 known non-UI or fragment entries)\n"
   }
  ]
 }
