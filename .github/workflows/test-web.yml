@@ -22,16 +22,34 @@ jobs:
       - run: node tests/language-dialogs.cjs
       - run: node tests/layout-static.cjs
       - run: node tests/floating-actions.cjs
+      - run: node tests/income-funding.cjs
+      - run: node tests/funding-capsule.cjs
+      - run: node tests/restore-recurring.cjs
+      - run: node tests/review-plan-bug.cjs
+      - run: node tests/account-menu.cjs
+      - run: node tests/expense-time.cjs
+      - run: node tests/expense-filters.cjs
+      - run: node tests/home-month.cjs
+      - run: node tests/category-report.cjs
+      - run: node tests/recurrence-expanded.cjs
+      - run: node tests/debt-currency.cjs
+      - run: node tests/income-history.cjs
+      - run: node tests/post-review-fixes.cjs
+      - run: node tests/home-chips.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: web-test-results
           path: |
+            tests/*-results.json
             tests/results.json
             tests/full-audit-results.json
             tests/journey-results.json
             tests/layout-static-results.json
             tests/floating-actions-results.json
+            tests/income-funding-results.json
+            tests/funding-capsule-results.json
+            tests/restore-recurring-results.json
             dynamic-language-results.json
   native-parser:
     runs-on: ubuntu-latest
