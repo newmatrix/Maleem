@@ -1,0 +1,26 @@
+[
+  {
+    "name": "English debt currency picker shows the code, no Arabic symbol",
+    "pass": true
+  },
+  {
+    "name": "Debt currency picker keeps Arabic name and symbol in Egyptian Arabic",
+    "pass": true
+  },
+  {
+    "name": "Editing a recurring expense older than 24 months keeps its interval",
+    "pass": true
+  },
+  {
+    "name": "New recurring expense still limited to 24 months",
+    "pass": true
+  },
+  {
+    "name": "Daily recurrence does not push debt reminders out or double-notify",
+    "pass": true
+  },
+  {
+    "name": "Weekly recurrence reminds a day before and on the day for four weeks only",
+    "pass": true
+  }
+]

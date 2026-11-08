@@ -1,0 +1,272 @@
+{
+  "date": "2026-11-05",
+  "web_scenarios": 17,
+  "web_passed": 17,
+  "extended_scenarios": 27,
+  "extended_passed": 27,
+  "native_checks": 22,
+  "native_compiler": "Kotlin 2.1.21",
+  "xml_files": 32,
+  "android_apk_built": false,
+  "changed_files": [
+    {
+      "file": ".github/workflows/test-web.yml",
+      "new": true,
+      "sha256": "73b3789a605d651e62a9d924e4e96f5b33d7e486a375bd888d15c7dbd34eb260"
+    },
+    {
+      "file": ".gitignore",
+      "new": true,
+      "sha256": "551b71cde58451bbe1c7575596aa4d5e54c82b664fd4711d1a5c01b283a13112"
+    },
+    {
+      "file": "app/src/main/assets/www/index.html",
+      "new": false,
+      "sha256": "241ae74e2181a36b1baede7a51606cecc70ed91b794414599410ce1e0863acc3"
+    },
+    {
+      "file": "app/src/main/assets/www/locales/ar.js",
+      "new": true,
+      "sha256": "28b47df9bcb24527cc31290cd0c39c7ab4e4f503b6dd571101f80ba2e3d94179"
+    },
+    {
+      "file": "app/src/main/assets/www/locales/eg.js",
+      "new": true,
+      "sha256": "5c674ebf77f0b13bc34256373c67952f98a9993e661190746c1fcb263e26d7cd"
+    },
+    {
+      "file": "app/src/main/assets/www/locales/en.js",
+      "new": true,
+      "sha256": "871cd153da010516d11c4d490aecdbe4930dcbd09fd8d992eaa6b9c6fe3bbcee"
+    },
+    {
+      "file": "app/src/main/assets/www/locales/README.md",
+      "new": true,
+      "sha256": "f1f82347ffe341a3e73c31f15a61dd193c85d55fecc8e05da1b4c9f0329c1bbe"
+    },
+    {
+      "file": "app/src/main/java/com/heshamtaha/maleem/CaptureIdentity.kt",
+      "new": true,
+      "sha256": "fc2b82961dd8a01b044c5f86ee922db82a0f0e3603f7591a421b4fa1a4bdb54b"
+    },
+    {
+      "file": "app/src/main/java/com/heshamtaha/maleem/MainActivity.kt",
+      "new": false,
+      "sha256": "0c6abe9104baff5fcd66bf7ef5019888a4489f4abcc1efcc171219eb05b88235"
+    },
+    {
+      "file": "app/src/main/java/com/heshamtaha/maleem/NativeLanguage.kt",
+      "new": true,
+      "sha256": "4fb04299c27dd0a51357b50413f7ba543cbbf63a3d216dde9ac85e1c9e0b56d0"
+    },
+    {
+      "file": "app/src/main/java/com/heshamtaha/maleem/PayCapture.kt",
+      "new": false,
+      "sha256": "daa154514996dfd864f00c31198e9f32d02bb88707c28574aa19cb7f90b8ce32"
+    },
+    {
+      "file": "app/src/main/java/com/heshamtaha/maleem/PayParser.kt",
+      "new": false,
+      "sha256": "a7de67d6d010bc4105810f3bb4e5b53c3511bf3977f89d7bc26c0cf20b1cf314"
+    },
+    {
+      "file": "app/src/main/java/com/heshamtaha/maleem/Reminders.kt",
+      "new": false,
+      "sha256": "10668fbd2e3dfc85afd3b92d6f3acf210128f6beffb897ada9d8602692f50e6b"
+    },
+    {
+      "file": "app/src/main/java/com/heshamtaha/maleem/Widgets.kt",
+      "new": false,
+      "sha256": "a4abdfc8d33860d14d6f36378d82c445ed8f325f1b8583a2216cd83a67505383"
+    },
+    {
+      "file": "app/src/main/res/layout/wg_small.xml",
+      "new": false,
+      "sha256": "5abcfb171ec2b9e0cfebf30a94b3f93ee78822eadbb55f4d00a3fbe071f82301"
+    },
+    {
+      "file": "AUDIT-REPAIRS-2026-11-03.md",
+      "new": true,
+      "sha256": "923d7087ee4431441a6b4221b0e10f33bfe632b30908421a2bff9169a63cb476"
+    },
+    {
+      "file": "DEEP-REVIEW-2026-11-03.md",
+      "new": true,
+      "sha256": "e57069a60e238ed806afbc166f089b579be1911d8dd4ce4f1c7fd0db9dfd583c"
+    },
+    {
+      "file": "FIXES-2026-11-03.md",
+      "new": true,
+      "sha256": "a68b4e40e22984334eaf347adfe5e1fbd92ac1259befce4b211647f0b0b2fc18"
+    },
+    {
+      "file": "FULL-AUDIT-2026-11-03.md",
+      "new": true,
+      "sha256": "da59c3f6403c608584def90c446bf7cd45213000297f695514f886ec31ee7b30"
+    },
+    {
+      "file": "LANGUAGE-RECHECK.md",
+      "new": true,
+      "sha256": "c810c89b1c7a6c1da4ec6bde1c4294c23c5adfe26f93a123b0d3fc4358342483"
+    },
+    {
+      "file": "tests/full-audit-confirmed.json",
+      "new": true,
+      "sha256": "e208fe457d2551a653d54b6309423355ceacc214e585e33e25fe01a98011ac2f"
+    },
+    {
+      "file": "tests/full-audit-results.json",
+      "new": true,
+      "sha256": "f19f5eeeb8b73326fa0e9046c2394c91567defda505799e99f21b7d4d8aabd56"
+    },
+    {
+      "file": "tests/full-audit.cjs",
+      "new": true,
+      "sha256": "92a38ca1088e06c81e7d3ad247f1bc78d29e8d349fada4d537a2d611f501adbe"
+    },
+    {
+      "file": "tests/journey-results.json",
+      "new": true,
+      "sha256": "f6f8110892bc0d2b4cd53fe23358fd13dab94f93a15c1524364b02fc14eadce9"
+    },
+    {
+      "file": "tests/journeys.cjs",
+      "new": true,
+      "sha256": "87f4610894e594bb5d764a3c426ab091e2187f616d65b7c1118148223993c103"
+    },
+    {
+      "file": "tests/language-dialogs-results.json",
+      "new": true,
+      "sha256": "6cbb131da63335702a15699e1adce8be9b0a133c555f0f3eb3427d4e5483370e"
+    },
+    {
+      "file": "tests/language-dialogs.cjs",
+      "new": true,
+      "sha256": "de2b42830a8f57cb2833e1321893229c3d565ab81993c64670c7b2d74caf489a"
+    },
+    {
+      "file": "tests/NativeRegression.kt",
+      "new": true,
+      "sha256": "027551cad4d0eee69e4b26bd3037d74ed0aea47a7ebbf13d92959568487bfcc5"
+    },
+    {
+      "file": "tests/package.json",
+      "new": true,
+      "sha256": "a52abdc2fa485923c8fbabac591b5d2f479107eb8fdd7a6dcd72932bfcb502d6"
+    },
+    {
+      "file": "tests/regression.cjs",
+      "new": true,
+      "sha256": "1733979f259bfee2f6392745bb0d40572be3469a34cc6b470f002f76aa9fb267"
+    },
+    {
+      "file": "tests/results.json",
+      "new": true,
+      "sha256": "f77e5e21d4d2b51bbafa4024ac02a2aa16f76fbbaba2e9e7e28468dfcc82fd6b"
+    },
+    {
+      "file": "tests/floating-actions.cjs",
+      "new": true,
+      "sha256": "dd1602adfbd43734b13c8c80edae79a30b69795e1b7004f64d07db520b5908b9"
+    },
+    {
+      "file": "tests/floating-actions-results.json",
+      "new": true,
+      "sha256": "d13bfd9f12965744fb737f172fbf95cd3c292b7108a09ea7aab346d0ac2f3a42"
+    },
+    {
+      "file": "FLOATING-ACTIONS-2026-11-04.md",
+      "new": true,
+      "sha256": "18308f9d8360e580462ffcbd665e6bd8c5e6383f4709d404d555b1598338a051"
+    },
+    {
+      "file": "tests/layout-static.cjs",
+      "new": true,
+      "sha256": "6893e2e4060176225a7a76b830bf7d5473566b95c45b9b269da736f57544fe08"
+    },
+    {
+      "file": "tests/layout-static-results.json",
+      "new": true,
+      "sha256": "7c1842946db6a918075ae1651938da0455dcc562e3acd011f48c0792ac19e839"
+    },
+    {
+      "file": "tests/income-funding.cjs",
+      "new": true,
+      "sha256": "799b31eedef8de5aeecc7673dcec26ce8f9101f348e4b33b6fc300a5d3a3a507"
+    },
+    {
+      "file": "tests/income-funding-results.json",
+      "new": true,
+      "sha256": "7c2c1d5b790bb5667d153ab5e95cab4fd7d25bc8c9729c2f864e7c357d4c52de"
+    },
+    {
+      "file": "INCOME-FUNDING-2026-11-04.md",
+      "new": true,
+      "sha256": "148f52ec0767842e9eb9d88b4ae7fe6a9ece4a0737502976a8333f043d804da0"
+    },
+    {
+      "file": "tests/funding-capsule.cjs",
+      "new": true,
+      "sha256": "af88e7cbc89a40803241198b0faa9c42fe645aee56480c4e43bcba392de30093"
+    },
+    {
+      "file": "tests/funding-capsule-results.json",
+      "new": true,
+      "sha256": "10dcf28c5bc68c0acadd0790a4cee1ba15ebe647d18305ab5755e9b13b8e9e6e"
+    },
+    {
+      "file": "FUNDING-CAPSULE-2026-11-05.md",
+      "new": true,
+      "sha256": "c9d7f83473733e1472ef565ad8afe78246db21d64c374967abfed40ce1b21ad1"
+    },
+    {
+      "file": "tests/restore-recurring.cjs",
+      "new": true,
+      "sha256": "0f9b8d9ce482a3facff8ff268026bd6788146f173270a58a8ee69ca28c669d07"
+    },
+    {
+      "file": "tests/restore-recurring-results.json",
+      "new": true,
+      "sha256": "6816a8446d8fdb417d0c194385830276f136c7735007c0f877696c68179d22b9"
+    },
+    {
+      "file": "RESTORE-RECURRING-2026-11-05.md",
+      "new": true,
+      "sha256": "4388462a18805e0909ac32be16ed42a9278fba3887cbfe896900a09ef8aacaad"
+    }
+  ],
+  "journey_scenarios": 9,
+  "journey_passed": 9,
+  "layout_static_scenarios": 2,
+  "layout_static_passed": 2,
+  "floating_actions_scenarios": 4,
+  "floating_actions_passed": 4,
+  "current_review": {
+    "date": "2026-11-05",
+    "executed": {
+      "restore_recurring": 5,
+      "regression": 17,
+      "preview_layout_widths": [
+        320,
+        390
+      ]
+    },
+    "android_apk_built": false,
+    "drive_live_tested": false,
+    "messaging_removed": true,
+    "self_hash_excluded": true,
+    "not_rerun": [
+      "full_audit",
+      "journeys",
+      "language_dialogs",
+      "income_funding",
+      "funding_capsule",
+      "floating_actions",
+      "NativeRegression.kt"
+    ]
+  },
+  "income_funding_scenarios": 24,
+  "income_funding_passed": 24,
+  "funding_capsule_scenarios": 6,
+  "funding_capsule_passed": 6
+}

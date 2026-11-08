@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Recurring intervals, year rollover and month-end clamping",
+    "pass": true
+  },
+  {
+    "name": "Off-cycle charges excluded from forecast; paid occurrences excluded",
+    "pass": true
+  },
+  {
+    "name": "Create, reload, edit and backup preserve recurrence",
+    "pass": true
+  },
+  {
+    "name": "Drive restores newest across unordered backups without picker; undo retained",
+    "pass": true
+  },
+  {
+    "name": "Invalid newest backup leaves existing data untouched",
+    "pass": true
+  }
+]

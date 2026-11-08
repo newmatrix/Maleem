@@ -149,7 +149,7 @@ object Updater {
                 conn.disconnect()
 
                 // 1) the file is exactly the one in update.json
-                if (sha256.isNotBlank() && !sha256.equals(sha256Of(part), ignoreCase = true)) { part.delete(); done("sha"); return@Thread }
+                if (sha256.isBlank() || !sha256.equals(sha256Of(part), ignoreCase = true)) { part.delete(); done("sha"); return@Thread } // a missing SHA-256 is a refusal, not a skipped check
                 // 2) it is Maleem, newer than this one, signed like this one
                 val err = verifyApk(c, part, code)
                 if (err != null) { part.delete(); done(err); return@Thread }

@@ -286,8 +286,11 @@ class MainActivity : AppCompatActivity() {
 
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 if (request.url.host == APP_HOST) return false
-                // Facebook / YouTube / GitHub links open outside the app
-                try { startActivity(Intent(Intent.ACTION_VIEW, request.url)) } catch (_: Exception) { }
+                // Facebook / YouTube / GitHub links open outside the app; only web and mail links, never other schemes (intent:, file:, content:...)
+                val scheme = request.url.scheme?.lowercase()
+                if (scheme == "https" || scheme == "http" || scheme == "mailto") {
+                    try { startActivity(Intent(Intent.ACTION_VIEW, request.url)) } catch (_: Exception) { }
+                }
                 return true
             }
         }

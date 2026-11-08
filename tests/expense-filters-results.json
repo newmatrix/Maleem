@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Multiple categories, global sort, totals and unchanged balances eg 320",
+    "pass": true
+  },
+  {
+    "name": "Multiple categories, global sort, totals and unchanged balances eg 390",
+    "pass": true
+  },
+  {
+    "name": "Multiple categories, global sort, totals and unchanged balances ar 320",
+    "pass": true
+  },
+  {
+    "name": "Multiple categories, global sort, totals and unchanged balances ar 390",
+    "pass": true
+  },
+  {
+    "name": "Multiple categories, global sort, totals and unchanged balances en 320",
+    "pass": true
+  },
+  {
+    "name": "Multiple categories, global sort, totals and unchanged balances en 390",
+    "pass": true
+  },
+  {
+    "name": "All results contribute to total beyond display limit",
+    "pass": true
+  }
+]

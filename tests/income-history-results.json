@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Reach old income, edit account/report, delete and undo eg 320",
+    "pass": true
+  },
+  {
+    "name": "Reach old income, edit account/report, delete and undo eg 390",
+    "pass": true
+  },
+  {
+    "name": "Reach old income, edit account/report, delete and undo ar 320",
+    "pass": true
+  },
+  {
+    "name": "Reach old income, edit account/report, delete and undo ar 390",
+    "pass": true
+  },
+  {
+    "name": "Reach old income, edit account/report, delete and undo en 320",
+    "pass": true
+  },
+  {
+    "name": "Reach old income, edit account/report, delete and undo en 390",
+    "pass": true
+  },
+  {
+    "name": "Spent free income cannot be deleted or reduced",
+    "pass": true
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Period-only income: monthly",
+    "pass": true
+  },
+  {
+    "name": "Period-only income: weekly",
+    "pass": true
+  },
+  {
+    "name": "Period-only income: biweekly",
+    "pass": true
+  },
+  {
+    "name": "Permanent raise persists, is not future income, and future tips ask again",
+    "pass": true
+  },
+  {
+    "name": "Free income 300, free expense 100, salary expense 100; reports retain both",
+    "pass": true
+  },
+  {
+    "name": "Editing expense funding and amount releases previous free debit",
+    "pass": true
+  },
+  {
+    "name": "Insufficient free balance blocks expense without partial writes",
+    "pass": true
+  },
+  {
+    "name": "Delete and undo free-funded expense restores funding balance",
+    "pass": true
+  },
+  {
+    "name": "Spent free income cannot be reduced, transferred, or deleted below spent amount",
+    "pass": true
+  },
+  {
+    "name": "Permanent edit, reclassification, delete and undo update base once",
+    "pass": true
+  },
+  {
+    "name": "Salary receipt does not duplicate planned budget or create free balance",
+    "pass": true
+  },
+  {
+    "name": "Backup restoration preserves funding and does not replay permanent increases",
+    "pass": true
+  },
+  {
+    "name": "Legacy transactions remain budget-funded; invalid funding fields are rejected",
+    "pass": true
+  },
+  {
+    "name": "Currency conversion scales free balance and permanent base without duplication",
+    "pass": true
+  },
+  {
+    "name": "Free income carries into next period",
+    "pass": true
+  },
+  {
+    "name": "Reallocate unspent free income to current period and back without duplicate income",
+    "pass": true
+  },
+  {
+    "name": "Manual future base change survives reload; receiving a new tip remains independent",
+    "pass": true
+  },
+  {
+    "name": "Partial refund and undo return money to free income without affecting salary budget",
+    "pass": true
+  },
+  {
+    "name": "Free-funded fees cannot overdraw and use the same funding source",
+    "pass": true
+  },
+  {
+    "name": "Free expenses do not trigger salary-budget overspending alerts",
+    "pass": true
+  },
+  {
+    "name": "Period addition deletion and undo do not alter base budget",
+    "pass": true
+  },
+  {
+    "name": "Funding selectors usable on small screen eg",
+    "pass": true
+  },
+  {
+    "name": "Funding selectors usable on small screen ar",
+    "pass": true
+  },
+  {
+    "name": "Funding selectors usable on small screen en",
+    "pass": true
+  }
+]

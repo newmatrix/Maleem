@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Home chips and pop-ups eg 320",
+    "pass": true
+  },
+  {
+    "name": "Home chips and pop-ups eg 390",
+    "pass": true
+  },
+  {
+    "name": "Home chips and pop-ups ar 320",
+    "pass": true
+  },
+  {
+    "name": "Home chips and pop-ups ar 390",
+    "pass": true
+  },
+  {
+    "name": "Home chips and pop-ups en 320",
+    "pass": true
+  },
+  {
+    "name": "Home chips and pop-ups en 390",
+    "pass": true
+  },
+  {
+    "name": "Chips hide when there is nothing to show",
+    "pass": true
+  },
+  {
+    "name": "English chip labels are translated",
+    "pass": true
+  }
+]

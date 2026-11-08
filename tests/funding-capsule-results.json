@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Conditional capsule eg 320px: hidden, available, exhausted, editing, layout",
+    "pass": true
+  },
+  {
+    "name": "Conditional capsule eg 390px: hidden, available, exhausted, editing, layout",
+    "pass": true
+  },
+  {
+    "name": "Conditional capsule ar 320px: hidden, available, exhausted, editing, layout",
+    "pass": true
+  },
+  {
+    "name": "Conditional capsule ar 390px: hidden, available, exhausted, editing, layout",
+    "pass": true
+  },
+  {
+    "name": "Conditional capsule en 320px: hidden, available, exhausted, editing, layout",
+    "pass": true
+  },
+  {
+    "name": "Conditional capsule en 390px: hidden, available, exhausted, editing, layout",
+    "pass": true
+  }
+]

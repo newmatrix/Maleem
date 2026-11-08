@@ -1113,5 +1113,48 @@ Object.assign(window.I18N.en.x,{
   "غيّر مصدر مصاريف الدخل الحر أو امسحها مع الدخل.": "Change the funding of free-income expenses or delete them along with the income."
 });
 
-Object.assign(window.I18N.en.x,{"تكرار المصروف": "Repeat expense", "اختار عدد الشهور من 1 إلى 120": "Choose an interval from 1 to 120 months"});
+Object.assign(window.I18N.en.x,{"تكرار المصروف": "Repeat expense", "اختار عدد الشهور من 1 إلى 24": "Choose an interval from 1 to 24 months"});
 
+
+Object.assign(window.I18N.en.x,{"وقت المصروف": "Expense time", "اختار وقت صحيح للمصروف": "Choose a valid expense time", "وقت المصروف مينفعش يكون في المستقبل": "Expense time cannot be in the future"});
+
+Object.assign(window.I18N.en.x,{"الساعة": "Hour", "الدقيقة": "Minute"});
+
+Object.assign(window.I18N.en.x,{"تاريخ ووقت المصروف": "Expense date and time", "اختار تاريخ صحيح للمصروف": "Choose a valid expense date"});
+
+Object.assign(window.I18N.en.x,{"اختار فئة أو أكتر": "Choose one or more categories", "ترتيب المصروفات": "Sort expenses", "الأحدث الأول": "Newest first", "الأقدم الأول": "Oldest first", "المبلغ: من الأكبر للأصغر": "Amount: high to low", "المبلغ: من الأصغر للأكبر": "Amount: low to high", "الفئة: أ إلى ي": "Category: A to Z", "الفئة: ي إلى أ": "Category: Z to A", "ظاهر أول 300 نتيجة حسب الترتيب المختار؛ الإجمالي لكل النتائج.": "Showing the first 300 results in the selected order; total includes all matches."});
+
+Object.assign(window.I18N.en.x,{"اختار اليوم": "Choose date"});
+
+Object.assign(window.I18N.en.x,{"عرض المصروفات": "Expense view", "الشهر ده": "This month", "مصاريف الشهر ده": "This month’s expenses", "مفيش مصاريف الشهر ده": "No expenses this month"});
+
+Object.assign(window.I18N.en.x,{"مفيش عمليات في الفئة دي خلال الفترة المختارة": "No transactions in this category for the selected period"});
+
+
+Object.assign(window.I18N.en.x,{"المبلغ (سيبه فاضي لو بيتغير)": "Amount (leave blank if variable)", "نوع التكرار": "Repeat", "يومي": "Daily", "أسبوعي": "Weekly", "شهري": "Monthly", "كل يوم": "Every day", "كل أسبوع": "Every week", "بداية التكرار": "Start date", "نهاية التكرار (اختياري)": "End date (optional)", "حالة التكرار": "Schedule status", "شغال": "Active", "متوقف": "Paused", "اختار تاريخ بداية صحيح": "Choose a valid start date", "تاريخ النهاية لازم يكون بعد البداية أو نفس اليوم": "End date must be on or after the start date", "اتحفظ التكرار": "Schedule saved", "اتضاف المصروف المتكرر": "Recurring expense added", "تخطي الاستحقاق ده": "Skip this occurrence", "تم تخطي الاستحقاق": "Occurrence skipped", "الاستحقاق ده متسجل بالفعل": "This occurrence is already recorded", "بدون نهاية": "No end date", "متوقف — اضغط للتشغيل": "Paused — tap to resume", "شغال — اضغط للإيقاف": "Active — tap to pause"});
+
+Object.assign(window.I18N.en.x,{"عملة السلفة": "Loan currency", "تغيير العملة هيحوّل السلفة والزيادات والدفعات بالسعر ده. مبالغ الحسابات المسجلة مش هتتغير.": "Changing currency converts the loan, additions and repayments at this rate. Recorded account amounts stay unchanged.", "سعر التحويل": "Conversion rate", "المتبقي بعد التحويل": "Remaining after conversion", "اكتب سعر التحويل": "Enter a conversion rate", "راجع سعر التحويل والمبلغ": "Check the conversion rate and amount", "المبلغ أقل من الدفعات المسجلة": "Amount is below recorded repayments", "مفيش سعر تحويل متاح": "No conversion rate available", "المبلغ في الحساب": "Account amount"});
+
+Object.assign(window.I18N.en.x,{"اضغط على عملية دخل لتعديلها أو حذفها": "Tap an income entry to edit or delete it", "عرض المزيد": "Show more"});
+Object.assign(window.I18N.en.x,{"عرض أقل":"Show less"});
+
+/* English gaps found by a screen-by-screen sweep (home, upcoming dues, close-period card, due-date labels) */
+Object.assign(window.I18N.en.x,{"حوشت":"Saved","مواعيد قريبة":"Upcoming dues","كل الالتزامات":"All obligations","فاضل":"Remaining","قفّل وحوّل":"Close and move","متأخر":"Overdue","آخر الشهر":"the end of the month","آخر الأسبوع":"the end of the week","آخر الأسبوعين":"the end of the two weeks"});
+window.I18N.en.p.unshift(...[
+["متأخر من شهور فاتت: (.+)","Overdue from past months: $1"],
+["متأخر (يوم واحد|يومين|\\d+ أيام|\\d+ يوم)","$1 overdue"],
+["بعد (يوم واحد|يومين|\\d+ أيام|\\d+ يوم)","In $1"],
+["(\\d+) يوم","$1 days"],
+["(\\d+) جاية","$1 upcoming"],
+["(.+) في اليوم لحد (آخر الشهر|آخر الأسبوع|آخر الأسبوعين)، بعد المصاريف الثابتة الجاية","$1 a day until $2, after upcoming recurring expenses"],
+["(.+) في اليوم لحد (آخر الشهر|آخر الأسبوع|آخر الأسبوعين)","$1 a day until $2"],
+["(.+) في اليوم النهارده، بعد المصاريف الثابتة الجاية","$1 a day today, after upcoming recurring expenses"],
+["(.+) في اليوم النهارده","$1 a day today"],
+["مفيش سعر صرف دلوقتي لـ (.+)، فمش محسوبين في الإجمالي\\.","No exchange rate right now for $1, so it is not included in the total."],
+["قفّل ميزانية ([A-Za-z0-9\\u200E \\-]+)","Close $1 budget"],
+["ميزانية ([A-Za-z0-9\\u200E \\-]+)","$1 budget"],
+["(.+)، تحوّلهم للادخار؟","$1, move it to savings?"],
+["فاضل من (.+): (.+) \\(الميزانية (.+)، صرفت (.+)\\)","Remaining from $1: $2 (budget $3, spent $4)"],
+["اتقفلت الفترة وحوشت (.+) في (.+)","Period closed. You saved $1 in $2"],
+["اتقفلت الفترة، و(.+) بيتحسبوا في مدخراتك","Period closed, and $1 counts toward your savings"]
+]);
