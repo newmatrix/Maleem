@@ -1,0 +1,133 @@
+/* home: a slimmer budget card, and the money card at a normal size */
+.hero{padding:14px 16px 12px;box-shadow:0 8px 18px -14px color-mix(in srgb,var(--brand) 70%,transparent)}
+.hero::after{inset:8px;border-radius:12px}
+.hero .label{font-size:.86rem}
+.hero .big{font-size:2.05rem;margin:0 0 8px}
+.hero .big small{font-size:.9rem}
+.hero .chip{padding:3px 10px;font-size:.78rem}
+.hero .bar{height:20px}
+.hero .bar .pct{font-size:.76rem;left:10px}
+.hero .meta{margin-top:8px}
+.hero .meta .m small{font-size:.76rem}
+.hero .meta .m b{font-size:1.04rem}
+.hero .fc{margin:8px 0 0;font-size:.8rem;line-height:1.4}
+.hero .fc.daily{margin-top:8px;padding:6px 10px}
+.hero .fc.daily b{font-size:.98rem}
+.hero .fc.daily+.fc{margin-top:6px}
+.hero .cta{margin-top:8px;padding:8px 12px}
+.hero .stats{gap:6px}
+.hero .st{padding:7px 9px}
+#moneyBox{margin-top:14px}
+#moneyBox .card{padding:14px;margin:0;border-radius:var(--r-card,18px)}
+#moneyBox .card-h h3{font-size:1rem}
+#moneyBox .card-h b{font-size:1.02rem}
+#moneyBox .mny-split{margin-top:8px;margin-bottom:10px;gap:8px}
+#moneyBox .mny-split>div{padding:8px 10px;border-radius:12px}
+#moneyBox .mny-split b{font-size:.98rem}
+#moneyBox .mny-acc{padding:7px 2px;font-size:.9rem}
+#moneyBox .mny-acc:first-of-type{margin-top:6px}
+#moneyBox .mny-btn{margin-top:8px;padding:9px 12px;font-size:.88rem;min-height:40px}
+#moneyBox .hint{font-size:.82rem}
+#upcoming .upc,#capBox .upc,#sumBox .sum-card{margin-top:12px}
+.section-h{margin:18px 2px 8px}
+/* income entry: one pill (مصروف / دخل) that replaces the sheet title, + source chips */
+.kind-pill{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:6px 12px;margin:0 0 10px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:1.02rem;font-weight:700;outline:none;cursor:pointer}
+.kind-pill svg{width:14px;height:14px;flex:none;color:var(--muted)}
+#kindMenu .pe{font-size:1.1rem;width:20px;text-align:center}
+#kindMenu [aria-checked="true"]{color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,transparent)}
+/* cash withdrawals, loans and refunds (round 47) */
+#caKind{flex-wrap:wrap;gap:4px}
+/* language (round 51) */
+.lang-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:0;padding-top:16px}
+.lang-seg button{border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 4px;font:inherit;color:var(--ink);text-align:center;min-width:0}
+.lang-seg button b{display:block;font-size:.98rem;line-height:1.3}
+.lang-seg button small{display:block;font-size:.7rem;color:var(--muted);margin-top:3px}
+.lang-seg button[aria-checked="true"]{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface))}
+.lang-seg button[aria-checked="true"] small{color:var(--brand)}
+.lang-demo{margin-top:14px;border-radius:18px;padding:16px;color:#fff;background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%)}
+.lang-demo .ld-cap{font-size:.72rem;opacity:.8;margin-bottom:8px}
+.lang-demo .ld-greet{font-size:1.15rem;font-weight:700}
+.lang-demo .ld-bud{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:10px}
+.lang-demo .ld-bud b{font-size:1.35rem}
+.lang-demo .ld-row{display:flex;justify-content:space-between;gap:8px;font-size:.85rem;opacity:.92;margin-top:6px}
+.lang-demo .ld-tip{margin-top:10px;font-size:.82rem;background:rgba(255,255,255,.14);border-radius:12px;padding:8px 10px}
+.lang-demo .ld-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.lang-demo .ld-btn{background:#fff;color:var(--brand);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.85rem}
+.lang-demo .ld-chip{background:rgba(255,255,255,.18);border-radius:999px;padding:6px 12px;font-size:.85rem}
+html[dir="ltr"] #mPrev svg,html[dir="ltr"] #mNext svg,html[dir="ltr"] .chev,html[dir="ltr"] .back-ic{transform:scaleX(-1)}
+.income-funding-options{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:0;padding-top:16px}
+.income-funding-options.has-scope{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.income-funding-options .fund-row{min-width:0;margin:0;padding:10px;align-content:start}
+.income-funding-options .fund-row select{font-size:.8rem;padding:9px 4px}
+.income-funding-options .fund-row label{font-size:.82rem}
+.fund-row{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.fund-row select{width:100%;max-width:100%;min-width:0;font:inherit;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--ink);padding:10px}
+.home-chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 2px}
+.hchip{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:7px 13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:.82rem;cursor:pointer}
+.hchip span{color:var(--muted);white-space:nowrap}.hchip b{white-space:nowrap}
+#freeSheet .card,#moneySheet .card{box-shadow:none;border:0;background:none;padding:0;margin:0}
+.fw-amt{font-size:1.6rem;font-weight:800;text-align:center;margin:6px 0 2px}
+#moneySheet .mny .card-h h3{display:none}#moneySheet .mny .card-h{justify-content:center;margin-bottom:0}#moneySheet .mny .card-h b{font-size:1.6rem}
+/* A funding capsule joins the existing controls only when a free balance is usable. */
+#sheet .sheet-head.has-fund{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+#sheet .sheet-head.has-fund .kind-pill,#sheet .sheet-head.has-fund h2{margin:0;flex:none}
+#sheet .sheet-head.has-fund .head-pills{position:static;max-width:100%;margin:0;display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}
+#sheet .sheet-head.has-fund .head-pills #accPill{flex:0 1 auto}
+#sheet #fundPill{position:relative;cursor:pointer;flex:none}
+#sheet #fundPill[hidden]{display:none!important}
+#sheet #expenseFund{display:none!important}
+#fundMenu button[aria-checked="true"]{color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,transparent)}
+#sheet #fundPill:focus-within{outline:2px solid var(--brand);outline-offset:2px}
+#sheet #expenseFund:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+/* Floating actions rest half outside the LEFT app edge in every language.
+   Clip the outer half on wide screens too; transparent space must not intercept card controls. */
+#fab,#micFab{right:auto;opacity:.38;transition:left .25s ease,opacity .25s ease;transform:none;clip-path:inset(-30px -30px -30px 50%)}
+html #fab{left:max(-31px,calc(50% - 291px))}
+html #micFab{left:max(-24px,calc(50% - 284px))}
+html.fab-awake #fab{left:max(18px,calc(50% - 242px))}
+html.fab-awake #micFab{left:max(25px,calc(50% - 235px))}
+html.fab-awake #fab,html.fab-awake #micFab{opacity:1;clip-path:none}
+#v-expenses::after,#v-debts::after{content:"";display:block;height:130px}
+@media(prefers-reduced-motion:reduce){#fab,#micFab{transition:none}}
+/* English reads left to right: mirror the few places the layout pins to a side (round 51) */
+/* Floating action buttons intentionally stay on the left in English too. */
+html[dir="ltr"] .head-pills{left:auto;right:0}
+html[dir="ltr"] .switch i::after{right:auto;left:3px}
+html[dir="ltr"] .switch input:checked + i::after{transform:translateX(22px)}
+html[dir="ltr"] .sp-type-row .switch input:checked + i::after{transform:translateX(19px)}
+html[dir="ltr"] .hero .bar>i{background:linear-gradient(90deg,#A6FBEB,#7DF4E2)}
+html[dir="ltr"] .hero .bar.warn>i{background:linear-gradient(90deg,#FFE08A,#F4B740)}
+html[dir="ltr"] .hero .bar.bad>i{background:linear-gradient(90deg,#FFB4A3,#FF7A60)}
+html[dir="ltr"] .hero .bar .pct{left:auto;right:12px}
+html[dir="ltr"] .hero .meta .m.left{text-align:right}
+html[dir="ltr"] .xp::before,html[dir="ltr"] .dc::before{right:auto;left:0}
+html[dir="ltr"] .md.turn::after{left:auto;right:-5px}
+html[dir="ltr"] .streak{left:auto;right:12px}
+html[dir="ltr"] .dev2 .dv-name,html[dir="ltr"] #pdfReport td,html[dir="ltr"] #pdfReport th{text-align:left}
+html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:normal;word-break:normal}
+#caKind button{flex:1 1 calc(50% - 4px)}
+.cap-alt{display:inline-block;border:0;background:none;padding:3px 0 0;font:inherit;font-size:.78rem;font-weight:700;color:var(--brand)}
+.acc-cash{display:flex;gap:8px;margin-top:10px}
+.acc-cash .btn{flex:1}
+.in-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.in-chips button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 13px;font:inherit;font-size:.88rem;cursor:pointer}
+.in-chips button[aria-pressed="true"]{background:color-mix(in srgb,var(--brand) 16%,var(--surface));border-color:var(--brand);font-weight:700}
+/* gold */
+.in-chips.tight{gap:5px}
+.in-chips.tight button{padding:6px 9px;font-size:.85rem}
+.gd-kind{background:var(--surface-2);border-radius:15px;padding:10px 12px;margin-top:8px}
+.gd-kind+.gd-kind{margin-top:8px}
+.gd-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gd-top b{font-size:1rem}
+.gd-top .date-in{width:128px;flex:none}
+.gd-kind small{display:block;color:var(--muted);font-size:.82rem;margin-top:3px}
+.acc-row.gd-row .an small{white-space:normal;overflow:visible;text-overflow:clip}
+/* very narrow phones: the date / payment / account pills go under the title instead of crowding it */
+@media (max-width:340px){.head-pills,.head-pills.three{position:static;max-width:none;flex-wrap:wrap;margin:0 0 10px}}
+.gd-tot{display:flex;justify-content:space-between;gap:10px;padding:8px 2px;border-top:1px solid var(--line);font-size:.95rem}
+/* the budget page now holds three things (budget, income, ...): their titles are shown, unlike the other single-card pages */
+.me-page[data-mepage="budget"]>.card>h3:first-child:not(.look-h),.me-page[data-mepage="budget"]>.card>.card-h>h3{display:block}
+.me-page[data-mepage="accounts"]>.card>.card-h>h3{display:block} /* two cards on that page: «حساباتي» and «مدخراتي» (round 48) */
+.me-page[data-mepage="budget"]>.card+.card{margin-top:14px}
+/* section titles on the budget and accounts pages sit at the reading-direction start: right in Arabic, left in English (flex-end above was the opposite side) */
+.me-page[data-mepage="budget"]>.card>.card-h,.me-page[data-mepage="accounts"]>.card>.card-h{justify-content:space-between}

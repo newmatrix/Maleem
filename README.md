@@ -177,6 +177,8 @@ Maleem (Android)
 └── Firebase (اختياري)       → مزامنة المصروفات داخل المساحة المشتركة
 ```
 
+> **للمطوّرين:** مصدر الواجهة في `src-web/` (يُبنى إلى `index.html` بـ `node tools/build-www.cjs`). الدليل الكامل في [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)، وخريطة الكود في [`docs/CODE-MAP.md`](docs/CODE-MAP.md)، وقائمة فحص الإصدار في [`docs/RELEASING.md`](docs/RELEASING.md).
+
 | الملف أو المجلد | الدور |
 |---|---|
 | `app/src/main/assets/www/index.html` | الواجهة، الأقسام، الحسابات، التقارير، إعدادات التطبيق ومنطق المساحة المشتركة. |

@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مليم</title>
+<script>/* hide the page until the app script has decided what to show (lock / welcome); 3s safety net.
+   Cold start: the opening animation, once per app session (not after switching member), never with reduced motion. */(function(){var r=document.documentElement;r.classList.add('booting');setTimeout(function(){r.classList.remove('booting')},3000);try{var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;if(!rm&&!sessionStorage.getItem('maleem.splashed')){sessionStorage.setItem('maleem.splashed','1');r.classList.add('splash-on');setTimeout(function(){r.classList.remove('splash-on')},4500)}}catch(e){}})()</script>
+<link rel="icon" href="img/maleem-logo.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+@@CSS@@
+</style>
+</head>
+<body>
+<div id="splash" aria-hidden="true"><div class="sp-tile"><img src="img/splash-mark.png" alt=""></div><div class="sp-word">مليم</div></div>
+<div class="app">
+
+  <!-- المصروفات -->
+  <section class="view active" id="v-expenses" aria-label="المصروفات">
+    <div class="topbar home">
+      <button class="home-av" id="homeAv" type="button" aria-label="صفحتي (أنا)"></button>
+      <div><h1 id="greet"></h1><div class="sub" id="todayLabel"></div></div>
+      <div class="home-header-actions"><button class="eye-btn" id="eyeBtn" type="button" aria-pressed="false" aria-label="إخفاء المبالغ"></button><button type="button" id="homeExpensePick" aria-label="عرض المصروفات" aria-haspopup="menu" aria-controls="homeExpenseMenu" aria-expanded="false"></button></div>
+    </div>
+    <div class="hero" id="hero"></div>
+
+    <div class="home-chips" id="homeChips" hidden>
+      <button type="button" class="hchip" id="chipFree" hidden aria-haspopup="dialog"></button>
+      <button type="button" class="hchip" id="chipMoney" hidden aria-haspopup="dialog"></button>
+    </div>
+    <div id="sumBox"></div>
+    <div id="capBox"></div>
+    <div id="closeCard"></div>
+    <div id="upcoming"></div>
+    <div id="todayBlock"><div class="section-h"><h2><span id="homeExpenseTitle">مصاريف النهارده</span><span class="cnt" id="todayCount"></span></h2><span class="tot" id="todayTotal"></span></div>
+    <div id="todayList"></div></div>
+  </section>
+
+  <!-- التقارير -->
+  <section class="view" id="v-reports" aria-label="التقارير">
+    <div id="reportsMain">
+      <div class="topbar"><h1>التقارير</h1><button class="back" id="searchBtn" aria-label="بحث في كل الحركات"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button></div>
+      <div class="mswitch">
+        <button id="mPrev" aria-label="الشهر اللي قبله"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        <span id="mLabel"></span>
+        <button id="mNext" aria-label="الشهر اللي بعده"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      </div>
+      <button class="month-card" id="monthCard"></button>
+      <div class="seg" id="repSeg" role="group" aria-label="أقسام التقارير" style="margin-top:14px"><button type="button" data-rt="ov">نظرة عامة</button><button type="button" data-rt="ac">الحسابات</button><button type="button" data-rt="sp">المصروفات</button><button type="button" data-rt="tl">أدوات</button></div>
+      <div id="rpOv" style="margin-top:14px"><div class="card mny" id="repFc" hidden style="margin-bottom:12px"></div><div class="card mny" id="repMoney" hidden></div><div class="empty" id="repOvEmpty" hidden><b>مفيش أرقام تتعرض لسه</b>سجّل دخل أو حسابات أو أقساط وهتظهر هنا.</div></div>
+      <div id="rpAc" style="margin-top:14px" hidden><div class="card mny" id="repAccts" hidden></div><div class="empty" id="repAcEmpty" hidden><b>مفيش حسابات</b>ضيف حساباتك من «أنا» وهتشوف حركتها هنا.</div></div>
+      <div id="rpSp" style="margin-top:14px" hidden>
+      <div class="card" style="margin-top:14px">
+        <h3>الصرف اليومي</h3>
+        <p class="hint" id="dailyHint"></p>
+        <div class="chart-wrap" id="dailyChart"></div>
+      </div>
+      <div class="card">
+        <h3>مقارنة بالشهر اللي فات</h3>
+        <p class="hint" id="cmpHint"></p>
+        <div id="cmpList" style="margin-top:6px"></div>
+      </div>
+      <div class="card" id="payRepCard">
+        <h3>حسب طريقة الدفع</h3>
+        <div id="payRep" style="margin-top:8px"></div>
+      </div>
+            </div>
+      <div id="rpTl" style="margin-top:14px" hidden>
+      <div class="card">
+        <h3>حفظ المصاريف</h3>
+        <p class="hint" id="exportHint">اختار هتحفظ الملفات بنوع إيه، وهتلاقيها في التنزيلات.</p>
+        <div class="save-grid" id="exportGrid">
+          <button class="save-btn x" data-fmt="xlsx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M9 8.5l6 7M15 8.5l-6 7"/></svg>حفظ كـ Excel</button>
+          <button class="save-btn p" data-fmt="pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>حفظ كـ PDF</button>
+          <button class="save-btn p" data-year="1" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M9 15h6"/></svg>تقرير سنوي PDF</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>استيراد مصاريف من ملف</h3>
+        <p class="hint">ارفع ملف PDF أو Excel أو CSV فيه مصاريفك، ومليم هيقرا البنود ويوزعها على الفئات. اللي مش مفهوم بيروح «أخرى»، وبتراجع كل حاجة قبل ما تتسجل.</p>
+        <button class="btn" id="impBtn" style="width:100%;margin-top:12px">📥 اختار ملف</button>
+      </div>
+      </div>
+    </div>
+
+    <div id="reportsDetail" hidden>
+      <div class="topbar">
+        <h1 id="detailTitle"></h1>
+        <button class="back" id="backBtn" aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      </div>
+      <div class="card">
+        <h3>توزيع المصاريف</h3>
+        <div class="donut-box" id="donut"></div>
+        <ul class="legend" id="legend"></ul>
+      </div>
+      <div id="dayByDay"></div>
+    </div>
+
+    <div id="reportsCategory" hidden>
+      <div class="topbar"><h1 id="reportCategoryTitle"></h1><button type="button" class="back" id="reportCategoryBack" aria-label="رجوع">‹</button></div>
+      <div class="card report-category-total"><span id="reportCategoryPeriod" class="hint"></span><strong id="reportCategoryTotal"></strong><span id="reportCategoryCount" class="hint"></span></div>
+      <div id="reportCategoryList"></div>
+    </div>
+    <div id="reportsSearch" hidden>
+      <div class="topbar">
+        <h1>بحث في كل الحركات</h1>
+        <button class="back" id="searchBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      </div>
+      <div class="field search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="searchIn" type="search" placeholder="مصروف أو تحويل أو دخل أو سلفة أو قسط" autocomplete="off" enterkeyhint="search" aria-label="بحث في كل الحركات"></div>
+      <div class="sf-bar"><button type="button" class="sf-btn" id="sfBtn" aria-expanded="false">فلاتر</button><button type="button" class="linkbtn" id="sfClear" hidden>مسح الفلاتر</button></div>
+      <div class="sf-panel" id="sfPanel" hidden>
+        <details class="sf-categories"><summary id="sfCatSummary">كل الفئات</summary><div id="sfCat" class="sf-cat-options" role="group" aria-label="اختار فئة أو أكتر"></div></details>
+        <div class="sf-field sf-payment"><span>طريقة الدفع</span><select id="sfPay" hidden></select><button type="button" class="sf-pick" id="sfPayPick" aria-haspopup="menu" aria-expanded="false"></button></div>
+        <div class="sf-field"><span>من يوم</span><input id="sfFrom" type="hidden"><button type="button" class="sf-pick" id="sfFromPick" aria-haspopup="dialog"></button></div>
+        <div class="sf-field"><span>لحد يوم</span><input id="sfTo" type="hidden"><button type="button" class="sf-pick" id="sfToPick" aria-haspopup="dialog"></button></div>
+        <label>من مبلغ<input id="sfMin" type="text" inputmode="decimal" placeholder="0"></label>
+        <label>لحد مبلغ<input id="sfMax" type="text" inputmode="decimal" placeholder="—"></label>
+      </div>
+      <div class="sf-sort"><span>ترتيب المصروفات</span><select id="sfSort" hidden><option value="time-desc">الأحدث الأول</option><option value="time-asc">الأقدم الأول</option><option value="amount-desc">المبلغ: من الأكبر للأصغر</option><option value="amount-asc">المبلغ: من الأصغر للأكبر</option><option value="cat-asc">الفئة: أ إلى ي</option><option value="cat-desc">الفئة: ي إلى أ</option></select><button type="button" class="sf-pick" id="sfSortPick" aria-haspopup="menu" aria-expanded="false"></button></div>
+      <p class="search-sum" id="searchSum" aria-live="polite"></p>
+      <div id="searchRes"></div>
+    </div>
+  </section>
+
+  <!-- التزاماتي -->
+  <section class="view" id="v-debts" aria-label="التزاماتي">
+    <div class="topbar"><h1>التزاماتي</h1></div>
+    <div class="ob-sum">
+      <div class="os in"><small>ليك عند الناس</small><b><span class="num" id="sumIn">0</span></b><span class="n" id="sumInN"></span></div>
+      <div class="os out"><small>عليك للناس</small><b><span class="num" id="sumOut">0</span></b><span class="n" id="sumOutN"></span></div>
+    </div>
+    <div class="seg ob-seg" id="obSeg" role="group" aria-label="نوع الالتزام">
+      <button data-ob="debts">السلف والديون</button>
+      <button data-ob="gams">الجمعيات</button>
+      <button data-ob="insts">التقسيط</button>
+    </div>
+    <div id="obDebts"></div>
+    <div id="obGams" hidden></div>
+    <div id="obInsts" hidden></div>
+  </section>
+
+  <!-- أنا -->
+  <section class="view" id="v-me" aria-label="أنا">
+    <div id="meHome">
+    <div class="topbar" style="justify-content:flex-start;gap:12px"><button class="back" id="meBack" type="button" aria-label="رجوع" style="display:none"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>أنا</h1></div>
+    <div class="me-card">
+      <button class="me-av" id="meAv" aria-label="الصورة الشخصية"></button>
+      <div class="me-txt"><b id="meName" data-notr dir="auto"></b><small id="meSub"></small></div>
+      <span class="streak" id="meStreak" hidden></span>
+    </div>
+    <input type="file" id="photoFile" accept="image/*" hidden>
+    <div class="card">
+      <div class="card-h"><h3 id="mmTitle">فلوسي الشهر ده</h3><span class="hint" id="mmPeriod"></span></div>
+      <div class="mm-grid">
+        <div class="mm in"><small>الدخل</small><b id="mmIn">0</b></div>
+        <div class="mm out"><small>صرفت</small><b id="mmOut">0</b></div>
+        <div class="mm sv"><small id="mmSvL">حوشت</small><b id="mmSv">0</b></div>
+      </div>
+      <div id="mmTarget"></div>
+    </div>
+    <div id="meGroups"></div>
+    </div>
+    <div class="me-page" data-mepage="accounts" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الحسابات</h1></div>
+    <div class="card" id="accCard">
+      <div class="card-h"><h3>حساباتي</h3><span class="hint" id="accTotal"></span></div>
+      <p class="hint">البنوك والمحافظ والكاش اللي معاك. اختار الحساب وانت بتسجل المصروف، والرصيد بيتحدّث لوحده.</p>
+      <div id="accList"></div>
+      <div class="acc-btns">
+        <button class="btn add-cat" id="addAcc" type="button">＋ حساب جديد</button>
+        <button class="btn add-cat" id="addTr" type="button">⇄ تحويل بين حساباتي</button>
+      </div>
+      <button class="btn add-cat" id="accMv" type="button" style="width:100%;margin-top:8px">⇅ نقل بين حساباتي والميزانية</button>
+      <div id="trList"></div>
+      <div class="pay-row"><div class="txt">عرض الأرصدة في المصروفات<small>تظهر في أول الصفحة الرئيسية</small></div><select id="moneyViewSel" aria-label="عرض الأرصدة"><option value="sum">ملخص</option><option value="split">تفصيل</option><option value="off">مخفي</option></select></div>
+    </div>
+    <div class="card" id="savCard">
+      <div class="card-h"><h3>💰 مدخراتي</h3><span class="hint" id="savTotal"></span></div>
+      <p class="hint">فلوس كنت محوشها قبل مليم، في البيت أو في أي مكان. التحويل منها وليها مش مصروف ولا دخل، ومش بيغيّر الميزانية.</p>
+      <div id="savList"></div>
+      <button class="btn add-cat" id="addSav" type="button" style="width:100%;margin-top:8px">＋ مدخرات كنت محوشها قبل مليم</button>
+      <button class="btn add-cat" id="savMv" type="button" style="width:100%;margin-top:8px" hidden>⇅ نقل بين مدخراتي والميزانية</button>
+    </div>
+    </div>
+    <div class="me-page" data-mepage="fixed" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>المصاريف الثابتة والجاية</h1></div>
+    <div class="card">
+      <div class="card-h"><h3>مصاريف ثابتة</h3><span class="hint" id="fixTotal"></span></div>
+      <p class="hint">زي الإيجار والنت والاشتراكات. هتظهرلك في الصفحة الرئيسية في ميعادها عشان تسجلها بدوسة.</p>
+      <div id="fixList"></div>
+      <button class="btn add-cat" id="addFixed" style="width:100%;margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>إضافة مصروف ثابت</button>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>مصروفات جاية</h3><span class="hint" id="plTotal"></span></div>
+      <p class="hint">حاجة هتدفعها أو تشتريها في يوم معين ومش بتتكرر. هتظهرلك في الصفحة الرئيسية قبل ميعادها، ويجيلك تنبيه قبلها بيوم، وتسجلها بدوسة. وبتتحسب من «تقدر تصرف قد إيه في اليوم» قبل ما تحصل.</p>
+      <div id="plList"></div>
+      <button class="btn add-cat" id="addPlan" style="width:100%;margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>إضافة مصروف جاي</button>
+    </div>
+    </div>
+    <div class="me-page" data-mepage="saving" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الادخار</h1></div>
+    <div class="card">
+      <h3>الادخار</h3>
+      <div class="pay-row"><div class="txt">هدف الادخار الشهري<small>اللي عايز تحوشه كل شهر</small></div><input id="saveTargetIn" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" aria-label="هدف الادخار الشهري"></div>
+      <div id="goalList" style="margin-top:12px"></div>
+      <button class="btn add-cat" id="addGoal" style="width:100%;margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>هدف ادخار جديد</button>
+    </div>
+    </div>
+    <div class="me-page" data-mepage="gold" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الدهب</h1></div>
+    <div class="card" id="goldSum"></div>
+    <div class="card">
+      <div class="card-h"><h3>مشترياتك</h3></div>
+      <div id="goldList"></div>
+      <button class="btn add-cat" id="addGold" type="button" style="width:100%;margin-top:10px">＋ شراء دهب</button>
+    </div>
+    </div>
+    <div class="me-page" data-mepage="budget" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الميزانية وطريقة القبض والدخل</h1></div>
+    <div class="card">
+      <h3 id="budgetCardTitle">ميزانية الشهر</h3>
+      <p class="hint" style="margin:6px 0 0">بتقبض إزاي؟</p>
+      <div class="seg" id="payTypeSeg" role="group" aria-label="طريقة القبض"><button type="button" data-pt="monthly">شهري</button><button type="button" data-pt="weekly">أسبوعي</button><button type="button" data-pt="biweekly">كل أسبوعين</button><button type="button" data-pt="variable">متغير</button></div>
+      <p class="hint" id="payTypeHint" style="margin:8px 0 0"></p>
+      <div class="pay-row" id="anchorRow" hidden><div class="txt">آخر يوم قبضت فيه<small>الفترة بتتحسب من اليوم ده</small></div><input id="payAnchor" class="date-in" type="date" aria-label="آخر يوم قبض" style="width:150px"></div>
+      <div class="seg" id="budgetSeg" role="group" aria-label="نوع الميزانية">
+        <button data-mode="fixed">تحديد ميزانية</button>
+        <button data-mode="open">ميزانية مفتوحة</button>
+      </div>
+      <div id="budgetFixed">
+        <p class="hint" style="margin-top:12px">صفحة المصروفات بتحسب الباقي على أساس الرقم ده.</p>
+        <div class="field">
+          <input id="budgetInput" type="text" inputmode="decimal" placeholder="مثلاً 10000" aria-label="ميزانية الشهر">
+          <span class="cur">ج.م</span>
+        </div>
+        <div class="pay-row" id="paydayRow">
+          <div class="txt">يوم القبض<small id="payHint"></small></div>
+          <select id="payday" aria-label="يوم القبض"></select>
+        </div>
+        <button class="btn primary" id="saveBudget" style="width:100%;margin-top:10px">حفظ الميزانية</button>
+      </div>
+      <p class="hint" id="budgetOpen" style="margin-top:12px">من غير حد للصرف. الشاشة الرئيسية هتعرض إجمالي مصاريفك في الشهر وانت بتضيف.</p>
+    </div>
+        <div class="card mny" id="inCard">
+      <div class="card-h"><h3>الدخل المستلم</h3><span class="hint" id="inTotal"></span></div>
+      <p class="hint" id="inHint"></p>
+      <div id="inRec"></div>
+      <div id="inStats"></div>
+      <p class="hint">اضغط على عملية دخل لتعديلها أو حذفها</p>
+      <div id="inList"></div>
+      <button type="button" class="btn" id="inMore" hidden style="width:100%;margin-top:12px">عرض المزيد</button>
+      <button type="button" class="btn" id="inLess" hidden style="width:100%;margin-top:8px">عرض أقل</button>
+      <button class="btn add-cat" id="addIn" type="button" style="width:100%;margin-top:10px">＋ استلمت دخل</button>
+    </div>
+    </div>
+    <div class="me-page" data-mepage="data" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>بياناتي</h1></div>
+    <div class="card">
+      <div class="data-av-wrap"><button class="data-av" id="dataAv" type="button" aria-label="الصورة الشخصية"></button><span class="data-av-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg></span></div>
+      <div class="field"><input id="profName" type="text" placeholder="اسمك" maxlength="24" autocomplete="given-name" aria-label="الاسم" style="font-size:1.05rem"></div>
+      <div class="field"><input id="profAge" type="text" inputmode="numeric" placeholder="العمر" maxlength="3" aria-label="العمر" style="font-size:1.05rem"><span>سنة</span></div>
+      <div class="pay-row"><div class="txt">العملة</div><select id="currencySel" aria-label="العملة"></select></div>
+      <p class="err-msg" id="profErr" style="text-align:start"></p>
+      <button class="btn primary" id="saveProfile" style="width:100%">حفظ بياناتي</button>
+    </div>
+    </div>
+    <div class="me-page" data-mepage="stats" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>إحصائياتي</h1></div>
+    <div class="card">
+      <h3>إحصائياتي</h3>
+      <div class="st-grid" id="statsGrid"></div>
+    </div>
+    </div>
+    <div class="me-page" data-mepage="home" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الصفحة الرئيسية</h1></div>
+    <div class="card" id="homeCard">
+      <h3>الصفحة الرئيسية</h3>
+      <p class="hint">اختار إيه اللي يظهرلك في صفحة المصروفات. الميزانية فوق بتفضل دايمًا.</p>
+      <div id="homeToggles"></div>
+    </div>
+    </div>
+  </section>
+
+  <!-- الإعدادات -->
+  <section class="view" id="v-settings" aria-label="الإعدادات">
+
+    <div id="setHome">
+    <div class="topbar"><h1>الإعدادات</h1></div>
+    <div class="field set-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input id="setQ" type="search" placeholder="دوّر في الإعدادات" autocomplete="off" aria-label="دوّر في الإعدادات"><button type="button" class="set-q-x" id="setQX" aria-label="مسح البحث" hidden>✕</button></div>
+    <div id="setRes" hidden><div class="card set-list" id="setResList"></div></div>
+    <div id="setGroups">
+      <div class="set-gt">الحساب</div>
+      <div class="card set-list"><button type="button" class="set-item" data-set-go="members" id="si-members"><span class="si" style="--c:#2D7FD3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg></span><span class="st"><b>الأعضاء</b><small id="ss-members"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="security" id="si-security"><span class="si" style="--c:#475569"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.3"/></svg></span><span class="st"><b>القفل والحماية</b><small id="ss-security"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+      <div class="set-gt">التخصيص</div>
+      <div class="card set-list"><button type="button" class="set-item" data-set-go="lang" id="si-lang"><span class="si" style="--c:#0E7C7B"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg></span><span class="st"><b>اللغة</b><small id="ss-lang" data-notr></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="appearance" id="si-appearance"><span class="si" style="--c:#8B5CF6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.8 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.8-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.1"/><circle cx="10.5" cy="7.5" r="1.1"/><circle cx="15" cy="7.8" r="1.1"/></svg></span><span class="st"><b>المظهر</b><small id="ss-appearance"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="cats" id="si-cats"><span class="si" style="--c:#E07A2E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5a1.5 1.5 0 0 1 1.5-1.5h7.2l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-7.1 7.1a1.5 1.5 0 0 1-2.1 0z"/><circle cx="8" cy="8" r="1.4"/></svg></span><span class="st"><b>الفئات</b><small id="ss-cats"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="pays" id="si-pays"><span class="si" style="--c:#16A34A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h3"/></svg></span><span class="st"><b>طرق الدفع</b><small id="ss-pays"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+      <div class="set-gt">التنبيهات والسرعة</div>
+      <div class="card set-list"><button type="button" class="set-item" data-set-go="alerts" id="si-alerts"><span class="si" style="--c:#E11D48"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span><span class="st"><b>التنبيهات والتذكيرات</b><small id="ss-alerts"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="capture" id="si-capture"><span class="si" style="--c:#0EA5A4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5h16v9H8l-4 3.5z"/><path d="M12 8.5v4.5M10 10.8h4"/></svg></span><span class="st"><b>التسجيل من إشعارات البنك</b><small id="ss-capture"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="widget" id="si-widget"><span class="si" style="--c:#4F46E5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><path d="M17 14v6M14 17h6"/></svg></span><span class="st"><b>الويدجت والإعدادات السريعة</b><small id="ss-widget"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+      <div class="set-gt">المشاركة والبيانات</div>
+      <div class="card set-list"><button type="button" class="set-item" data-set-go="space" id="si-space"><span class="si" style="--c:#D9466F"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M7.5 12h9" opacity=".0"/><circle cx="8.5" cy="10" r="1.6"/><circle cx="15.5" cy="10" r="1.6"/><path d="M6.5 16c.8-1.5 2.1-2.2 3.5-2.2M17.5 16c-.8-1.5-2.1-2.2-3.5-2.2"/></svg></span><span class="st"><b>المساحة المشتركة</b><small id="ss-space"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item" data-set-go="backup" id="si-backup"><span class="si" style="--c:#0284C7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.8 8.6 4 4 0 0 1 17.5 18"/><path d="M12 11v8M9.2 13.8 12 11l2.8 2.8"/></svg></span><span class="st"><b>النسخ الاحتياطي</b><small id="ss-backup"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="set-item danger" data-set-go="data" id="si-data"><span class="si" style="--c:#C2412D"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 12.5a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-12.5"/><path d="M10.5 11v6M13.5 11v6"/></svg></span><span class="st"><b>مسح البيانات</b><small id="ss-data"></small></span></button></div>
+      <div class="set-gt" id="sg-app" hidden>التطبيق</div>
+      <div class="card set-list" id="sg-app-list" hidden><button type="button" class="set-item" data-set-go="update" id="si-update"><span class="si" style="--c:#0F766E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4.5h-4.5"/><path d="M12 8v5l3 2"/></svg></span><span class="st"><b>التحديثات</b><small id="ss-update"></small></span></button><button type="button" class="set-item" data-set-go="feedback" id="si-feedback"><span class="si" style="--c:#7C3AED"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><span class="st"><b>اقتراحات وملاحظات</b><small id="ss-feedback"></small></span></button></div>
+    </div>
+    <div class="card dev2" style="margin-top:18px">
+      <div class="dv-top">
+        <div class="dv-av" dir="ltr" aria-hidden="true">HT</div>
+        <div class="dv-txt"><div class="dv-name" dir="ltr">Hesham Taha</div><div class="dv-role">مطور مليم</div></div>
+        <span class="dv-ver" dir="ltr">v1.0</span>
+      </div>
+      <div class="socials">
+        <a href="https://www.facebook.com/HeshamTahaOfficial" target="_blank" rel="noopener" aria-label="فيسبوك"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.23 2.68.23v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg></a>
+        <a href="https://www.youtube.com/@heshamtaha1" target="_blank" rel="noopener" aria-label="يوتيوب"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
+        <a href="https://github.com/newmatrix/" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.3 1.9 1.3 3.1 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg></a>
+      </div>
+    </div>
+    <div class="card support" id="supportCard">
+      <div class="sup-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6a5 5 0 1 1 7.5 6.6z"/></svg>ادعم مليم</div>
+      <p class="hint">مليم مجاني ومن غير إعلانات. لو عجبك وحابب تساعد إنه يكمّل، أي مبلغ يفرق معانا.</p>
+      <div class="sup-grid">
+        <a class="sup-btn" id="supIpa" href="https://ipn.eg/S/heshamtaha02/instapay/6qo1sd" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg><b>InstaPay</b><small dir="ltr">heshamtaha02@instapay</small></a>
+        <button type="button" class="sup-btn" id="supVfc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6"/><path d="M20 12v4h-4a2 2 0 0 1 0-4h4"/></svg><b>فودافون كاش</b><small dir="ltr">01001649278</small></button>
+      </div>
+    </div>
+    </div>
+    <div class="set-page" data-page="members" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الأعضاء</h1></div>
+    <div class="card" id="mbCard">
+      <h3>الأعضاء</h3>
+      <p class="hint">كل عضو ليه مصاريفه والتزاماته وإعداداته وكلمة السر بتاعته. الويدجت والتذكيرات وتسجيل المصاريف من إشعارات البنك بتشتغل للعضو اللي فتح التطبيق آخر مرة.</p>
+      <div id="mbList"></div>
+      <div class="export-grid"><button class="btn" id="mbAdd" type="button">إضافة عضو</button><button class="btn" id="mbSwitch" type="button">تبديل العضو</button></div>
+    </div>
+    </div>
+    <div class="set-page" data-page="security" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>القفل والحماية</h1></div>
+    <div class="card">
+      <h3>الحماية</h3>
+      <div class="set-row">
+        <div class="txt">قفل بكلمة سر<small>رقم سري من 4 أرقام أو كلمة سر عند فتح التطبيق</small></div>
+        <label class="switch"><input type="checkbox" id="pinToggle" aria-label="قفل بكلمة سر"><i></i></label>
+      </div>
+      <div class="set-row" id="lockChangeRow" hidden>
+        <div class="txt">تغيير كلمة السر<small>أو التحويل من رقم سري لكلمة سر والعكس</small></div>
+        <button class="btn" id="lockChange" type="button">تغيير</button>
+      </div>
+      <div class="set-row">
+        <div class="txt">قفل بالبصمة<small id="bioHint">بيشتغل في نسخة أندرويد</small></div>
+        <label class="switch"><input type="checkbox" id="bioToggle" aria-label="قفل بالبصمة" disabled><i></i></label>
+      </div>
+    </div>
+    </div>
+    <div class="set-page" data-page="lang" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>اللغة</h1></div>
+    <div class="card">
+      <p class="hint">اختار لغة التطبيق، وشوف شكلها تحت قبل ما تحفظ.</p>
+      <div class="lang-seg" id="langSeg" role="radiogroup" aria-label="اللغة" data-notr></div>
+      <div class="lang-demo" id="langDemo" aria-live="polite" data-notr></div>
+      <p class="hint" id="langNote" data-notr style="margin-top:10px"></p>
+      <button class="btn primary" type="button" id="langSave" data-notr style="width:100%;margin-top:6px"></button>
+    </div>
+  </div>
+  <div class="set-page" data-page="appearance" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>المظهر</h1></div>
+    <div class="card">
+      <h3>المظهر</h3>
+      <div class="seg" id="themeSeg" role="group" aria-label="المظهر">
+        <button data-theme="light">فاتح</button>
+        <button data-theme="dark">داكن</button>
+        <button data-theme="system">تابع للنظام</button>
+      </div>
+      <div class="style-grid" id="styleGrid" role="group" aria-label="ستايل التطبيق"></div>
+      <p class="hint" id="styleHint" hidden>الستايل ده داكن دايمًا، بغض النظر عن اختيار فاتح أو داكن.</p>
+      <div class="accent-row" id="accentRow" role="group" aria-label="لون التطبيق"></div>
+    </div>
+
+    <div class="card" id="fontCard">
+      <h3 class="look-h">الخط</h3>
+      <p class="hint">اختار الخط اللي مريح لعينك، وبيتطبّق على التطبيق كله. وتقدر تخلّي الكتابة أعرض.</p>
+      <div class="font-grid" id="fontList" role="radiogroup" aria-label="الخط"></div>
+      <div class="font-sample" id="fontSample" aria-live="polite">ميزانية الشهر ٥,٠٠٠ ج.م، فاضل ٣,٢٤٠ ج.م</div>
+      <span class="mb-lab" id="fwLab" style="display:block;margin-top:12px">سمك الخط</span>
+      <div class="fw-pills" id="fwSeg" role="group" aria-labelledby="fwLab"><button type="button" class="fw-pill" data-fw="normal" style="font-weight:400">عادي</button><button type="button" class="fw-pill" data-fw="bold" style="font-weight:800">عريض</button></div>
+    </div>
+
+    <div class="card" id="lookCard">
+      <h3 class="look-h">شكل الواجهة</h3>
+      <p class="hint">بيغيّر شكل الكروت والمسافات وحجم الخط، وبيشتغل مع أي ثيم ولون فوق.</p>
+      <div class="look-list look-row" id="lookList" role="radiogroup" aria-label="شكل الواجهة"></div>
+      <p class="hint look-desc" id="lookDesc" aria-live="polite"></p>
+    </div>
+
+    <div class="card" id="motionCard">
+      <h3 class="look-h">الحركة</h3>
+      <p class="hint">إحساس الأزرار لما تدوس عليها، وطريقة ظهور الشاشات لما تنقل بينها.</p>
+      <span class="mb-lab" id="pressLab">نبضة الأزرار</span>
+      <div class="look-list look-row" id="pressList" role="radiogroup" aria-labelledby="pressLab"></div>
+      <p class="hint look-desc" id="pressDesc" aria-live="polite"></p>
+      <span class="mb-lab" id="transLab">حركة التنقل</span>
+      <div class="look-list look-row" id="transList" role="radiogroup" aria-labelledby="transLab"></div>
+      <p class="hint look-desc" id="transDesc" aria-live="polite"></p>
+      <div class="set-row" id="hapticRow" hidden style="margin-top:10px">
+        <div class="txt">اهتزاز خفيف<small>هزة صغيرة جدًا مع كل دوسة</small></div>
+        <label class="switch"><input type="checkbox" id="hapticToggle" aria-label="اهتزاز خفيف"><i></i></label>
+      </div>
+    </div>
+    </div>
+    <div class="set-page" data-page="cats" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الفئات</h1></div>
+    <div class="card">
+      <div class="card-h"><h3>الفئات</h3><span class="hint" id="catCount"></span></div>
+      <p class="hint">دي الفئات اللي بتختار منها وانت بتسجل مصروف. اسحب أيقونة ⋮⋮ عشان تغيّر ترتيبها، أو دوس مطولًا على أي فئة وانت بتضيف مصروف وحرّكها.</p>
+      <div id="catList"></div>
+      <div class="cat-actions solo" id="catActions">
+        <button class="btn add-cat" id="addCat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>إضافة فئة جديدة</button>
+      </div>
+      <button class="btn add-cat" id="addCatSug" style="width:100%;margin-top:8px">فئات مقترحة</button>
+    </div>
+    </div>
+    <div class="set-page" data-page="pays" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>طرق الدفع</h1></div>
+    <div class="card">
+      <div class="card-h"><h3>طرق الدفع</h3><span class="hint" id="payCount"></span></div>
+      <p class="hint">دوس على أي طريقة عشان تخليها الافتراضية في المصاريف الجديدة، ومن ⋮ تعدلها أو تحذفها.</p>
+      <div id="payList" class="pay-grid"></div>
+      <button class="btn add-cat" id="addPay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>إضافة طريقة دفع</button>
+    </div>
+    </div>
+    <div class="set-page" data-page="alerts" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>التنبيهات والتذكيرات</h1></div>
+    <div class="card">
+      <h3>التنبيهات</h3>
+      <p class="hint" id="alertsHint"></p>
+      <div class="set-row" id="row80">
+        <div class="txt"><span id="lbl80">لما أوصل 80% من الميزانية</span><small>تنبيه إنك قربت تخلص ميزانيتك</small></div>
+        <label class="switch"><input type="checkbox" id="alert80" aria-label="تفعيل تنبيه قرب نهاية الميزانية"><i></i></label>
+      </div>
+      <div class="set-row" id="rowPct">
+        <div class="txt">نسبة التنبيه<small>غيّرها على حسب راحتك</small></div>
+        <button type="button" class="time-chip" id="pctChip" aria-label="تغيير نسبة التنبيه">80%</button>
+      </div>
+      <button class="linkbtn" id="previewNotif">شوف شكل التنبيه</button>
+      <div class="sep"></div>
+      <div class="set-row" style="border-top:0">
+        <div class="txt">تذكير يومي<small>عشان تسجل أي مصروف نسيته قبل ما اليوم يخلص</small></div>
+        <label class="switch"><input type="checkbox" id="remindToggle" aria-label="تذكير يومي"><i></i></label>
+      </div>
+      <div class="set-row" id="remindTimeRow">
+        <div class="txt">وقت التذكير<small>دوس على الوقت عشان تغيّره</small></div>
+        <button type="button" class="time-chip" id="remindTimeChip" aria-label="تغيير وقت التذكير اليومي">11:00 م</button>
+      </div>
+      <button class="linkbtn" id="previewRemind">شوف شكل التذكير</button>
+      <div class="sep"></div>
+      <div class="set-row" style="border-top:0">
+        <div class="txt">تذكير بالمواعيد<small>السلف والجمعيات والمصاريف الثابتة، قبل الميعاد بيوم ويوم الميعاد نفسه</small></div>
+        <label class="switch"><input type="checkbox" id="dueToggle" aria-label="تذكير بالمواعيد"><i></i></label>
+      </div>
+      <div class="sep"></div>
+      <div class="set-row" style="border-top:0">
+        <div class="txt">ملخص شهري<small>أول كل شهر: صرفت قد إيه مقارنة باللي قبله، وإيه اللي زاد أو قل، والحاجات اللي بتتكرر ومش متسجلة ثابتة</small></div>
+        <label class="switch"><input type="checkbox" id="sumToggle" aria-label="ملخص شهري"><i></i></label>
+      </div>
+      <button class="linkbtn" id="sumShow">شوف ملخص الشهر اللي فات</button>
+      <div id="exactRow" hidden>
+        <p class="hint" style="margin-top:8px">أندرويد ممكن يأخر التذكيرات شوية عشان يوفر البطارية. لو عايزها تيجي في ميعادها بالظبط اسمح بـ"المنبهات والتذكيرات".</p>
+        <button class="linkbtn" id="exactBtn">اسمح بالتذكير في الميعاد بالظبط</button>
+      </div>
+    </div>
+    </div>
+    <div class="set-page" data-page="capture" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>التسجيل من إشعارات البنك</h1></div>
+    <div class="card" id="capCard" hidden>
+      <h3>تسجيل تلقائي من الإشعارات</h3>
+      <div class="set-row" style="border-top:0">
+        <div class="txt">لقط عمليات الدفع<small>من رسايل البنك وإشعارات المحافظ وإنستاباي. كل عملية بتظهرلك في الرئيسية وانت اللي بتأكد تسجيلها</small></div>
+        <label class="switch"><input type="checkbox" id="capToggle" aria-label="تسجيل تلقائي من الإشعارات"><i></i></label>
+      </div>
+      <p class="hint" id="capStatus"></p>
+      <button class="linkbtn" id="capPerm" hidden>كمّل تفعيل الإذن</button>
+      <div class="sep"></div>
+      <div class="set-row"><div class="txt">رسوم إنستاباي<small>لما تلقط عملية إنستاباي خارجة، هقترح عليك تسجّل رسومها معاها وانت اللي بتوافق قبل الحفظ</small></div><label class="switch"><input type="checkbox" id="ipFeeToggle" aria-label="رسوم إنستاباي"><i></i></label></div>
+      <div id="ipFeeBox" hidden>
+        <div class="pay-row"><div class="txt">النسبة<small>% من مبلغ التحويل</small></div><input id="ipFeePct" class="date-in" type="text" inputmode="decimal" dir="ltr" aria-label="نسبة الرسوم" style="width:90px"></div>
+        <div class="pay-row"><div class="txt">أقل رسوم<small>بالجنيه</small></div><input id="ipFeeMin" class="date-in" type="text" inputmode="decimal" dir="ltr" aria-label="أقل رسوم" style="width:90px"></div>
+        <div class="pay-row"><div class="txt">أكتر رسوم<small>بالجنيه</small></div><input id="ipFeeMax" class="date-in" type="text" inputmode="decimal" dir="ltr" aria-label="أكتر رسوم" style="width:90px"></div>
+        <p class="hint" id="ipFeeHint"></p>
+      </div>
+      <div id="capBlockedWrap" hidden>
+        <div class="sep"></div>
+        <strong style="display:block;margin:8px 0 2px;font-size:.92rem">تطبيقات بتتجاهلها</strong>
+        <div id="capBlocked"></div>
+      </div>
+    </div>
+    </div>
+    <div class="set-page" data-page="feedback" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>اقتراحات وملاحظات</h1></div>
+    <div class="card" id="fbCard">
+      <p class="hint" style="margin:0 0 10px">عندك فكرة تحسّن مليم، أو مشكلة قابلتك؟ اكتبها هنا وهتوصل للمطوّر مباشرة.</p>
+      <div class="in-chips tight" id="fbKind" role="group" aria-label="النوع"><button type="button" data-fk="sug" aria-pressed="true">💡 اقتراح</button><button type="button" data-fk="bug" aria-pressed="false">🐞 مشكلة</button></div>
+      <div class="field" style="margin-top:10px"><input id="fbName" type="text" maxlength="60" placeholder="اسمك" autocomplete="off" aria-label="اسمك"></div>
+      <div class="field" style="margin-top:8px"><input id="fbEmail" type="email" inputmode="email" maxlength="100" placeholder="إيميلك (اختياري)" autocomplete="off" aria-label="إيميلك" style="text-align:start;font-weight:500"></div>
+      <div class="field" style="margin-top:8px;align-items:flex-start"><textarea id="fbText" maxlength="2000" rows="5" placeholder="اكتب اقتراحك بالتفصيل..." aria-label="الاقتراح أو المشكلة" style="flex:1;min-width:0;min-height:130px;border:0;background:none;padding:10px 0;font:inherit;font-size:1.05rem;outline:none;resize:vertical;color:inherit"></textarea></div>
+      <p class="hint" style="margin:8px 0 0">لو كتبت إيميلك هرد عليك عليه. هيتبعت معاه رقم نسخة مليم وإصدار أندرويد بس، ومفيش أي بيانات مالية بتتبعت.</p>
+      <p class="err-msg" id="fbMsg" aria-live="polite"></p>
+      <button class="btn primary" id="fbSend" type="button" style="width:100%;margin-top:6px">ابعت</button>
+      <button class="linkbtn" id="fbOpen" type="button" hidden>افتح الفورم في المتصفح وابعت من هناك</button>
+    </div>
+    </div>
+    <div class="set-page" data-page="widget" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الويدجت والإعدادات السريعة</h1></div>
+    <div class="card" id="wgCard" hidden>
+      <h3>الويدجت والإعدادات السريعة</h3>
+      <p class="hint">ضيف ويدجت مليم لشاشتك الرئيسية، وبلاطة «مصروف بالصوت» في الإعدادات السريعة.</p>
+      <div class="export-grid">
+        <button class="btn" id="wgAddS" type="button">ويدجت صغيرة</button>
+        <button class="btn" id="wgAddM" type="button">ويدجت متوسطة</button>
+      </div>
+      <button class="btn" id="wgAddTile" type="button" style="width:100%;margin-top:8px">إضافة بلاطة «مصروف بالصوت»</button>
+      <div class="set-row" style="margin-top:12px">
+        <div class="txt">إخفاء المبالغ في الويدجت<small>الأرقام بتتخفى (••••)، لكن نسبة الصرف من الميزانية والشريط بيفضلوا ظاهرين</small></div>
+        <label class="switch"><input type="checkbox" id="wgHide" aria-label="إخفاء المبالغ في الويدجت"><i></i></label>
+      </div>
+      <p class="hint">لو الأزرار ما اشتغلتش على جهازك: اضغط مطولًا على فراغ في الشاشة الرئيسية ← الويدجت ← مليم. وللبلاطة: اسحب الإعدادات السريعة ← أيقونة القلم ← مليم.</p>
+    </div>
+    </div>
+    <div class="set-page" data-page="space" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>المساحة المشتركة</h1></div>
+    <div class="card" id="spaceCard">
+      <div class="card-h"><h3>مساحة مشتركة</h3><span class="hint" id="spStatus"></span></div>
+      <div id="spOff">
+        <p class="hint">أنشئ مساحة أو انضم بكود. تقدر تختار أنواع البيانات اللي توافق على مشاركتها.</p>
+        <div class="sp-row" style="margin-top:12px"><button class="btn primary" id="spCreate" aria-expanded="false" aria-controls="spPanel">إنشاء مساحة</button><button class="btn" id="spJoin" aria-expanded="false" aria-controls="spPanel">انضمام بكود</button></div>
+        <div class="sp-panel" id="spPanel" hidden>
+          <div id="spCodeWrap" class="sp-code-wrap" hidden>
+            <label class="wl-lab" for="spCodeIn">كود المساحة</label>
+            <div class="field"><input id="spCodeIn" type="text" dir="ltr" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX" style="text-align:center;letter-spacing:.1em"></div>
+          </div>
+          <div class="sp-setup-prefs" id="spSetupPrefs">
+            <h3 id="spSetupTitle">اختيارات المشاركة</h3>
+            <p class="hint" id="spSetupIntro">حدد أنواع البيانات التي توافق على مشاركتها.</p>
+            <div id="spSetupTypeList" class="sp-type-list"></div>
+            <p class="sp-share-note">الأنواع اللي انت حددتها بس هي اللي هتظهر للطرف التاني. وأي نوع هتعطل مشاركته بعد كده هتفضل البيانات القديمة ظاهرة للطرف التاني.</p>
+          </div>
+          <label class="wl-lab" for="spName" style="margin-top:12px">اسمك في المساحة</label>
+          <div class="field"><input id="spName" type="text" maxlength="24" placeholder="مثلاً محمد"></div>
+          <p class="err-msg" id="spErr"></p>
+          <div class="sheet-actions" style="margin-top:12px"><button class="btn primary" id="spGo">إنشاء</button><button class="btn" id="spCancel">إلغاء</button></div>
+        </div>
+      </div>
+      <div id="spWait" hidden>
+        <p class="hint" id="spWaitText"></p>
+        <button class="btn" id="spManageWait" style="width:100%;margin-top:8px">اختيارات المشاركة</button>
+        <button class="linkbtn wl-link" id="spCancelRequest">إلغاء الطلب</button>
+      </div>
+      <div id="spOn" hidden>
+        <p class="hint">كود المساحة. ابعته للشخص التاني عشان يرسل طلب انضمام، وموافقتك مطلوبة.</p>
+        <div class="sp-code" id="spCode"></div>
+        <div class="sp-row"><button class="btn" id="spCopy">نسخ الكود</button><div class="sp-auto"><span>مشاركة المصاريف الجديدة تلقائيًا</span><label class="switch"><input type="checkbox" id="spAuto" aria-label="مشاركة المصاريف تلقائيًا"><i></i></label></div></div>
+        <button class="btn" id="spManageBtn" style="width:100%;margin-top:8px">إدارة المساحة</button>
+        <button class="btn" id="spUpload" style="width:100%;margin-top:8px" hidden>مشاركة مصاريفي يدويًا</button>
+        <p class="hint" id="spInfo" style="margin-top:10px"></p>
+        <div id="spReqWrap" hidden style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">
+          <strong>طلبات الانضمام</strong>
+          <div id="spReqList" class="sp-req-list"></div>
+        </div>
+        <div id="spMembersWrap" hidden style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">
+          <strong>الأعضاء</strong>
+          <div id="spMemList"></div>
+        </div>
+        <button class="linkbtn wl-link" id="spLeave">الخروج من المساحة</button>
+      </div>
+    </div>
+    </div>
+    <div class="set-page" data-page="backup" hidden>
+    <div class="topbar set-top"><button class="back" type="button" data-set-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>النسخ الاحتياطي</h1></div>
+    <div class="card" id="bkCard">
+      <h3>النسخ الاحتياطي</h3>
+      <p class="hint" id="backupHint"></p>
+      <div id="bkAuto" hidden>
+        <div id="driveOff"><button class="btn primary" id="driveLink" style="width:100%;margin-top:10px">ربط Google Drive</button></div>
+        <div id="driveOn" hidden>
+          <div class="set-row" style="margin-top:10px"><div class="txt">مربوط بحساب<small id="driveEmail" dir="ltr"></small></div><button type="button" class="linkbtn" id="driveUnlink" style="padding:0">فك الربط</button></div>
+        </div>
+        <div class="set-row" id="autoBkRow" style="margin-top:12px">
+          <div class="txt">نسخة تلقائية<small id="autoBkSub">كل فترة تختارها، لما تفتح التطبيق</small></div>
+          <button type="button" class="time-chip" id="autoBkChip" aria-label="تغيير مدة النسخ الاحتياطي التلقائي">كل 7 أيام</button>
+        </div>
+        <div id="bkToWrap" hidden>
+          <span class="mb-lab" id="bkToLab">النسخة تتحفظ فين</span>
+          <div class="seg" id="bkToSeg" role="group" aria-labelledby="bkToLab"><button type="button" data-to="drive" aria-pressed="false">Drive بس</button><button type="button" data-to="both" aria-pressed="false">Drive والموبايل</button></div>
+        </div>
+        <p class="hint" id="driveStatus"></p>
+      </div>
+      <div class="export-grid">
+        <button class="btn" id="backupBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 15l3-3 3 3"/></svg><span id="backupBtnTxt">نسخ احتياطي</span></button>
+        <button class="btn" id="restoreBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 17l3 3 3-3"/></svg>استعادة</button>
+      </div>
+    </div>
+    </div>
+    <div id="spManage" class="sub-anim">
+    <div class="topbar">
+      <h1 id="spManageTitle">إدارة المساحة</h1>
+      <button class="back" id="spManageBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+    </div>
+    <div class="card" id="spPrefsCard" hidden>
+      <h3 id="spPrefsTitle">البيانات اللي هشاركها</h3>
+      <p class="hint" id="spPrefsIntro"></p>
+      <div id="spTypeList" class="sp-type-list"></div>
+      <p class="sp-share-note" id="spPrefsNote">تفعيل نوع بيانات يرفع السجلات الموجودة والجديدة. عند إيقافه تظل النسخ التي سبق رفعها ظاهرة، وتتوقف مزامنة التغييرات الجديدة.</p>
+      <button class="btn primary sp-save-prefs" id="spSavePrefs" hidden>حفظ اختيارات المشاركة</button>
+    </div>
+    <div class="card" id="spDataCard" hidden>
+      <h3>البيانات المشتركة</h3>
+      <p class="hint">ملخص المصروفات والتقارير المشتركة. السلف والجمعيات والأهداف والدخل والمصاريف الثابتة بتظهر في شاشاتها العادية، وأي عضو مفعّل نوعها يقدر يعدّلها.</p>
+      <div id="spSharedData" class="sp-shared-data"></div>
+    </div>
+    </div>
+  </section>
+</div>
+
+<button class="fab" id="fab" aria-label="إضافة مصروف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+<button class="mic-fab" id="micFab" type="button" aria-label="تسجيل مصروف بالصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+<div class="voice-card" id="voiceCard" role="dialog" aria-live="polite" aria-label="تسجيل بالصوت">
+  <div class="vc-orb" id="vcOrb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+  <div class="vc-title" id="vcTitle">بحضّر المايك…</div>
+  <div class="vc-hint" id="vcHint">قول المبلغ والفئة، مثلًا: «٤٦٠ جنيه باقة انترنت ارضي». وللدخل: «استلمت مرتب ٨٠٠٠»</div>
+  <div class="vc-text" id="vcText" dir="auto"></div>
+  <button class="btn" id="vcCancel" type="button">إلغاء</button>
+</div>
+
+<nav class="nav" aria-label="التنقل الرئيسي"><div class="nav-in">
+  <button data-tab="expenses" aria-current="page"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h12v4"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 13.5h2"/></svg></span>المصروفات</button>
+  <button data-tab="reports"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>التقارير</button>
+  <button data-tab="debts"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg></span>التزاماتي</button>
+  <button data-tab="me"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.1 3.6-7 8-7s8 2.9 8 7"/></svg></span>أنا</button>
+  <button data-tab="settings"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span>الإعدادات</button>
+</div></nav>
+
+<!-- Add/Edit sheet -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="sheetTitle">مصروف جديد</h2><button type="button" class="kind-pill" id="kindPill" aria-haspopup="menu" aria-expanded="false" aria-label="نوع العملية: مصروف"><span>مصروف</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="head-pills"><button type="button" class="pay-pill" id="fundPill" aria-haspopup="menu" aria-expanded="false" hidden><span id="fundPillText">المرتب</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><select id="expenseFund" aria-label="يتخصم من" hidden><option value="budget">المرتب</option><option value="free">دخل حر</option></select><button type="button" class="pay-pill date-pill" id="datePill" aria-haspopup="menu" aria-expanded="false" aria-label="تاريخ المصروف"></button><button type="button" class="pay-pill" id="payPill" aria-haspopup="menu" aria-expanded="false" aria-label="طريقة الدفع"></button><button type="button" class="pay-pill" id="accPill" aria-haspopup="menu" aria-expanded="false" aria-label="الحساب اللي اتخصم منه المبلغ" hidden></button></div></div>
+  <label class="amount-box" id="amountBox" for="amountInput"><button type="button" class="calc-tg" id="calcTg" aria-label="آلة حاسبة" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01"/></svg></button><input id="amountInput" class="v" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" placeholder="0" aria-label="المبلغ" dir="ltr"><span class="c cur">ج.م</span></label>
+  <div class="calc-row" id="calcRow" hidden><span class="calc-res" id="calcRes"></span><div class="calc-ops" id="calcOps" aria-label="آلة حاسبة"><button type="button" data-op="+" aria-label="زائد">+</button><button type="button" data-op="-" aria-label="ناقص">−</button><button type="button" data-op="×" aria-label="ضرب">×</button><button type="button" data-op="÷" aria-label="قسمة">÷</button><button type="button" class="eq" data-op="=" aria-label="يساوي">=</button></div></div>
+  <div class="cats" id="cats" role="group" aria-label="الفئة"></div>
+  <input class="note" id="noteInput" type="text" placeholder="ملاحظة (اختياري)" maxlength="80">
+  <div class="note-sug" id="noteSug" hidden></div>
+  <label class="pay-row" id="ipFeeRow" style="cursor:pointer;margin-top:8px" hidden><span class="txt" id="ipFeeTxt"></span><input type="checkbox" id="ipFeeChk" style="width:22px;height:22px;accent-color:var(--brand)"></label>
+  <div class="rc-row" id="rcRow">
+    <input type="file" id="rcCam" accept="image/*" capture="environment" hidden>
+    <input type="file" id="rcGal" accept="image/*" hidden>
+    <div class="rc-btns" id="rcEmpty"><button type="button" class="dchip" id="rcCamBtn">📷 صوّر الإيصال</button><button type="button" class="dchip" id="rcGalBtn">🖼️ صورة من المعرض</button></div>
+    <div class="rc-has" id="rcHas" hidden><button type="button" class="rc-thumb" id="rcThumb" aria-label="عرض صورة الإيصال"><img id="rcImg" alt=""></button><span>صورة الإيصال<small class="rc-reading" id="rcReading" hidden>بقرا الإيصال…</small></span><button type="button" class="linkbtn rc-del" id="rcDel">شيل الصورة</button></div>
+  </div>
+  <p class="err-msg" id="sheetErr"></p>
+  <div class="sheet-actions" id="expActions">
+    <button class="btn primary" id="saveBtn">حفظ</button>
+    <button class="btn" id="cancelBtn">إلغاء</button>
+    <button class="btn danger sheet-del" id="delInSheet" hidden>حذف</button>
+  </div>
+  <button class="linkbtn fx-skip" id="fxSkip" hidden>مش هسجله الشهر ده</button>
+</div>
+
+<!-- receipt photo viewer -->
+<div class="rc-view" id="rcView" hidden role="dialog" aria-modal="true" aria-label="صورة الإيصال">
+  <button type="button" class="rc-x" id="rcViewX" aria-label="إغلاق">✕</button>
+  <div class="rc-scroll" id="rcScroll"><img id="rcViewImg" alt="صورة الإيصال"></div>
+  <p class="rc-cap" id="rcViewCap"></p>
+</div>
+
+<!-- capture from notifications: explanation before Android's permission screen -->
+<div class="sheet" id="capSheet" role="dialog" aria-modal="true" aria-labelledby="capTitle">
+  <div class="grab"></div>
+  <h2 id="capTitle">تسجيل المصاريف من الإشعارات</h2>
+  <div class="cap-info">
+    <p>عشان مليم يلقط عمليات الدفع لوحده، محتاج إذن <b>«الوصول للإشعارات»</b> من أندرويد. بعد ما تدوس «افتح الإعدادات» فعّل <b>مليم</b> من القايمة وارجع.</p>
+    <p>🔎 مليم بيدوّر بس على رسايل الخصم والدفع اللي فيها مبلغ، وبيتجاهل الشات وأكواد التحقق (OTP). والفلوس الداخلة بيقراها بس لو ضفت حسابات في مليم، عشان يعرف الحساب ويسجّل الدخل أو التحويل بين حساباتك.</p>
+    <p>📱 اللي بيلقطه بيفضل على موبايلك ومش بيترفع على أي سيرفر، وباقي الإشعارات مش بتتخزن خالص.</p>
+    <p>✅ مفيش مصروف بيتسجل غير لما توافق عليه، وتقدر تقفل الميزة من الإعدادات في أي وقت.</p>
+    <p class="hint" id="capRestricted" hidden>لو مليم ظاهر رمادي في القايمة ومش راضي يتفعل: ده لأنه متثبت من ملف APK. دوس «افتح معلومات التطبيق» تحت، وبعدين النقط التلاتة فوق ← «السماح بالإعدادات المحظورة»، وارجع فعّله.</p>
+  </div>
+  <div class="sheet-actions"><button class="btn primary" id="capGo">افتح الإعدادات</button><button class="btn" id="capCancel">مش دلوقتي</button></div>
+  <button class="linkbtn" id="capAppInfo" hidden>افتح معلومات التطبيق</button>
+</div>
+
+<!-- PIN setup sheet -->
+<div class="sheet pin-sheet" id="pinSheet" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+  <div class="grab"></div>
+  <h2 id="pinTitle">اختار رقم سري</h2>
+  <div class="dots" id="pinDots"><i></i><i></i><i></i><i></i></div>
+  <div class="keypad" id="pinPad" dir="ltr"></div>
+  <button class="btn" id="pinCancel" style="width:100%">إلغاء</button>
+</div>
+
+<!-- Lock setup: choose PIN or password / confirm the current password -->
+<div class="sheet" id="credSheet" role="dialog" aria-modal="true" aria-labelledby="credTitle">
+  <div class="grab"></div>
+  <h2 id="credTitle">اختار طريقة القفل</h2>
+  <div id="credKindBox"><div class="choice" id="credSeg" role="group" aria-label="نوع القفل"><button type="button" data-kind="pin" aria-pressed="true"><span class="ci" aria-hidden="true">🔢</span>رقم سري 4 أرقام</button><button type="button" data-kind="pass" aria-pressed="false"><span class="ci" aria-hidden="true">🔤</span>كلمة سر</button></div></div>
+  <div id="credPassBox">
+    <div class="field"><input id="credP1" type="password" maxlength="64" autocomplete="new-password" aria-label="كلمة السر" placeholder="كلمة السر"></div>
+    <div class="field" id="credP2Wrap"><input id="credP2" type="password" maxlength="64" autocomplete="new-password" aria-label="تأكيد كلمة السر" placeholder="اكتبها تاني للتأكيد"></div>
+  </div>
+  <p class="err-msg" id="credErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="credGo">كمّل</button><button class="btn" id="credCancel">إلغاء</button></div>
+</div>
+
+<!-- New member -->
+<div class="sheet" id="mbSheet" role="dialog" aria-modal="true" aria-labelledby="mbTitle">
+  <div class="grab"></div>
+  <h2 id="mbTitle">عضو جديد</h2>
+  <label class="mb-lab" for="mbName">اسم العضو</label>
+  <div class="field"><input id="mbName" type="text" maxlength="24" placeholder="مثلاً محمد" autocomplete="off"></div>
+  <span class="mb-lab" id="mbKindLab">نوع القفل</span>
+  <div class="choice" id="mbSeg" role="group" aria-labelledby="mbKindLab"><button type="button" data-kind="pin" aria-pressed="true"><span class="ci" aria-hidden="true">🔢</span>رقم سري 4 أرقام</button><button type="button" data-kind="pass" aria-pressed="false"><span class="ci" aria-hidden="true">🔤</span>كلمة سر</button></div>
+  <label class="mb-lab" for="mbP1" id="mbPassLab">الرقم السري</label>
+  <div class="field"><input id="mbP1" type="password" maxlength="4" inputmode="numeric" autocomplete="new-password" aria-label="كلمة السر"></div>
+  <div class="field"><input id="mbP2" type="password" maxlength="4" inputmode="numeric" autocomplete="new-password" aria-label="تأكيد كلمة السر"></div>
+  <p class="hint">لو العضو نسي كلمة السر، مفيش طريقة ترجعها. الحل الوحيد إن عضو تاني يمسحه هو وبياناته.</p>
+  <p class="err-msg" id="mbErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="mbGo">إضافة</button><button class="btn" id="mbCancel">إلغاء</button></div>
+</div>
+
+<div class="notif" id="notif" role="alert">
+  <div class="ni" id="notifIco">⚠️</div>
+  <div class="nb"><div class="nh"><span>مليم</span><span>دلوقتي</span></div><b id="notifTitle"></b><p id="notifBody"></p></div>
+  <button class="nx" id="notifClose" aria-label="إغلاق التنبيه">×</button>
+</div>
+
+<!-- Debt sheet -->
+<div class="sheet" id="debtSheet" role="dialog" aria-modal="true" aria-labelledby="debtTitle">
+  <div class="grab"></div>
+  <h2 id="debtTitle">سلفة جديدة</h2>
+  <div class="seg" id="debtDir" role="group" aria-label="نوع السلفة">
+    <button data-dir="in">ليا عند حد</button>
+    <button data-dir="out">عليا لحد</button>
+  </div>
+  <div class="field"><input id="debtPerson" type="text" placeholder="اسم الشخص" maxlength="30" aria-label="اسم الشخص" style="font-size:1.05rem"></div>
+  <label class="amount-box" id="debtAmtBox"><input id="debtAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ" dir="ltr" autocomplete="off"><span class="c" id="debtAmtCur">ج.م</span></label>
+  <div class="pay-row"><div class="txt">عملة السلفة</div><button type="button" class="sf-pick" id="debtCurPick" aria-haspopup="menu" aria-expanded="false"></button></div>
+  <div id="debtConvert" hidden><p class="hint">تغيير العملة هيحوّل السلفة والزيادات والدفعات بالسعر ده. مبالغ الحسابات المسجلة مش هتتغير.</p><div class="pay-row"><label id="debtRateLabel" for="debtRate"></label><input id="debtRate" class="date-in" inputmode="decimal" type="text" dir="ltr" aria-label="سعر التحويل"></div><p class="hint" id="debtConvertResult"></p></div>
+  <div class="pay-row"><div class="txt">ميعاد الرد<small>اختياري، وهيجيلك تذكير قبله بيوم</small></div><input type="text" id="debtDue" class="date-in wp-in" readonly inputmode="none" placeholder="اختار التاريخ" dir="ltr" autocomplete="off" aria-label="ميعاد الرد، دوس عشان تختار اليوم والشهر والسنة"></div>
+  <div class="tp-wrap wp" id="debtDueWp" hidden></div>
+  <div class="qchips" id="dueChips"><button type="button" data-qd="1">بكرة</button><button type="button" data-qd="7">بعد أسبوع</button><button type="button" data-qd="m">بعد شهر</button><button type="button" data-qd="" class="clr">من غير ميعاد</button></div>
+  <input class="note" id="debtNote" type="text" placeholder="ملاحظة (اختياري)" maxlength="80">
+  <div class="pay-row" id="debtAccRow"><div class="txt" id="debtAccLab">الحساب<small>سيبه «من غير حساب» لو الفلوس دي مش من حساب متسجل</small></div><select id="debtAcc" aria-label="الحساب"></select></div>
+  <p class="hint" id="debtFx"></p>
+  <p class="err-msg" id="debtErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="debtSave">حفظ</button><button class="btn" id="debtCancel">إلغاء</button></div>
+</div>
+
+<!-- Account sheet -->
+<div class="sheet" id="accSheet" role="dialog" aria-modal="true" aria-labelledby="accTitle">
+  <div class="grab"></div>
+  <h2 id="accTitle">حساب جديد</h2>
+  <div class="seg" id="accType" role="group" aria-label="نوع الحساب"><button type="button" data-t="bank">🏦 بنك</button><button type="button" data-t="wallet">👛 محفظة</button><button type="button" data-t="cash">💵 كاش</button></div>
+  <div class="field"><input id="accName" type="text" placeholder="اسم الحساب" maxlength="40" aria-label="اسم الحساب" style="font-size:1.05rem"></div>
+  <div class="field" id="accBankRow"><input id="accBank" type="text" maxlength="40" aria-label="اسم البنك أو المحفظة" style="font-size:1.05rem"></div>
+  <div class="field" id="accLast4Row"><input id="accLast4" type="text" inputmode="numeric" maxlength="4" placeholder="آخر 4 أرقام من الكارت (اختياري)" aria-label="آخر 4 أرقام من الكارت" dir="ltr" autocomplete="off" style="font-size:1.05rem"></div>
+  <div class="field" id="accPhoneRow"><input id="accPhone" type="tel" inputmode="tel" maxlength="16" placeholder="رقم المحفظة (اختياري)" aria-label="رقم المحفظة" dir="ltr" autocomplete="off" style="font-size:1.05rem"></div>
+  <div class="pay-row"><div class="txt">العملة<small id="accCurNote" hidden>مينفعش تتغير بعد ما يبقى للحساب حركات</small></div><select id="accCur" aria-label="العملة"></select></div>
+  <div class="pay-row"><div class="txt" id="accBalLab">الرصيد دلوقتي</div><input id="accBal" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="الرصيد" style="width:150px"></div>
+  <div class="pay-row"><div class="txt">نبّهني لو الرصيد قل عن<small>اختياري، بنفس عملة الحساب</small></div><input id="accLow" class="date-in" type="text" inputmode="decimal" placeholder="—" dir="ltr" autocomplete="off" aria-label="حد الرصيد المنخفض" style="width:130px"></div>
+  <button type="button" class="btn" id="accRecon" hidden style="width:100%;margin-top:10px">طابق الرصيد مع البنك</button>
+  <div class="acc-cash" id="accCashRow" hidden><button type="button" class="btn" id="accWd">💵 سحب كاش</button><button type="button" class="btn" id="accDep">🏦 إيداع كاش</button></div>
+  <p class="hint center">مش بنحفظ رقم الكارت كامل ولا الـ CVV، آخر 4 أرقام بس.</p>
+  <div id="accHistBox" hidden><p class="acc-sub">حركات الحساب</p><ul class="plist" id="accHist"></ul><button type="button" class="linkbtn" id="accHistMore" hidden>عرض الكل</button></div>
+  <p class="err-msg" id="accErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="accSave">حفظ</button><button class="btn" id="accCancel">إلغاء</button></div>
+  <button class="btn danger sheet-del" id="accDel" hidden>حذف الحساب</button>
+</div>
+
+<!-- Close the period: put what was left into a savings goal -->
+<div class="sheet" id="clsSheet" role="dialog" aria-modal="true" aria-labelledby="clsTitle">
+  <div class="grab"></div>
+  <h2 id="clsTitle">قفّل الفترة</h2>
+  <p class="hint center" id="clsInfo"></p>
+  <label class="amount-box" id="clsAmtBox"><input id="clsAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ" dir="ltr" autocomplete="off"><span class="c cur">ج.م</span></label>
+  <div class="pay-row"><div class="txt">يروح لـ<small>هدف ادخار، أو من غير هدف</small></div><select id="clsGoal" aria-label="هدف الادخار"></select></div>
+  <p class="hint center">الباقي بيتحسب في مدخراتك تلقائي. اختيار الهدف بيزوّد اللي حوشته فيه بس.</p>
+  <p class="err-msg" id="clsErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="clsSave">قفّل الفترة</button><button class="btn" id="clsCancel">إلغاء</button></div>
+</div>
+
+<!-- Reconcile an account with the real balance -->
+<div class="sheet" id="rcnSheet" role="dialog" aria-modal="true" aria-labelledby="rcnTitle">
+  <div class="grab"></div>
+  <h2 id="rcnTitle">مطابقة الرصيد</h2>
+  <p class="hint center" id="rcnInfo"></p>
+  <div class="pay-row"><div class="txt">الرصيد الحقيقي دلوقتي<small>اللي ظاهر في البنك أو المحفظة</small></div><input id="rcnAmt" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="الرصيد الحقيقي" style="width:150px"></div>
+  <p class="hint center" id="rcnDiff" style="min-height:2.6em"></p>
+  <p class="err-msg" id="rcnErr"></p>
+  <div style="display:grid;gap:8px;margin-top:8px">
+    <button class="btn primary" id="rcnRec" hidden></button>
+    <button class="btn" id="rcnAdj" hidden>عدّل الرصيد بس من غير تسجيل</button>
+    <button class="btn" id="rcnCancel">إلغاء</button>
+  </div>
+</div>
+
+<!-- Transfer sheet -->
+<div class="sheet" id="trSheet" role="dialog" aria-modal="true" aria-labelledby="trTitle">
+  <div class="grab"></div>
+  <h2 id="trTitle">تحويل بين حساباتي</h2>
+  <p class="hint center" id="trHint">بتسجّل تحويل عملته فعلاً. مش مصروف ومش دخل.</p>
+  <div class="pay-row"><div class="txt">من</div><select id="trFrom" aria-label="من حساب"></select></div>
+  <p class="hint" id="trAvail" style="margin:2px 4px 6px"></p>
+  <div class="pay-row"><div class="txt">إلى</div><select id="trTo" aria-label="إلى حساب"></select></div>
+  <label class="amount-box" id="trOutBox" style="margin-top:12px"><input id="trOut" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ المحوّل" dir="ltr" autocomplete="off"><span class="c cur" id="trOutCur"></span></label>
+  <div id="trRateRow" hidden>
+    <div class="pay-row"><div class="txt">سعر الصرف<small id="trRateHint"></small></div><input id="trRate" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="سعر الصرف" style="width:110px"></div>
+    <button type="button" class="btn" id="trRefresh" style="width:100%;margin-top:8px">حدّث سعر الصرف دلوقتي</button>
+    <div class="pay-row"><div class="txt">المبلغ اللي وصل<small>بالعملة اللي في الحساب التاني</small></div><input id="trIn" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="المبلغ اللي وصل" style="width:130px"></div>
+  </div>
+  <div class="pay-row"><div class="txt" id="trFeeLab">رسوم التحويل<small>اختياري، بتتخصم من حساب التحويل</small></div><input id="trFee" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="رسوم التحويل" style="width:110px"></div>
+  <div class="pay-row"><div class="txt">التاريخ</div><input id="trDay" class="date-in" type="date" aria-label="تاريخ التحويل" style="width:150px"></div>
+  <input class="note" id="trNote" type="text" placeholder="ملاحظة (اختياري)" maxlength="80" style="margin-top:10px">
+  <p class="err-msg" id="trErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="trSave">حفظ</button><button class="btn" id="trCancel">إلغاء</button></div>
+  <button class="btn danger sheet-del" id="trDel" hidden>حذف التحويل</button>
+</div>
+
+<!-- Savings <-> budget -->
+<div class="sheet" id="freeSheet" role="dialog" aria-modal="true" aria-labelledby="freeTitle">
+  <div class="grab"></div>
+  <h2 id="freeTitle">رصيد الدخل الحر</h2>
+  <div class="card" id="freeWallet" hidden></div>
+</div>
+<div class="sheet" id="moneySheet" role="dialog" aria-modal="true" aria-labelledby="moneyTitle">
+  <div class="grab"></div>
+  <h2 id="moneyTitle">الفلوس اللي معايا</h2>
+  <div id="moneyBox"></div>
+</div>
+<div class="sheet" id="mvSheet" role="dialog" aria-modal="true" aria-labelledby="mvTitle">
+  <div class="grab"></div>
+  <h2 id="mvTitle">نقل بين حساباتي والميزانية</h2>
+  <p class="hint center" id="mvInfo"></p>
+  <div class="seg" id="mvDir" role="group" aria-label="اتجاه النقل"><button type="button" data-d="in">للميزانية</button><button type="button" data-d="out">من الميزانية</button></div>
+  <div class="pay-row"><div class="txt" id="mvAccLab">من</div><select id="mvAcc" aria-label="الحساب"></select></div>
+  <div class="pay-row"><div class="txt" id="mvViaLab">هتصرفهم من</div><select id="mvVia" aria-label="الحساب التاني"></select></div>
+  <label class="amount-box" id="mvAmtBox" style="margin-top:12px"><input id="mvAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ" dir="ltr" autocomplete="off"><span class="c cur" id="mvCur"></span></label>
+  <p class="hint center" id="mvHint"></p>
+  <p class="err-msg" id="mvErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="mvSave">نقل</button><button class="btn" id="mvCancel">إلغاء</button></div>
+  <div id="mvListBox" hidden><p class="acc-sub">النقلات في الفترة دي</p><ul class="plist" id="mvList"></ul></div>
+</div>
+
+<!-- Installment plan sheet -->
+<div class="sheet" id="instSheet" role="dialog" aria-modal="true" aria-labelledby="instTitle">
+  <div class="grab"></div>
+  <h2 id="instTitle">تقسيط جديد</h2>
+  <div class="field"><input id="instName" type="text" placeholder="اشتريت إيه؟ (مثلًا: موبايل)" maxlength="60" aria-label="الحاجة المقسّطة" style="font-size:1.05rem"></div>
+  <div class="field"><input id="instParty" type="text" placeholder="الجهة اللي بقسط معاها (اختياري)" maxlength="40" aria-label="الجهة" style="font-size:1.05rem"></div>
+  <div id="instGen">
+    <div class="field"><input id="instTotal" type="text" inputmode="decimal" placeholder="إجمالي المبلغ اللي عليك" aria-label="إجمالي المبلغ" dir="rtl" autocomplete="off" style="font-size:1.05rem"><span class="cur" id="instCur"></span></div>
+    <div class="pay-row"><div class="txt">مدة التقسيط</div><select id="instMonths" aria-label="عدد الأقساط"></select></div>
+    <div class="pay-row"><div class="txt">القسط الشهري<small>تقدر تغيّر أي قسط لوحده بعد الحفظ</small></div><input id="instMonthly" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="القسط الشهري" style="width:120px"></div>
+    <div class="pay-row"><div class="txt">ميعاد أول قسط</div><input id="instFirst" class="date-in" type="date" aria-label="ميعاد أول قسط" style="width:150px"></div>
+  </div>
+  <label class="pay-row" style="cursor:pointer"><span class="txt">الشراء اتسجل قبل كده كمصروف<small>لو اتسجل، الأقساط مش هتتحسب مصروف تاني، هتتخصم من الحساب بس</small></span><input type="checkbox" id="instRec" style="width:22px;height:22px;accent-color:var(--brand)"></label>
+  <p class="err-msg" id="instErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="instSave">حفظ</button><button class="btn" id="instCancel">إلغاء</button></div>
+</div>
+
+<!-- One installment -->
+<div class="sheet" id="iiSheet" role="dialog" aria-modal="true" aria-labelledby="iiTitle">
+  <div class="grab"></div>
+  <h2 id="iiTitle">قسط</h2>
+  <p class="hint center" id="iiInfo"></p>
+  <div class="pay-row"><div class="txt">قيمة القسط<small>بتتغير للقسط ده بس</small></div><input id="iiAmt" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="قيمة القسط" style="width:130px"></div>
+  <div class="pay-row"><div class="txt">ميعاد القسط</div><input id="iiDue" class="date-in" type="date" aria-label="ميعاد القسط" style="width:150px"></div>
+  <ul class="plist" id="iiHist"></ul>
+  <p class="err-msg" id="iiErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="iiSave">حفظ</button><button class="btn" id="iiPay">دفعت</button><button class="btn" id="iiCancel">إلغاء</button></div>
+</div>
+
+<!-- Pay an installment -->
+<div class="sheet" id="ipSheet" role="dialog" aria-modal="true" aria-labelledby="ipTitle">
+  <div class="grab"></div>
+  <h2 id="ipTitle">دفع قسط</h2>
+  <p class="hint center" id="ipInfo"></p>
+  <label class="amount-box" id="ipAmtBox"><input id="ipAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ" dir="ltr" autocomplete="off"><span class="c cur" id="ipCur"></span></label>
+  <div class="pay-row" id="ipAccRow"><div class="txt">اتدفع من<small>الحساب اللي هيتخصم منه</small></div><select id="ipAcc" aria-label="الحساب"></select></div>
+  <div class="pay-row"><div class="txt">التاريخ</div><input id="ipDay" class="date-in" type="date" aria-label="تاريخ الدفع" style="width:150px"></div>
+  <p class="hint center" id="ipNote"></p>
+  <p class="err-msg" id="ipErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="ipSave">تسجيل الدفع</button><button class="btn" id="ipCancel">إلغاء</button></div>
+</div>
+
+<!-- Income received -->
+<div class="sheet" id="inSheet" role="dialog" aria-modal="true" aria-labelledby="inTitle">
+  <div class="grab"></div>
+  <h2 id="inTitle">استلمت دخل</h2>
+  <button type="button" class="kind-pill" id="inKindPill" aria-haspopup="menu" aria-expanded="false" aria-label="نوع العملية: دخل"><span>دخل</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+  <label class="amount-box" id="inAmtBox"><input id="inAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ" dir="ltr" autocomplete="off"><span class="c cur" id="inCur"></span></label>
+  <div class="field"><input id="inSrc" type="text" placeholder="من فين؟ (مرتب، شغل حر، ...)" maxlength="40" aria-label="مصدر الدخل" list="inSrcList" style="font-size:1.05rem"><datalist id="inSrcList"></datalist></div>
+  <div class="in-chips" id="inChips" role="group" aria-label="اختار المصدر"></div>
+  <div class="in-chips" id="inRepeatRow" hidden><button type="button" id="inRepeatChip" aria-pressed="false">🔁 بيتكرر كل شهر</button><input type="checkbox" id="inRepeat" hidden></div>
+  <div class="pay-row" id="inAccRow"><div class="txt">استلمته على<small>الحساب اللي رصيده هيزيد</small></div><select id="inAcc" aria-label="الحساب"></select></div>
+  <p class="hint" id="inNoAcc" style="margin:4px 0 8px" hidden>الدخل بيتسجل مرة واحدة، ومصدر الصرف منفصل عن الحساب البنكي أو المحفظة.</p>
+  <div class="pay-row"><div class="txt">التاريخ</div><input id="inDay" class="date-in" type="date" aria-label="تاريخ الاستلام" style="width:150px"></div>
+  <div class="income-funding-options" id="incomeFundingOptions">
+  <div class="pay-row fund-row"><label class="txt" for="incomeFund">أضيف الدخل للميزانية؟</label><select id="incomeFund"><option value="free">لا، يفضل دخل حر</option><option value="add">أيوه، أضيفه للميزانية</option><option value="salary">مرتب محسوب أصلًا في الميزانية</option></select></div>
+  <div class="pay-row fund-row" id="incomeScopeRow" hidden><label class="txt" for="incomeScope">مدة الزيادة</label><select id="incomeScope"><option value="period">الفترة دي بس</option><option value="permanent">كل فترات القبض</option></select></div>
+  </div>
+  <p class="hint" id="incomeFundHint"></p>
+  <details id="inAlloc" class="inst-all"><summary>وزّع الفلوس دي (اختياري)</summary>
+    <p class="hint" id="inAllocHint" style="margin:6px 0"></p>
+    <div class="pay-row"><div class="txt">للمصاريف</div><input id="inAlSpend" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="للمصاريف" style="width:110px"></div>
+    <div class="pay-row"><div class="txt">للأقساط والفواتير</div><input id="inAlBills" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="للأقساط والفواتير" style="width:110px"></div>
+    <div class="pay-row"><div class="txt">للادخار</div><input id="inAlSave" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="للادخار" style="width:110px"></div>
+    <button type="button" class="btn" id="inAlSuggest" style="width:100%;margin-top:8px">اقترح توزيع</button>
+    <label class="pay-row" id="inSetBudgetRow" style="cursor:pointer" hidden><span class="txt">اعتمد مبلغ المصاريف كميزانية الفترة<small>الميزانية بتبقى المبلغ ده</small></span><input type="checkbox" id="inSetBudget" style="width:22px;height:22px;accent-color:var(--brand)"></label>
+    <p class="hint" style="margin:8px 0 0">ده تقسيم لنفس الفلوس: مش بيزوّد رصيد ومش بيتحسب دخل تاني.</p>
+  </details>
+  <input class="note" id="inNote" type="text" placeholder="ملاحظة (اختياري)" maxlength="80" style="margin-top:10px">
+  <p class="err-msg" id="inErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="inSave">حفظ</button><button class="btn" id="inCancel">إلغاء</button></div>
+  <button class="btn danger sheet-del" id="inDel" hidden>حذف</button>
+</div>
+
+<!-- Gold purchase -->
+<div class="sheet" id="gdSheet" role="dialog" aria-modal="true" aria-labelledby="gdTitle">
+  <div class="grab"></div>
+  <h2 id="gdTitle">شراء دهب</h2>
+  <div class="in-chips tight" id="gdKarat" role="group" aria-label="العيار"><button type="button" data-gk="21" aria-pressed="true">عيار 21</button><button type="button" data-gk="24" aria-pressed="false">عيار 24</button><button type="button" data-gk="18" aria-pressed="false">عيار 18</button><button type="button" data-gk="coin" aria-pressed="false">جنيه ذهب</button></div>
+  <div class="field" style="margin-top:8px"><input id="gdQty" type="text" inputmode="decimal" dir="ltr" autocomplete="off" placeholder="الوزن بالجرام" aria-label="الوزن" style="font-size:1.05rem"><span class="cur" id="gdQtyU">جرام</span></div>
+  <p class="hint" style="margin:10px 0 2px">السعر الكلي اللي دفعته</p>
+  <label class="amount-box" id="gdPriceBox"><input id="gdPrice" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="السعر الكلي اللي دفعته" dir="ltr" autocomplete="off"><span class="c cur" id="gdCur"></span></label>
+  <p class="hint" id="gdPerTxt" style="margin:4px 0 6px;min-height:1.2em"></p>
+  <div class="pay-row"><div class="txt">تاريخ الشراء</div><input id="gdDay" class="date-in" type="date" aria-label="تاريخ الشراء" style="width:150px"></div>
+  <div class="pay-row" id="gdAccRow"><div class="txt">اتدفع من حساب<small>الرصيد هينقص (اختياري)</small></div><select id="gdAcc" aria-label="الحساب"></select></div>
+  <input class="note" id="gdNote" type="text" placeholder="ملاحظة (اختياري): الصاغة، هدية، شبكة..." maxlength="80" style="margin-top:10px">
+  <details id="gdSold" class="inst-all"><summary>اتباع؟ (اختياري)</summary>
+    <p class="hint" style="margin:6px 0">اكتب اللي استلمته كله لما بعته. امسح الخانة لو عايز تلغي البيع.</p>
+    <div class="field"><input id="gdSPrice" type="text" inputmode="decimal" dir="ltr" autocomplete="off" placeholder="السعر اللي بعته بيه" aria-label="سعر البيع"><span class="cur" id="gdSCur"></span></div>
+    <div class="pay-row"><div class="txt">تاريخ البيع</div><input id="gdSDay" class="date-in" type="date" aria-label="تاريخ البيع" style="width:150px"></div>
+    <div class="pay-row" id="gdSAccRow"><div class="txt">استلمته على<small>الرصيد هيزيد (اختياري)</small></div><select id="gdSAcc" aria-label="الحساب"></select></div>
+  </details>
+  <p class="err-msg" id="gdErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="gdSave">حفظ</button><button class="btn" id="gdCancel">إلغاء</button></div>
+  <button class="btn danger sheet-del" id="gdDel" hidden>حذف</button>
+</div>
+
+<!-- A captured payment that needs a decision -->
+<div class="sheet" id="caSheet" role="dialog" aria-modal="true" aria-labelledby="caTitle">
+  <div class="grab"></div>
+  <h2 id="caTitle">العملية دي محتاجة تحديد</h2>
+  <p class="hint center" id="caInfo"></p>
+  <div class="seg" id="caKind" role="group" aria-label="نوع العملية"></div>
+  <div class="pay-row"><div class="txt" id="caAccLab">الحساب</div><select id="caAcc" aria-label="الحساب"></select></div>
+  <div class="pay-row" id="caOtherRow" hidden><div class="txt" id="caOtherLab"></div><select id="caOther" aria-label="الحساب التاني"></select></div>
+  <p class="err-msg" id="caErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="caGo">كمّل</button><button class="btn" id="caCancel">إلغاء</button></div>
+  <button class="btn danger sheet-del" id="caIgnore">تجاهل العملية دي</button>
+</div>
+
+<!-- Money that came back from an expense (a refund, or a friend paid you back) -->
+<div class="sheet" id="rfSheet" role="dialog" aria-modal="true" aria-labelledby="rfTitle">
+  <div class="grab"></div>
+  <h2 id="rfTitle">فلوس رجعتلك من مصروف</h2>
+  <p class="hint center" id="rfInfo"></p>
+  <div class="pay-row" id="rfExpRow"><div class="txt">من أنهي مصروف؟</div><select id="rfExp" aria-label="المصروف" style="max-width:62%"></select></div>
+  <label class="amount-box" id="rfAmtBox" style="margin-top:12px"><input id="rfAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ اللي رجع" dir="ltr" autocomplete="off"><span class="c cur" id="rfCur"></span></label>
+  <div class="pay-row" id="rfAccRow"><div class="txt">رجعت على<small id="rfAccHint"></small></div><select id="rfAcc" aria-label="الحساب اللي الفلوس رجعت عليه"></select></div>
+  <p class="hint center" id="rfAfter"></p>
+  <p class="err-msg" id="rfErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="rfSave">سجّل</button><button class="btn" id="rfCancel">إلغاء</button></div>
+</div>
+
+<!-- Pick an account -->
+<div class="sheet" id="pkSheet" role="dialog" aria-modal="true" aria-labelledby="pkTitle">
+  <div class="grab"></div>
+  <h2 id="pkTitle">الحساب</h2>
+  <p class="hint center" id="pkInfo"></p>
+  <div class="pay-row"><div class="txt" id="pkLab">الحساب</div><select id="pkAcc" aria-label="الحساب"></select></div>
+  <p class="err-msg" id="pkErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="pkGo">تمام</button><button class="btn" id="pkCancel">إلغاء</button></div>
+</div>
+
+<!-- Payment sheet -->
+<div class="sheet" id="paySheet" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+  <div class="grab"></div>
+  <h2 id="payTitle">تسجيل سداد</h2>
+  <p class="hint center" id="payInfo"></p>
+  <label class="amount-box" id="payAmtBox"><input id="payAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ المسدد" dir="ltr" autocomplete="off"><span class="c" id="payAmtCur">ج.م</span></label>
+  <button class="btn" id="payAll" style="width:100%;margin-top:10px"></button>
+  <div class="pay-row" id="payAccRow"><div class="txt" id="payAccLab">الحساب</div><select id="payAcc" aria-label="الحساب"></select></div>
+  <ul class="plist" id="payHist"></ul>
+  <p class="hint" id="payFx"></p>
+  <p class="err-msg" id="payErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="paySave">حفظ</button><button class="btn" id="payCancel">إلغاء</button></div>
+</div>
+
+<!-- Suggested categories -->
+<div class="sheet" id="sugSheet" role="dialog" aria-modal="true" aria-labelledby="sugTitle">
+  <div class="grab"></div>
+  <h2 id="sugTitle">فئات مقترحة</h2>
+  <p class="hint center">اختار اللي يناسبك وهيتضافوا لفئاتك. تقدر تعدّل أو تحذف أي واحدة بعد كده.</p>
+  <div id="sugList"></div>
+  <p class="err-msg" id="sugErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="sugSave">إضافة المختار</button><button class="btn" id="sugCancel">إلغاء</button></div>
+</div>
+
+<!-- Add more to an existing debt -->
+<div class="sheet" id="dAddSheet" role="dialog" aria-modal="true" aria-labelledby="dAddTitle">
+  <div class="grab"></div>
+  <h2 id="dAddTitle">زوّد على السلفة</h2>
+  <p class="hint center" id="dAddInfo"></p>
+  <label class="amount-box" id="dAddAmtBox"><input id="dAddAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="المبلغ اللي هتزوده" dir="ltr" autocomplete="off"><span class="c" id="dAddAmtCur">ج.م</span></label>
+  <div class="field"><input id="dAddNote" type="text" placeholder="ملاحظة (اختياري)" maxlength="60" aria-label="ملاحظة" style="font-size:1.05rem"></div>
+  <div class="pay-row" id="dAddAccRow"><div class="txt" id="dAddAccLab">الحساب</div><select id="dAddAcc" aria-label="الحساب"></select></div>
+  <p class="hint center" id="dAddAfter"></p>
+  <p class="hint" id="dAddFx"></p>
+  <p class="err-msg" id="dAddErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="dAddSave">إضافة</button><button class="btn" id="dAddCancel">إلغاء</button></div>
+</div>
+
+<!-- The account of one person: every addition and payment, with the total and what is left after each -->
+<div class="sheet" id="dLogSheet" role="dialog" aria-modal="true" aria-labelledby="dLogTitle">
+  <div class="grab"></div>
+  <h2 id="dLogTitle">الحساب</h2>
+  <div class="gsum-g dlg-sum" id="dLogSum"></div>
+  <ul class="dlg" id="dLogList"></ul>
+  <div class="sheet-actions"><button class="btn" id="dLogClose">قفل</button></div>
+</div>
+
+<!-- Gam'eya sheet -->
+<div class="sheet" id="gamSheet" role="dialog" aria-modal="true" aria-labelledby="gamTitle">
+  <div class="grab"></div>
+  <h2 id="gamTitle">جمعية جديدة</h2>
+  <div class="field"><input id="gamName" type="text" placeholder="اسم الجمعية، مثلاً جمعية الشغل" maxlength="30" aria-label="اسم الجمعية" style="font-size:1.05rem"></div>
+  <label class="amount-box" id="gamAmtBox"><input id="gamAmt" class="v" type="text" inputmode="decimal" placeholder="0" aria-label="قيمة القسط الشهري" dir="ltr" autocomplete="off"><span class="c"><span class="cur">ج.م</span> <span id="gamAmtLbl">قسط</span></span></label>
+  <div class="pay-row"><div class="txt">عدد الشهور<small>عدد الأعضاء = عدد الشهور</small></div><select id="gamMembers" aria-label="عدد الشهور"></select></div>
+  <div class="pay-row"><div class="txt">داخل بكام فرد؟<small>لو داخل بأكتر من اسم، بتدفع قسط عن كل فرد وتقبض دور لكل فرد</small></div><select id="gamShares" aria-label="عدد الأفراد اللي داخل بيهم"></select></div>
+  <div class="pay-row"><div class="txt">أول شهر</div><input type="text" id="gamStart" class="date-in wp-in" readonly inputmode="none" placeholder="اختار الشهر" dir="ltr" autocomplete="off" aria-label="أول شهر، دوس عشان تختار الشهر والسنة"></div>
+  <div class="tp-wrap wp" id="gamStartWp" hidden></div>
+  <div class="pay-row"><div class="txt">يوم دفع القسط</div><select id="gamDay" aria-label="يوم دفع القسط"></select></div>
+  <div class="pay-row"><div class="txt"><span id="gamTurnLbl">دورك تقبض</span><small id="gamTurnHint"></small></div><select id="gamTurn" aria-label="دورك"></select></div>
+  <div id="gamTurnsMore"></div>
+  <p class="hint" id="gamSumm" style="margin:10px 4px 0;line-height:1.55" hidden></p>
+  <div class="set-row" style="border-top:0;padding-top:14px">
+    <div class="txt">احسب القسط من مصاريفي<small>القسط يتسجل كمصروف في فئة جمعية لما تدفعه</small></div>
+    <label class="switch"><input type="checkbox" id="gamAsExp" checked aria-label="احسب القسط من مصاريفي"><i></i></label>
+  </div>
+  <p class="err-msg" id="gamErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="gamSave">حفظ</button><button class="btn" id="gamCancel">إلغاء</button></div>
+</div>
+
+<!-- Generic form sheet -->
+<div class="sheet" id="formSheet" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+  <div class="grab"></div>
+  <h2 id="formTitle"></h2>
+  <div id="formBody"></div>
+  <p class="err-msg" id="formErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="formSave">حفظ</button><button class="btn" id="formCancel">إلغاء</button></div>
+</div>
+
+<!-- Update / message from the developer (update.json on GitHub) -->
+<div class="sheet" id="updSheet" role="dialog" aria-modal="true" aria-labelledby="updTitle">
+  <div class="grab"></div>
+  <div class="upd-ico" id="updIco" aria-hidden="true">✨</div>
+  <h2 id="updTitle">فيه نسخة جديدة من مليم</h2>
+  <p class="hint center" id="updSub"></p>
+  <div class="upd-notes" id="updNotes"></div>
+  <div class="upd-bar" id="updBar" hidden><i></i></div>
+  <p class="hint center" id="updMsg"></p>
+  <div class="sheet-actions"><button class="btn primary" id="updGo">تحديث</button><button class="btn" id="updLater">بعدين</button></div>
+  <button type="button" class="upd-never" id="updNever" hidden>مش عايز أشوف دي تاني</button>
+</div>
+
+<div class="upd-lock" id="updLock" hidden role="dialog" aria-modal="true" aria-labelledby="updLockTitle">
+  <div class="logo"><img src="img/maleem-logo.png" alt=""></div>
+  <h2 id="updLockTitle">لازم تحدّث مليم</h2>
+  <p id="updLockSub">النسخة اللي عندك محتاجة تتحدّث عشان تكمّل استخدام التطبيق.</p>
+  <div class="upd-notes" id="updLockNotes"></div>
+  <div class="upd-bar" id="updLockBar" hidden><i></i></div>
+  <p class="hint center" id="updLockMsg"></p>
+  <button class="btn primary" id="updLockGo" style="width:min(300px,100%)">تحديث دلوقتي</button>
+  <button class="linkbtn" id="updLockSave">احفظ نسخة من بياناتي</button>
+</div>
+
+<!-- Wipe confirm -->
+<div class="sheet" id="wipeSheet" role="dialog" aria-modal="true" aria-labelledby="wipeTitle">
+  <div class="grab"></div>
+  <div class="wipe-ico">🗑️</div>
+  <h2 id="wipeTitle">تمسح إيه؟</h2>
+  <p class="hint center">اختار اللي عايز تمسحه. اللي مش مختار بيفضل زي ما هو. التقارير بتتحسب من المصاريف والدخل، فمسحهم بيفضّيها.</p>
+  <div id="wipeOpts"></div>
+  <p class="hint center" id="wipeNote" style="margin-top:8px"></p>
+  <p class="hint" id="wipeSpNote" hidden>إنت في مساحة مشتركة: هتخرج منها، ومصاريف الطرف التاني مش هتتمسح.</p>
+  <div class="sheet-actions" style="margin-top:14px"><button class="btn danger-solid" id="wipeConfirm">امسح المختار</button><button class="btn" id="wipeCancel">إلغاء</button></div>
+</div>
+<div class="sheet" id="curAddSheet" role="dialog" aria-modal="true" aria-labelledby="curAddTitle">
+  <div class="grab"></div>
+  <h2 id="curAddTitle">عملة تانية</h2>
+  <p class="hint center">اكتب اسم العملة أو كودها (زي TRY أو SYP)، واختارها من القايمة. المبالغ بتتحول بسعر النهارده الحقيقي. ولو العملة مالهاش سعر منشور هتكتب سعر الدولار بيها بنفسك.</p>
+  <div class="field"><input id="curAddQ" type="text" placeholder="ابحث: ليرة، دولار كندي، TRY…" autocomplete="off" aria-label="ابحث عن عملة" style="font-size:1.05rem"></div>
+  <div class="cur-list" id="curAddList"></div>
+  <p class="hint center" id="curAddMsg" aria-live="polite"></p>
+  <div class="sheet-actions" style="margin-top:12px"><button class="btn" id="curAddCancel" type="button">إلغاء</button></div>
+</div>
+
+<div class="sheet" id="curSheet" role="dialog" aria-modal="true" aria-labelledby="curTitle">
+  <div class="grab"></div>
+  <h2 id="curTitle">تغيير العملة</h2>
+  <p class="hint center" id="curTxt"></p>
+  <p class="hint center" id="curRate" dir="auto" style="font-weight:700"></p>
+  <p class="hint center" id="curEx"></p>
+  <p class="hint center" id="curOld" hidden></p>
+  <div id="curManRow" hidden><p class="hint center" id="curManLab" style="margin:10px 0 4px;font-weight:700"></p><div class="field"><input id="curMan" type="text" inputmode="decimal" dir="ltr" autocomplete="off" placeholder="مثلًا 13000" aria-label="سعر الدولار" style="font-size:1.05rem"></div></div>
+  <div class="sheet-actions" style="margin-top:18px"><button class="btn primary" id="curGo">حوّل كل مبالغي</button><button class="btn" id="curCancel">إلغاء</button></div>
+</div>
+
+<!-- Daily reminder time sheet -->
+<div class="sheet" id="timeSheet" role="dialog" aria-modal="true" aria-labelledby="timeTitle">
+  <div class="grab"></div>
+  <h2 id="timeTitle">وقت التذكير اليومي</h2>
+  <p class="hint center" id="tpPreview"></p>
+  <div class="tp-wrap">
+    <div class="tp-col" id="tpH" role="listbox" aria-label="الساعة"></div>
+    <div class="tp-sep">:</div>
+    <div class="tp-col" id="tpM" role="listbox" aria-label="الدقائق"></div>
+    <div class="tp-col" id="tpP" role="listbox" aria-label="صباحاً أو مساءً"></div>
+  </div>
+  <div class="sheet-actions"><button class="btn primary" id="timeSave">حفظ</button><button class="btn" id="timeCancel">إلغاء</button></div>
+</div>
+
+<!-- Quick date change sheet -->
+<div class="sheet" id="dateSheet" role="dialog" aria-modal="true" aria-labelledby="dateSheetTitle">
+  <div class="grab"></div>
+  <h2 id="dateSheetTitle">تغيير تاريخ المصروف</h2>
+  <p class="hint center" id="dsInfo"></p>
+  <div class="date-row ds-row" id="dsRow" role="group" aria-label="التاريخ الجديد">
+    <button type="button" class="dchip" data-d="0">النهارده</button>
+    <button type="button" class="dchip" data-d="1">امبارح</button>
+    <label class="dchip" id="dsOther"><span id="dsOtherTxt">📅 تاريخ تاني</span><input type="date" id="dsIn" min="2000-01-01" aria-label="اختيار التاريخ الجديد"></label>
+  </div>
+  <div class="sheet-actions"><button class="btn" id="dsCancel">إلغاء</button></div>
+</div>
+
+<!-- Import review sheet -->
+<div class="sheet" id="impSheet" role="dialog" aria-modal="true" aria-labelledby="impTitle">
+  <div class="grab"></div>
+  <h2 id="impTitle">استيراد مصاريف</h2>
+  <p class="hint center" id="impInfo"></p>
+  <div class="imp-sum" id="impSum"></div>
+  <div class="pay-row" id="impDateRow"><div class="txt">تاريخ البنود اللي من غير تاريخ<small>الملف مفيهوش تاريخ لبعض البنود</small></div><input type="date" id="impDate" class="date-in" aria-label="تاريخ البنود اللي من غير تاريخ"></div>
+  <div class="imp-bar"><span>البنود</span><button type="button" class="linkbtn" id="impAll" style="padding:0">شيل التحديد</button></div>
+  <div class="imp-list" id="impList"></div>
+  <div class="sheet-actions"><button class="btn primary" id="impSave">سجّل</button><button class="btn" id="impCancel">إلغاء</button></div>
+</div>
+
+<!-- Alert percent sheet -->
+<div class="sheet" id="pctSheet" role="dialog" aria-modal="true" aria-labelledby="pctTitle">
+  <div class="grab"></div>
+  <h2 id="pctTitle">نسبة التنبيه</h2>
+  <p class="hint center">هنبهك أول ما تصرف النسبة دي من ميزانيتك</p>
+  <div class="pct-big" id="pctBig">80%</div>
+  <input type="range" id="pctRange" min="10" max="99" step="1" aria-label="نسبة التنبيه">
+  <div class="pct-presets" id="pctPresets"><button type="button" data-p="50">50%</button><button type="button" data-p="70">70%</button><button type="button" data-p="80">80%</button><button type="button" data-p="90">90%</button></div>
+  <p class="hint center" id="pctEx"></p>
+  <div class="sheet-actions"><button class="btn primary" id="pctSave">حفظ</button><button class="btn" id="pctCancel">إلغاء</button></div>
+</div>
+
+<!-- Automatic backup sheet -->
+<div class="sheet" id="autoBkSheet" role="dialog" aria-modal="true" aria-labelledby="autoBkTitle">
+  <div class="grab"></div>
+  <h2 id="autoBkTitle">النسخ الاحتياطي التلقائي</h2>
+  <p class="hint center">اختار كل كام يوم التطبيق يحفظ نسخة لوحده، أو أوقفه.</p>
+  <div class="pct-big" id="autoBkBig">كل 7 أيام</div>
+  <input type="range" id="autoBkRange" min="0" max="30" step="1" aria-label="مدة النسخ الاحتياطي التلقائي">
+  <div class="pct-presets" id="autoBkPresets"><button type="button" data-d="0">إيقاف</button><button type="button" data-d="1">كل يوم</button><button type="button" data-d="7">أسبوع</button><button type="button" data-d="14">أسبوعين</button><button type="button" data-d="30">شهر</button></div>
+  <p class="hint center">النسخة بتترفع على Google Drive لو ربطته، وإلا بتتحفظ على الموبايل في <b dir="ltr">Download/Maleem</b>.</p>
+  <div class="sheet-actions"><button class="btn primary" id="autoBkSave">حفظ</button><button class="btn" id="autoBkCancel">إلغاء</button></div>
+</div>
+
+<!-- Restore sheet (Android): from Google Drive (finds the newest backup by itself) or from a file -->
+<div class="sheet" id="rsSheet" role="dialog" aria-modal="true" aria-labelledby="rsTitle">
+  <div class="grab"></div>
+  <h2 id="rsTitle">استعادة نسخة احتياطية</h2>
+  <div id="rsHome">
+    <p class="hint center">اختار حساب جوجل اللي نسخك كانت بتترفع عليه، ومليم هيدوّر في فولدر <b dir="ltr">Maleem</b> ويفتحلك نسخك، وتختار الأحدث أو نسخة أقدم.</p>
+    <button class="btn primary rs-btn" id="rsDrive" type="button">من Google Drive</button>
+    <button class="btn rs-btn" id="rsFile" type="button">من ملف على الموبايل</button>
+  </div>
+  <div id="rsBusy" class="rs-busy" hidden><span class="rs-spin" aria-hidden="true"></span><p class="hint center" id="rsBusyTxt" role="status"></p></div>
+  <div id="rsPick" hidden>
+    <p class="hint center" id="rsPickTxt"></p>
+    <div class="rs-list" id="rsList"></div>
+  </div>
+  <div id="rsAsk" hidden><p class="rs-ask" id="rsAskTxt"></p></div>
+  <p class="hint center" id="rsErr" role="alert" hidden></p>
+  <div class="sheet-actions"><button class="btn primary" id="rsGo" type="button" hidden>استعادة</button><button class="btn" id="rsCancel" type="button">إلغاء</button></div>
+</div>
+
+<!-- Category sheet -->
+<div class="sheet" id="catSheet" role="dialog" aria-modal="true" aria-labelledby="catTitle">
+  <div class="grab"></div>
+  <h2 id="catTitle">فئة جديدة</h2>
+  <div class="cat-preview" id="catPreview"><div class="tile" id="catPrevTile">📦</div><input id="catName" class="note" type="text" placeholder="اسم الفئة، مثلاً فاتورة باقة فليكس" maxlength="28" aria-label="اسم الفئة"></div>
+  <div class="lbl">الأيقونة</div>
+  <div class="emoji-grid" id="emojiGrid" role="group" aria-label="الأيقونة"></div>
+  <div class="lbl">اللون</div>
+  <div class="swatches" id="swatches" role="group" aria-label="اللون"></div>
+  <div class="lbl">حد شهري للفئة (اختياري)</div>
+  <div class="field"><input id="catLim" type="text" inputmode="decimal" maxlength="12" placeholder="مثلاً 2000، وسيبه فاضي لو مش عايز حد" aria-label="حد شهري للفئة"></div>
+  <p class="hint" style="margin:6px 2px 0">هننبهك لما تقرب منه (بنفس نسبة تنبيه الميزانية)، ولما تعدّيه.</p>
+  <p class="err-msg" id="catErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="catSave">حفظ</button><button class="btn" id="catCancel">إلغاء</button></div>
+</div>
+
+<!-- Export choice sheet -->
+<div class="sheet" id="expSheet" role="dialog" aria-modal="true" aria-labelledby="expTitle">
+  <div class="grab"></div>
+  <h2 id="expTitle">حفظ المصاريف</h2>
+  <div class="opts">
+    <button class="opt" data-scope="month"><span class="oi">📅</span><span><b>الشهر ده بس</b><small id="optMonth"></small></span></button>
+    <button class="opt" data-scope="all"><span class="oi">🗂️</span><span><b>كل الشهور</b><small id="optAll"></small></span></button>
+  </div>
+  <button class="btn" id="expCancel" style="width:100%;margin-top:12px">إلغاء</button>
+</div>
+
+<div class="menu" id="fundMenu" role="menu" aria-label="يتخصم من"></div>
+<div class="menu" id="payMenu" role="menu" aria-label="طريقة الدفع"></div>
+<div class="menu" id="accMenu" role="menu" aria-label="الحساب"></div>
+<div class="menu" id="kindMenu" role="menu" aria-label="نوع العملية"></div>
+<div class="menu" id="dateMenu" role="menu" aria-label="تاريخ المصروف">
+  <button type="button" role="menuitemradio" data-d="0"><span class="pe">☀️</span>النهارده</button>
+  <button type="button" role="menuitemradio" data-d="1"><span class="pe">🌙</span>امبارح</button>
+  <button type="button" class="dm-other" id="dateOtherOpen" role="menuitemradio"><span class="pe">📅</span><span id="dateOtherTxt">تاريخ تاني…</span></button>
+  <button type="button" role="menuitem" id="dmPlan"><span class="pe">📌</span>مصروف جاي (فكّرني)</button>
+</div>
+<input type="hidden" id="expenseTime">
+<dialog id="expenseDatePopup" aria-labelledby="expenseDateTitle">
+  <h3 id="expenseDateTitle">تاريخ ووقت المصروف</h3>
+  <label class="expense-day"><span>اليوم</span><input type="date" id="dateIn" min="2000-01-01" aria-label="اختيار تاريخ المصروف"></label>
+  <input type="hidden" id="expenseTimeDraft">
+  <div class="expense-wheel-labels"><span>الساعة</span><span>الدقيقة</span></div>
+  <div class="tp-wrap expense-wheels"><div class="tp-col" id="expenseHourWheel" role="listbox" tabindex="0" aria-label="الساعة"></div><div class="tp-col" id="expenseMinuteWheel" role="listbox" tabindex="0" aria-label="الدقيقة"></div></div>
+  <p class="err-msg" id="expenseDateError" role="alert"></p>
+  <div class="expense-date-actions"><button type="button" class="btn" id="expenseDateApply">تأكيد</button><button type="button" class="btn secondary" id="expenseDateCancel">إلغاء</button></div>
+</dialog>
+<div class="menu" id="debtCurMenu" role="menu" aria-label="عملة السلفة"></div>
+<div class="menu" id="sfChoiceMenu" role="menu"></div>
+<dialog id="sfCalendar" aria-labelledby="sfCalendarTitle"><h3 id="sfCalendarTitle"></h3><div class="sf-cal-nav"><button type="button" id="sfMonthPrev" aria-label="الشهر السابق">‹</button><b id="sfMonthName"></b><button type="button" id="sfMonthNext" aria-label="الشهر التالي">›</button></div><div class="sf-cal-grid" id="sfCalendarDays"></div><div class="sf-cal-actions"><button type="button" class="btn" id="sfCalendarToday">النهارده</button><button type="button" class="btn" id="sfCalendarClear">مسح</button><button type="button" class="btn" id="sfCalendarCancel">إلغاء</button></div></dialog>
+<div class="menu" id="homeExpenseMenu" role="menu" aria-label="عرض المصروفات"><button type="button" role="menuitemradio" data-home-view="day" aria-checked="true">النهارده</button><button type="button" role="menuitemradio" data-home-view="month" aria-checked="false">الشهر ده</button></div>
+<div class="menu" id="menu" role="menu">
+  <button data-act="edit" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>تعديل</button>
+  <button data-act="date" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>تغيير التاريخ</button>
+  <button data-act="cashwd" role="menuitem" hidden><span aria-hidden="true" style="width:18px;text-align:center">💵</span>ده سحب كاش، مش مصروف</button>
+  <button data-act="refund" role="menuitem" hidden><span aria-hidden="true" style="width:18px;text-align:center">↩</span>رجعتلي فلوس منه</button>
+  <button data-act="del" class="d" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>حذف</button>
+</div>
+
+<!-- Lock screen -->
+<!-- Welcome (first run) -->
+<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wlTitle" hidden>
+  <div class="wl-in">
+    <div id="wlS1">
+      <div class="wl-logo" aria-hidden="true"><img src="img/maleem-logo.png" alt=""></div>
+      <h1 id="wlTitle">أهلاً بيك في مليم</h1>
+      <p class="wl-sub">سجّل مصاريفك بسهولة وتابع ميزانيتك. بياناتك بتفضل على موبايلك.</p>
+      <label class="wl-lab" for="wlName">اسمك (اختياري)</label>
+      <div class="field"><input id="wlName" type="text" maxlength="24" placeholder="مثلاً محمد" autocomplete="given-name"></div>
+      <p class="wl-hint">تقدر تسيبه فاضي، وتغيره بعدين من صفحة "أنا".</p>
+      <button class="btn primary wl-btn" id="wlNext1">كمّل</button>
+      <button class="linkbtn wl-link" id="wlRestore">عندي نسخة احتياطية؟ استعادة</button>
+    </div>
+    <div id="wlS2" hidden>
+      <h1>ميزانيتك</h1>
+      <p class="wl-sub">اختار الطريقة اللي تناسبك، وتقدر تغيّرها في أي وقت من صفحة "أنا".</p>
+      <div class="seg" id="wlSeg" role="group" aria-label="نوع الميزانية"><button type="button" data-mode="fixed" aria-pressed="true">ميزانية محددة</button><button type="button" data-mode="open" aria-pressed="false">ميزانية مفتوحة</button></div>
+      <div id="wlFixed">
+        <div class="field"><input id="wlBudget" type="text" inputmode="decimal" placeholder="مثلاً 10000" aria-label="ميزانية الشهر"><span class="cur">ج.م</span></div>
+        <p class="wl-hint" style="margin:10px 0 0">بتقبض إزاي؟</p>
+        <div class="seg" id="wlPt" role="group" aria-label="طريقة القبض"><button type="button" data-pt="monthly" aria-pressed="true">شهري</button><button type="button" data-pt="weekly" aria-pressed="false">أسبوعي</button><button type="button" data-pt="biweekly" aria-pressed="false">كل أسبوعين</button><button type="button" data-pt="variable" aria-pressed="false">متغير</button></div>
+        <div class="pay-row" id="wlPaydayRow"><div class="txt">يوم القبض<small>الميزانية والتقارير بتبدأ من اليوم ده</small></div><select id="wlPayday" aria-label="يوم القبض"></select></div>
+      </div>
+      <p class="wl-hint" id="wlOpen" hidden>من غير حد للصرف. هنعرضلك إجمالي مصاريفك في الشهر وانت بتضيف.</p>
+      <p class="err-msg" id="wlErr"></p>
+      <button class="btn primary wl-btn" id="wlDone" style="margin-top:8px">ابدأ</button>
+      <button class="linkbtn wl-link" id="wlBack">رجوع</button>
+    </div>
+    <div class="wl-dots" aria-hidden="true"><i class="on"></i><i></i></div>
+  </div>
+</div>
+
+<div class="lock" id="lock">
+  <div class="logo"><img src="img/maleem-logo.png" alt=""></div>
+  <h2 id="lockName">مليم</h2>
+  <p id="lockMsg" aria-live="polite">اكتب الرقم السري</p>
+  <div class="dots" id="lockDots"><i></i><i></i><i></i><i></i></div>
+  <div class="keypad" id="lockPad" dir="ltr"></div>
+  <div class="lock-pass" id="lockPassBox" hidden>
+    <div class="field"><input id="lockPass" type="password" maxlength="64" autocomplete="current-password" aria-label="كلمة السر"></div>
+    <button class="btn primary" id="lockPassGo" type="button">فتح</button>
+  </div>
+  <button class="linkbtn" id="bioBtn" hidden>افتح بالبصمة</button>
+  <button class="linkbtn" id="lockSwitch" hidden>مش انت؟ بدّل العضو</button>
+</div>
+
+<!-- Member picker (more than one member on this phone) -->
+<div class="lock mb-pick" id="mbPick" role="dialog" aria-modal="true" aria-labelledby="mbPickTitle">
+  <div class="logo"><img src="img/maleem-logo.png" alt=""></div>
+  <h2 id="mbPickTitle">مين بيستخدم مليم؟</h2>
+  <p>اختار اسمك</p>
+  <div class="mb-pick-list" id="mbPickList"></div>
+</div>
+
+<input type="file" id="restoreFile" accept="application/json,.json,text/plain" hidden>
+<input type="file" id="impFile" accept=".pdf,.xlsx,.xlsm,.csv,.tsv,.txt,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain" hidden>
+<div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="toastAct" hidden></button><i class="tbar" id="tbar"></i></div>
+<div id="pdfReport" aria-hidden="true"></div>
+
+<!-- LOCALES-START -->
+<script src="locales/eg.js"></script>
+<script src="locales/ar.js"></script>
+<script src="locales/en.js"></script>
+<!-- LOCALES-END -->
+<script>
+(function(){
+'use strict';
+@@JS@@
+})();
+</script>
+</body>
+</html>

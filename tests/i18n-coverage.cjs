@@ -56,4 +56,4 @@ for(const l of ['en','ar']){const known=new Set(base[l]),fresh=now[l].filter(s=>
  else console.log('PASS '+(l==='en'?'English':'Modern Standard Arabic')+' coverage: no new untranslated message ('+now[l].length+' known non-UI or fragment entries)')}
 const gone=['en','ar'].reduce((n,l)=>n+base[l].filter(s=>!now[l].includes(s)).length,0);
 if(gone)console.log('note: '+gone+' baseline entries are now translated or gone; run with --update to shrink the baseline');
-if(bad){console.log('\nAdd the translations to locales/en.js or ar.js, or run: node tests/i18n-coverage.cjs --update');process.exit(1)}
+if(bad){console.log('\nAdd the translations in i18n-src/tr/*.txt and run node tools/build-locales.cjs, or (for a non-UI string) run: node tests/i18n-coverage.cjs --update');process.exit(1)}

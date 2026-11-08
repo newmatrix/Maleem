@@ -1,6 +1,6 @@
 {
  "date": "2026-11-08",
- "scope": "Final source package: code review fixes, home chips, periodic reminder and the full English / Modern Standard Arabic translation pass; historical suites rerun separately (see CHANGES-2026-11-08.md)",
+ "scope": "Final source package: review fixes, home chips, periodic reminder, English / Modern Standard Arabic translation pass and code maintenance (src-web/ split verified byte-identical); historical suites rerun separately (see CHANGES-2026-11-08.md)",
  "test_suites": {
   "restore-recurring": 5,
   "review-plan-bug": 4,
@@ -17,9 +17,10 @@
   "post-review-fixes": 6,
   "home-chips": 8,
   "nudge": 18,
-  "i18n-coverage": 2
+  "i18n-coverage": 2,
+  "lint": 1
  },
- "scenarios_passed": 117,
+ "scenarios_passed": 118,
  "xml_files_parsed": 32,
  "android_apk_built": false,
  "device_tested": false,
@@ -66,7 +67,7 @@
   },
   {
    "file": ".github/workflows/test-web.yml",
-   "sha256": "eab2e51c94c164b066d13bbc00a266a13e3107d13722d3a5ca460c92056304b7"
+   "sha256": "cd8fa96bf077f24e3488d41763f7bb33b9899d05852f6806134606e0180d962f"
   },
   {
    "file": ".github/workflows/update-rates.yml",
@@ -86,7 +87,7 @@
   },
   {
    "file": "CHANGES-2026-11-08.md",
-   "sha256": "a98cc3ce3c8bb64212501022e67c34477c80f65ca9695ce474c623d0242df8aa"
+   "sha256": "58b811a1c5b42111ec624114e5dc3fa87cd8c64ccc74c629c3d61031b0d96514"
   },
   {
    "file": "DEEP-REVIEW-2026-11-03.md",
@@ -126,11 +127,11 @@
   },
   {
    "file": "README.md",
-   "sha256": "05af9a563282e15263784c0a19e7f9b2f24cac27d017a9cb8bb466a25529c99c"
+   "sha256": "9c6ffdb7667bff428031a37485f6692fb9c46f120d6dcd4736c997a842e686dc"
   },
   {
    "file": "RELEASE-CHECKS.json",
-   "sha256": "4c8fc2ccb13cfc39d16bed78bcc18a9b47cef00c6ea15c854beb1a06a784c94c"
+   "sha256": "fb173097cfd39a630018a0588668e09d989e0196fabbc7f268ba13bacd3c31e3"
   },
   {
    "file": "RESTORE-RECURRING-2026-11-05.md",
@@ -294,7 +295,7 @@
   },
   {
    "file": "app/src/main/assets/www/index.html",
-   "sha256": "a2be982822049d98409f157379f0d701b7633345858fd09131ad23d6fc582e6f"
+   "sha256": "167a3dce92f1816261835c04975b5f1b27dcd7a41ee27cad478e69db2c565438"
   },
   {
    "file": "app/src/main/assets/www/libs/THIRD_PARTY_LICENSES.txt",
@@ -330,7 +331,7 @@
   },
   {
    "file": "app/src/main/assets/www/locales/ar.js",
-   "sha256": "c97a81b929a56809e43791e17a38411ecc112c64db9f41a48f54d8b64db67b4c"
+   "sha256": "15ce0862b536249adebfaec49faf639fd2af3a253086e370c30ca38c58a113cd"
   },
   {
    "file": "app/src/main/assets/www/locales/eg.js",
@@ -338,7 +339,7 @@
   },
   {
    "file": "app/src/main/assets/www/locales/en.js",
-   "sha256": "fa5810550e93e510469bda0d258b73c7312a8f3898ecb9dbd7af21d98261c011"
+   "sha256": "a5d090c3756a372dc1426827db49c8866b9793b0a78c8e96f5f3c77f15545f53"
   },
   {
    "file": "app/src/main/java/com/heshamtaha/maleem/CaptureIdentity.kt",
@@ -370,7 +371,7 @@
   },
   {
    "file": "app/src/main/java/com/heshamtaha/maleem/Rates.kt",
-   "sha256": "9ad13cea6d146ca8bb4032d8c22948fee138535add48828840d932b0d2d90477"
+   "sha256": "5c380def314d0fbea21e86c36b0741df7b33b49c8714f94cb95227e87c7fefae"
   },
   {
    "file": "app/src/main/java/com/heshamtaha/maleem/Reminders.kt",
@@ -561,6 +562,18 @@
    "sha256": "c142f81ba8ec91f7648f31b817a2b1f30369ee1b58c043c57f9313a530bf2010"
   },
   {
+   "file": "docs/ARCHITECTURE.md",
+   "sha256": "896997866cb8ac21b5f552e4eb539f4f5ae7ac934af645f15a8b8f935ae7303b"
+  },
+  {
+   "file": "docs/CODE-MAP.md",
+   "sha256": "cfb1e1b654f5ddbe2d1c9b0558ac6074f8f922b189091a828336b981b033c6a4"
+  },
+  {
+   "file": "docs/RELEASING.md",
+   "sha256": "654af204e24c536a422f6753fdd61331707b631a2fb40ffedd3f2c5bf2cb166c"
+  },
+  {
    "file": "firestore.rules",
    "sha256": "1c79e96f35f2db2b1f92a892054bd17130e04c1515721f70016833caebeca018"
   },
@@ -585,12 +598,224 @@
    "sha256": "0f3ed8f03b50934cb8c48b15a470d5c20a30a5385825e48b55bcc8ea3d8f8e18"
   },
   {
+   "file": "i18n-src/ar.base.js",
+   "sha256": "1925a148b69f5ca8238375a68884000ce55768adb0fe35c086d6bdccca8bf123"
+  },
+  {
+   "file": "i18n-src/en.base.js",
+   "sha256": "f73a84290e462a6c249eb4ae381b6a05ac598f2723922a9af1f796b10f22512c"
+  },
+  {
+   "file": "i18n-src/sym.json",
+   "sha256": "9fb7a388cc83a3cc7604e1dacf175a60fad0b48656cd62a4b61b1dc80d51f25d"
+  },
+  {
+   "file": "i18n-src/tr/ar-01.txt",
+   "sha256": "776b3fdf94b21882e911babcc11cc98156b99f42e60eb58ef6e5341b1f1d57d2"
+  },
+  {
+   "file": "i18n-src/tr/ar-02.txt",
+   "sha256": "aa36e7117bfcb3b0ef670eceee67ad73915b318b62cbc65ed02f981258e5bf1d"
+  },
+  {
+   "file": "i18n-src/tr/ar-03.txt",
+   "sha256": "6d117b59cdd729bc4c5e0b301ab0caa3eb42d03bd96e727cc3a6dccfaa8a6a73"
+  },
+  {
+   "file": "i18n-src/tr/ar-04.txt",
+   "sha256": "3c89d370445a9cb37f98ec0218ceddd97a306a43f2ded8fb7861c930e8efca95"
+  },
+  {
+   "file": "i18n-src/tr/ar-05.txt",
+   "sha256": "0e2fb10589b8314b2fd73a7e7593196e61e65e109930cf423d68e842a03f2b92"
+  },
+  {
+   "file": "i18n-src/tr/en-01.txt",
+   "sha256": "3426afc9948dfac32ac708170c80acfc8016288083029a2e5977f419c4688815"
+  },
+  {
+   "file": "i18n-src/tr/en-02.txt",
+   "sha256": "cbddd7cb4bd4ea18dca0760386d13299ce2f1aca3a183d7d00549bddacdbafbb"
+  },
+  {
+   "file": "i18n-src/tr/en-03.txt",
+   "sha256": "983b320342999501407e385f942beaa47585a23276860e9ddc2cc1f7b72ce8ab"
+  },
+  {
+   "file": "i18n-src/tr/en-04.txt",
+   "sha256": "064fce25ab1b35f736361e5622d01003fa37c07a5a358a86a05d94539b47c328"
+  },
+  {
+   "file": "i18n-src/tr/en-05.txt",
+   "sha256": "38b1399d535092d6c617824373bde205ac263ef3622236b70d4ecd6c6fb39902"
+  },
+  {
+   "file": "i18n-src/tr/en-06.txt",
+   "sha256": "052c43804e390c983ffb5f922b20994c7792dcef45823e8aa0127b4f6e28f1d7"
+  },
+  {
+   "file": "i18n-src/tr/en-07.txt",
+   "sha256": "541a54d077b6eba61f6d2c07d7fe355d85276ae1c3cd5472809dba6ac902d891"
+  },
+  {
+   "file": "i18n-src/tr/en-08.txt",
+   "sha256": "bb3b48ce8bb0c4f852b931d5441b93881b6bec8029931ffca0986745ae53973c"
+  },
+  {
    "file": "rates.json",
    "sha256": "09f27d3d06e37d37a3f4fb80ca980286a17a4c5ca2d5701a3f3a0386c2ef55f6"
   },
   {
    "file": "settings.gradle.kts",
    "sha256": "d08d2393e653e4311585b98bd6fde62860afa2275443f1dec8c6ffd1408e6337"
+  },
+  {
+   "file": "src-web/css/000-base-and-opening.css",
+   "sha256": "f4db7723528802960743cc4b4ccb549ec6b6618bdfeaa65269dfb9274cf46736"
+  },
+  {
+   "file": "src-web/css/010-palettes-and-updates.css",
+   "sha256": "abee6c31c68656d944a8f6796e361cc58484b7ecf0a372ec54b738b8c6e300a5"
+  },
+  {
+   "file": "src-web/css/020-hero-nav-cards.css",
+   "sha256": "d0b10fede495c000a092eb73e399194abbe8ebe73abd0775da14eab7c7fdc5c4"
+  },
+  {
+   "file": "src-web/css/030-settings-sheets-lock.css",
+   "sha256": "5ee0f3aef52ce2935487a35d84e4123caf94ed8f9c3c95d3909a1acbd4ecb5eb"
+  },
+  {
+   "file": "src-web/css/040-looks-fonts-settings-pages.css",
+   "sha256": "1eb8df1589718b636aceaa57706df8961c93b89386e247883998b477e31224c7"
+  },
+  {
+   "file": "src-web/css/050-motion-categories-budget.css",
+   "sha256": "2a2f5ce1191ef61e7cc5c2a74da7c0e528d40028724c39151d3dd3ae615ecc3f"
+  },
+  {
+   "file": "src-web/css/060-obligations.css",
+   "sha256": "81dbd4e5d43f96f15b297028b49ce0344d93fb025a2dd78d186a7d11962cfc9f"
+  },
+  {
+   "file": "src-web/css/070-me-and-forms.css",
+   "sha256": "52823cd79903c6137b5322efe651ff5ed5b7519f5f50ba5da4c0c161c913992d"
+  },
+  {
+   "file": "src-web/css/080-home-income-language.css",
+   "sha256": "09e4285978ea4791e9e3f71f5dddce651b9dcc651537128a852550ef00684d91"
+  },
+  {
+   "file": "src-web/index.template.html",
+   "sha256": "1e340fe144da2c3c39d2295e43073c305ec2f53ff8c8652c5054c2f12cb68ffa"
+  },
+  {
+   "file": "src-web/js/000-constants.js",
+   "sha256": "2f796a0fe60355bcd71c67234a2c6f7496139a3fbeeab1398e13691cb62480cf"
+  },
+  {
+   "file": "src-web/js/010-state-and-storage.js",
+   "sha256": "cdc553c3027e830357d047d643e93652854c50d2df8276f4d75aba73cdf13696"
+  },
+  {
+   "file": "src-web/js/020-theme-and-toast.js",
+   "sha256": "1b486dcd1a9e890b2afe7332a6d7d9a0b11b87bbb3d1e0f965958c424e68f041"
+  },
+  {
+   "file": "src-web/js/030-home.js",
+   "sha256": "46024c5f116649c90c16bc135815100754dd698c968e294ef606fcef928e40d6"
+  },
+  {
+   "file": "src-web/js/031-reports.js",
+   "sha256": "3943a492cd54adf480f6607fcdfe93f5694983e749e3b375de395c6d45b6534a"
+  },
+  {
+   "file": "src-web/js/032-search.js",
+   "sha256": "bdd801d3a64d82462501c320e729d4174efb99eb6b6598686afce732d1fb25c1"
+  },
+  {
+   "file": "src-web/js/040-navigation-and-sheets.js",
+   "sha256": "4266170195dae80432ed3d689146947333884f6c4e0b3b8340bab9da5c3b9cbc"
+  },
+  {
+   "file": "src-web/js/050-expense-form.js",
+   "sha256": "65180a68eaa748b7d7cf99e6cccc7b3e82cc6a569b2b20376549ff04a21c0cdf"
+  },
+  {
+   "file": "src-web/js/060-accounts-and-money-card.js",
+   "sha256": "57dd007a855415b568c47b2f07dc61ec09810089a16c7adc403ad6310f508533"
+  },
+  {
+   "file": "src-web/js/061-planned-and-installments.js",
+   "sha256": "628b99984a8f27f545e8d9b7fc6fb13308453d976d094efaefa7df1434e7d5e1"
+  },
+  {
+   "file": "src-web/js/062-income-and-budget.js",
+   "sha256": "867f306c9ac9606f828be5bfbfd2116b787ffa970ffd2bc9c99c75f80b72806b"
+  },
+  {
+   "file": "src-web/js/070-voice-entry.js",
+   "sha256": "f9a0d33bf9817145bf947cbe225bc06aab672f588b71fda36c044c3ce5eb1b54"
+  },
+  {
+   "file": "src-web/js/080-settings-controls-and-alerts.js",
+   "sha256": "0497fd5777129e3c8513aceba999b7a486a74ac966d33cfbd4306decb796b2e3"
+  },
+  {
+   "file": "src-web/js/081-lock-and-members.js",
+   "sha256": "8c446888c3e5355fa60bb4745f84daf62463ec1b903064c688efefb21447b896"
+  },
+  {
+   "file": "src-web/js/082-settings-pages.js",
+   "sha256": "8d278098a3460543213663aa0345020c3a51e6c01023d7658e4fe48fb9cf184b"
+  },
+  {
+   "file": "src-web/js/090-exports-and-cloud-backup.js",
+   "sha256": "30447f6eb722839ac6e877512a4a9156071f5b9012a278156acede03feb9cb5c"
+  },
+  {
+   "file": "src-web/js/091-import-from-files.js",
+   "sha256": "f60f7b9b4eba08c991a03cad93d2071d23fb9a5ed5cef885972d0c2e4d622b18"
+  },
+  {
+   "file": "src-web/js/092-categories.js",
+   "sha256": "21b6d246c32e433e5aeb63b3b081b890581474f8a9894a1c99f782ed500c4954"
+  },
+  {
+   "file": "src-web/js/100-debts-and-gameyas.js",
+   "sha256": "ee4591bb0e35d7f2396b60d1029bb3dcf64f557823db64fd990a36363495bf3e"
+  },
+  {
+   "file": "src-web/js/110-profile-currency-income-payments.js",
+   "sha256": "2b89abcc8c0583e54f54be5b3f159038893b459c6176188473fbdc7f270cfce3"
+  },
+  {
+   "file": "src-web/js/120-google-drive-updates-reminder.js",
+   "sha256": "1194389864c1c65778aed515408baddc9847520af5727e8d9d44454b7a5ee43f"
+  },
+  {
+   "file": "src-web/js/130-fixed-planned-goals-photo.js",
+   "sha256": "dfa5f47252a296997c43769cfa6cbdca0f303ca5dacc5477a15ba6f474bd6c9b"
+  },
+  {
+   "file": "src-web/js/140-native-sync-effects-welcome.js",
+   "sha256": "deb870ef93c82a65f4575ad439cbd0da4071aea0c094024882bbed298b173b76"
+  },
+  {
+   "file": "src-web/js/150-shared-space.js",
+   "sha256": "d0a98498deaa8edc57438974efd61ab9f5801d31be2f9344d02cd539ad16d034"
+  },
+  {
+   "file": "src-web/js/160-receipts.js",
+   "sha256": "70cd545517836b5c03e60623d125afa4fc86a1bce13c55a652b5e9dd42d09e0e"
+  },
+  {
+   "file": "src-web/js/170-bank-notification-capture.js",
+   "sha256": "d459dceea15e3d85545f0f9b0735c0e8de71ff19f1a2d9e6e0a77dba5a29b685"
+  },
+  {
+   "file": "src-web/js/180-monthly-summary-and-boot.js",
+   "sha256": "069dec06e5cba6d310f3cbddc2d2d256c2051381c629a16605da94853b28da14"
   },
   {
    "file": "store/maleem-playstore-512.png",
@@ -690,7 +915,7 @@
   },
   {
    "file": "tests/i18n-coverage.cjs",
-   "sha256": "29d0b28deda9296e3c7020e65a019d9eaa8736d953d6d8cba2c408888b17fcef"
+   "sha256": "71612936f64b54cb87e34debb3ee172ea78eee417472dcd0f55f8058d09d4c23"
   },
   {
    "file": "tests/income-funding-results.json",
@@ -733,6 +958,10 @@
    "sha256": "6893e2e4060176225a7a76b830bf7d5473566b95c45b9b269da736f57544fe08"
   },
   {
+   "file": "tests/lint.cjs",
+   "sha256": "d701f1e4be5adff1c533e3ca3fdba1ab0c1fc13dfcda762b65297d8c2cfd6557"
+  },
+  {
    "file": "tests/nudge-results.json",
    "sha256": "173c89943f9c4d16ac60959684955d5fe0494658ee6a038157df2cb0a8d7c72c"
   },
@@ -742,7 +971,7 @@
   },
   {
    "file": "tests/package.json",
-   "sha256": "e37c8325ef0817494f781082871503659bd3f2095db58fd82a441b0c794e2dce"
+   "sha256": "bf2ef271902163b9037accb5c0560d85f79cc606116d7f93f206cd2a7cfa55b7"
   },
   {
    "file": "tests/post-review-fixes-results.json",
@@ -783,6 +1012,18 @@
   {
    "file": "tests/review-plan-bug.cjs",
    "sha256": "a95ee5f7fb318cb34eb8e703505f04f8512e269c3341afca00e2b2e7ccce3b83"
+  },
+  {
+   "file": "tools/build-locales.cjs",
+   "sha256": "193694defda6f9b3bfb8440493a2bd9aad07b8584ba81def40b6cfc0fd24bc19"
+  },
+  {
+   "file": "tools/build-www.cjs",
+   "sha256": "32b9389eab6ee90882504b514cf712c0d15c96df7a99f650fdfc776ad0878113"
+  },
+  {
+   "file": "tools/code-map.cjs",
+   "sha256": "5438432252bebcab5f5ac372a5937c4c88365664f13bfb3bc903e7329679e17a"
   },
   {
    "file": "update.json",

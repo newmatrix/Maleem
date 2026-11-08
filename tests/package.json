@@ -1,11 +1,14 @@
 {
   "private": true,
   "scripts": {
-    "test": "node regression.cjs && node full-audit.cjs && node journeys.cjs && node language-dialogs.cjs && node layout-static.cjs && node floating-actions.cjs && node income-funding.cjs && node funding-capsule.cjs && node restore-recurring.cjs && node review-plan-bug.cjs && node account-menu.cjs && node expense-time.cjs && node expense-filters.cjs && node home-month.cjs && node category-report.cjs && node recurrence-expanded.cjs && node debt-currency.cjs && node income-history.cjs && node post-review-fixes.cjs && node home-chips.cjs && node nudge.cjs && node i18n-coverage.cjs"
+    "test": "node ../tools/build-www.cjs --check && node ../tools/code-map.cjs --check && node ../tools/build-locales.cjs --check && node regression.cjs && node full-audit.cjs && node journeys.cjs && node language-dialogs.cjs && node layout-static.cjs && node floating-actions.cjs && node income-funding.cjs && node funding-capsule.cjs && node restore-recurring.cjs && node review-plan-bug.cjs && node account-menu.cjs && node expense-time.cjs && node expense-filters.cjs && node home-month.cjs && node category-report.cjs && node recurrence-expanded.cjs && node debt-currency.cjs && node income-history.cjs && node post-review-fixes.cjs && node home-chips.cjs && node nudge.cjs && node i18n-coverage.cjs && node lint.cjs",
+    "lint": "node lint.cjs"
   },
   "devDependencies": {
     "acorn": "8.14.0",
     "acorn-walk": "8.3.4",
+    "eslint": "9.39.5",
+    "globals": "15.15.0",
     "parse5": "7.2.1",
     "playwright": "1.62.1"
   }

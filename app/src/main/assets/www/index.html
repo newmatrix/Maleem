@@ -323,7 +323,7 @@ button{cursor:pointer}
   padding:10px 16px calc(14px + env(safe-area-inset-bottom,0px));transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);max-height:96%;overflow-y:auto}
 .sheet.open{transform:none}
 @media (prefers-reduced-motion:reduce){.sheet,.scrim,.bar>i{transition:none}}
-.grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 10px}
+.grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 6px}
 .sheet h2{margin:0 0 10px;font-size:1.15rem;text-align:center}
 .amount-box{display:flex;align-items:baseline;justify-content:center;gap:8px;background:var(--surface-2);border-radius:18px;padding:12px 14px;border:2px solid var(--brand)}
 .amount-box .v{font-size:2.5rem;font-weight:700;line-height:1.1;border:0;background:none;outline:none;width:100%;min-width:0;text-align:center;padding:0;font-variant-numeric:tabular-nums;color:var(--ink)}
@@ -346,7 +346,9 @@ button{cursor:pointer}
 .err-msg{color:var(--bad);font-size:.88rem;text-align:center;min-height:1.3em;margin:6px 0 0}
 .sheet-actions{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-top:8px}
 .sheet-actions>.btn:only-child{grid-column:1/-1;justify-self:center;width:min(100%,280px)}
-.sheet-del{margin-top:10px;width:100%}
+.sheet-actions.has-del{grid-template-columns:2fr 1fr auto}
+.sheet-actions>.sheet-del{margin-top:0;width:auto;padding-inline:18px}
+#sheetErr:empty{min-height:0;margin:0}
 /* Restore sheet: it can open over the welcome screen (z-index 60), so it and its scrim sit one step higher */
 .scrim.hi{z-index:61}
 #rsSheet{z-index:62}
@@ -1015,7 +1017,7 @@ details.closed-list[open] summary::before{transform:rotate(-90deg)}
 .sheet .field{margin-top:12px}
 .sheet .seg{margin-top:0;margin-bottom:12px}
 .sheet .amount-box{margin-top:12px;margin-bottom:0}
-#sheet .amount-box{margin-top:0;margin-bottom:16px;padding:8px 14px}
+#sheet .amount-box{margin-top:0;margin-bottom:10px;padding:8px 14px}
 #sheet .amount-box .v{font-size:2.1rem}
 .sheet .amount-box .v{font-size:2.1rem}
 .sheet .pay-row{margin-top:12px}
@@ -1096,6 +1098,11 @@ details.closed-list[open] summary::before{transform:rotate(-90deg)}
 #cats .cat .e{font-size:1.25rem}
 #cats .cat{min-width:0;overflow-wrap:anywhere}
 #cats .cat .cat-name{max-width:100%;overflow-wrap:anywhere}
+#cats{grid-auto-rows:66px}
+#cats .cat{justify-content:center}
+#cats .cat .cat-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+#noteInput{margin-top:10px;padding:8px 13px}
+#expActions{margin-top:16px}
 html[dir="ltr"] #cats.wide{grid-template-columns:repeat(var(--cols),minmax(76px,1fr))}
 /* calculator toggle inside the amount box */
 .calc-tg{align-self:center;flex:none;width:34px;height:34px;border:0;border-radius:11px;background:none;color:var(--muted);display:grid;place-items:center;padding:0;outline:none}
@@ -2017,11 +2024,11 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
     <div class="rc-has" id="rcHas" hidden><button type="button" class="rc-thumb" id="rcThumb" aria-label="عرض صورة الإيصال"><img id="rcImg" alt=""></button><span>صورة الإيصال<small class="rc-reading" id="rcReading" hidden>بقرا الإيصال…</small></span><button type="button" class="linkbtn rc-del" id="rcDel">شيل الصورة</button></div>
   </div>
   <p class="err-msg" id="sheetErr"></p>
-  <div class="sheet-actions">
+  <div class="sheet-actions" id="expActions">
     <button class="btn primary" id="saveBtn">حفظ</button>
     <button class="btn" id="cancelBtn">إلغاء</button>
+    <button class="btn danger sheet-del" id="delInSheet" hidden>حذف</button>
   </div>
-  <button class="btn danger sheet-del" id="delInSheet" hidden>حذف المصروف</button>
   <button class="linkbtn fx-skip" id="fxSkip" hidden>مش هسجله الشهر ده</button>
 </div>
 
@@ -4075,7 +4082,7 @@ function openSheet(id,pre){
   $('#sheetTitle').textContent= x?'تعديل مصروف':'مصروف جديد';
   $('#kindPill').hidden=!!(x||fxPending||plPending||capOpen); $('#sheetTitle').hidden=!$('#kindPill').hidden;
   $('#saveBtn').textContent= x?'حفظ التعديل':'حفظ';
-  $('#delInSheet').hidden=!x;
+  $('#delInSheet').hidden=!x; $('#expActions').classList.toggle('has-del',!!x);
   $('#amountBox').classList.remove('err');$('#sheetErr').textContent='';markCat();$('#cats').classList.remove('err');
   $('#scrim').classList.add('open');$('#sheet').classList.add('open');
   amtIn.focus({preventScroll:true}); if(x||(pre&&pre.amount)) amtIn.select();
@@ -4365,7 +4372,7 @@ $('#accDel').onclick=()=>{
 };
 
 /* --- a transfer between my accounts (also between currencies, with the rate that was really used) --- */
-var trEdit=null, trAuto=0, trSrc='a', trAsked=false;
+var trEdit=null, trAuto=0, trAsked=false;
 const trNum=el=>{const v=evalExpr(el.value); return Number.isFinite(v)?v:NaN};
 const trAvailOf=f=>{ let v=accBal(f.id); const old=trEdit&&S.transfers.find(z=>z.id===trEdit); if(old&&old.from===f.id) v+=old.out+old.fee; if(old&&old.to===f.id) v-=old.in; return r2(v) };
 function trSides(){
@@ -4381,7 +4388,7 @@ function trPaint(reset){
   $('#trAvail').textContent= f? `المتاح في «${accDisp(f)}»: ${fmt(trAvailOf(f))} ${curSym(f.cur)}` : '';
   if(!x) return;
   trAuto=rateFor(f.cur,t.cur)||0;
-  if(reset){ $('#trRate').value=trAuto?String(+trAuto.toPrecision(6)):''; trSrc='a'; trCalcIn() }
+  if(reset){ $('#trRate').value=trAuto?String(+trAuto.toPrecision(6)):''; trCalcIn() }
   $('#trRateHint').textContent= trAuto? `سعر النهارده: \u2068${'1 '+f.cur+' = '+curFmtRate(trAuto)+' '+t.cur}\u2069. عدّله لو البنك نفّذ بسعر تاني` : 'مفيش سعر متاح دلوقتي. اكتب السعر أو المبلغ اللي وصل: مليم مش بيخمّن';
   if(!trAuto&&!trAsked){trAsked=true; ratesRefresh(false,()=>{if($('#trSheet').classList.contains('open')&&!$('#trRateRow').hidden&&!$('#trRate').value) trPaint(true)})}
 }
@@ -4416,15 +4423,15 @@ function openTrSheet(id,pre){
   const okSide=v=>v===NEWCASH? virt : !!ACC(v);
   if(!t&&pre&&okSide(pre.from)&&okSide(pre.to)&&pre.from!==pre.to){ $('#trFrom').value=pre.from; $('#trTo').value=pre.to; $('#trOut').value=pre.out?String(pre.out):''; if(isDK(pre.day)&&pre.day<=todayKey()) $('#trDay').value=pre.day; trCaps=pre.caps||null; if(pre.fee>0) $('#trFee').value=String(pre.fee) }
   trPaint(!t);
-  if(t&&!$('#trRateRow').hidden){ $('#trRate').value=String(+(t.rate||t.in/t.out).toPrecision(6)); $('#trIn').value=String(t.in); trSrc=t.rs||'m' }
+  if(t&&!$('#trRateRow').hidden){ $('#trRate').value=String(+(t.rate||t.in/t.out).toPrecision(6)); $('#trIn').value=String(t.in) }
   $('#scrim').classList.add('open'); $('#trSheet').classList.add('open');
   if(!t&&!$('#trOut').value) setTimeout(()=>$('#trOut').focus({preventScroll:true}),300);
 }
 $('#trFrom').onchange=()=>{ if($('#trTo').value===$('#trFrom').value){const o=S.accounts.find(a=>a.id!==$('#trFrom').value); if(o) $('#trTo').value=o.id} trPaint(true) };
 $('#trTo').onchange=()=>{ if($('#trTo').value===$('#trFrom').value){const o=S.accounts.find(a=>a.id!==$('#trTo').value); if(o) $('#trFrom').value=o.id} trPaint(true) };
 $('#trOut').oninput=()=>{ if(!$('#trRateRow').hidden) trCalcIn() };
-$('#trRate').oninput=()=>{trSrc='m';trCalcIn()};
-$('#trIn').oninput=()=>{const o=trNum($('#trOut')), i=trNum($('#trIn')); if(o>0&&i>0){$('#trRate').value=String(+(i/o).toPrecision(6));trSrc='m'}};
+$('#trRate').oninput=()=>{trCalcIn()};
+$('#trIn').oninput=()=>{const o=trNum($('#trOut')), i=trNum($('#trIn')); if(o>0&&i>0){$('#trRate').value=String(+(i/o).toPrecision(6))}};
 $('#trRefresh').onclick=()=>{ $('#trErr').textContent=''; ratesRefresh(true,()=>{ trPaint(true); if(RT.err&&!trAuto) $('#trErr').textContent='مقدرتش أجيب السعر دلوقتي. اكتب السعر بنفسك أو جرّب لما النت يشتغل'; else toast('اتحدّث سعر الصرف') }) };
 $('#trCancel').onclick=closeSheets;
 $('#trSave').onclick=()=>{
@@ -4715,7 +4722,7 @@ function incomeIn(P){
 const PT_TXT={monthly:'شهري',weekly:'أسبوعي',biweekly:'كل أسبوعين',variable:'متغير'};
 /* what is owed in the next 30 days: installments left + fixed monthly expenses */
 function obligations30(){
-  const tk=todayKey(), end=dayKey(new Date(Date.now()+30*864e5)); let a=0;
+  const end=dayKey(new Date(Date.now()+30*864e5)); let a=0;
   S.insts.forEach(p=>p.items.forEach(i=>{ if(i.due<=end&&!itemDone(i)) a+=itemRem(i) }));
   S.fixed.forEach(f=>{a+=+f.amount||0});
   return r2(a);
@@ -5372,7 +5379,7 @@ function voiceDate(tok){
         if(U[0]==='d') return done(plus(U[1]*c),...ix);
         const t=new Date(T.getFullYear(),T.getMonth()+U[1]*c,1); return done(mk(t.getFullYear(),t.getMonth(),T.getDate()),...ix) }
     }
-    if(w==='اول'&&k[i+1]==='الشهر'){ const nx=VNEXT.has(k[i+2]), cur=T.getDate()===1&&!nx, t=new Date(T.getFullYear(),T.getMonth()+(nx||T.getDate()>1?1:0),1); return done(mk(t.getFullYear(),t.getMonth(),1),...(nx?[i,i+1,i+2]:[i,i+1])) }
+    if(w==='اول'&&k[i+1]==='الشهر'){ const nx=VNEXT.has(k[i+2]), t=new Date(T.getFullYear(),T.getMonth()+(nx||T.getDate()>1?1:0),1); return done(mk(t.getFullYear(),t.getMonth(),1),...(nx?[i,i+1,i+2]:[i,i+1])) }
     if((w==='نص'||w==='نصف'||w==='منتصف')&&k[i+1]==='الشهر'){ const nx=VNEXT.has(k[i+2]), t=new Date(T.getFullYear(),T.getMonth()+(nx||T.getDate()>15?1:0),1); return done(mk(t.getFullYear(),t.getMonth(),15),...(nx?[i,i+1,i+2]:[i,i+1])) }
     if((w==='نهايه'||w==='اخر')&&k[i+1]==='الشهر'){ const nx=VNEXT.has(k[i+2]), t=new Date(T.getFullYear(),T.getMonth()+(nx?1:0),1); return done(mk(t.getFullYear(),t.getMonth(),31),...(nx?[i,i+1,i+2]:[i,i+1])) }
     if(w==='الاسبوع'&&VNEXT.has(k[i+1])) return done(plus(7),i,i+1);
@@ -5411,7 +5418,6 @@ function parseVoiceDebt(text){
   const pick=nums.find(r=>cur(r.idx[r.idx.length-1]+1)||cur(r.idx[0]-1))||nums[0];
   const taken=new Set(D.used); if(pick){out.amount=pick.n; pick.idx.forEach(i=>taken.add(i))}
   k.forEach((w,i)=>{if(cur(i)) taken.add(i)});
-  const first=n=>{for(let i=0;i<tok.length;i++){ if(!taken.has(i)&&!vIsStop(k,i,taken)&&i>=n) return i } return -1};
   const c=k.findIndex((w,i)=>w==='عند'&&(k[i-1]==='ليا'||k[i-1]==='لي'));
   const sl=k.findIndex(w=>['سلفت','اسلفت','سلفته','سلفتها'].includes(w));
   const bo=k.findIndex(w=>['استلفت','اقترضت','استدنت','اتسلفت','اخدت'].includes(w));
@@ -7837,7 +7843,7 @@ const curFmtRate=v=>(Math.round(v*10000)/10000).toLocaleString('en-US',{maximumF
 /* the currency has no published rate: show the same sheet with a box for today's dollar rate */
 function curManualAsk(from,to,code){
   CURX={from,to,k:0,at:0,man:code};
-  const iso=t=>'\u2068'+t+'\u2069', old=manRate(code);
+  const old=manRate(code);
   $('#curTxt').textContent='هتتحول كل مبالغك من '+CUR_NAME(from)+' إلى '+CUR_NAME(to)+': المصروفات والميزانية والدخل والمصاريف الثابتة والأهداف والجمعيات. السلف بتفضل بعملتها المستقلة.';
   $('#curRate').textContent='مفيش سعر منشور لـ'+CUR_NAME(code)+'. اكتب سعر النهارده بنفسك (من بنكك أو موقع تثق فيه).';
   $('#curManRow').hidden=false; $('#curManLab').textContent='1 دولار = كام '+CUR_NAME(code)+'؟';
@@ -8467,7 +8473,7 @@ $('#fxSkip').onclick=()=>{
   if(plPending){ const id=plPending, i=S.plans.findIndex(x=>x.id===id); plPending=null; closeSheets();
     if(i<0) return; const [x]=S.plans.splice(i,1); save(); renderAll();
     toast(`اتشال ${x.name} من المصروفات الجاية`,'تراجع',()=>{S.plans.splice(i,0,x);save();renderAll()},3000); return }
-  if(!fxPending) return; const {id,mk}=fxPending, f=S.fixed.find(x=>x.id===id), k=id+':'+mk;
+  if(!fxPending) return; const {id,mk}=fxPending, k=id+':'+mk;
   S.fixedLog[k]='skip'; fxPending=null; save(); closeSheets(); renderAll();
   toast(TX('تم تخطي الاستحقاق'),'تراجع',()=>{delete S.fixedLog[k];save();renderAll()},3000);
 };

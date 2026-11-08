@@ -1,0 +1,43 @@
+html.booting body{visibility:hidden}
+/* Opening animation: the logo rises in, "مليم" writes itself under it, then the app shows (about 1s) */
+#splash{display:none}
+html.splash-on #splash{display:flex;visibility:visible;position:fixed;inset:0;z-index:300;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;gap:14px}
+#splash .sp-tile{width:96px;height:96px;border-radius:27px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#12E3D2 0%,#02A5A4 50%,#00535F 100%);box-shadow:0 14px 30px -12px rgba(0,83,95,.55);
+  opacity:0;transform:translateY(46px) scale(.88);animation:spUp .46s cubic-bezier(.2,.9,.25,1.15) forwards paused}
+#splash .sp-tile img{position:absolute;width:150%;height:150%;left:-25%;top:-25%}
+#splash .sp-word{font-family:var(--font);font-weight:700;font-size:2rem;line-height:1.2;color:var(--ink);clip-path:inset(0 0 0 100%);
+  animation:spWrite .42s .28s cubic-bezier(.45,0,.2,1) forwards paused}
+html.splash-go #splash .sp-tile,html.splash-go #splash .sp-word{animation-play-state:running}
+html.splash-out #splash{animation:spOut .22s ease forwards}
+@keyframes spUp{to{opacity:1;transform:none}}
+@keyframes spWrite{to{clip-path:inset(0 0 0 0)}}
+@keyframes spOut{to{opacity:0;transform:scale(1.04)}}
+:root{
+  --bg:#EEF6F6; --surface:#FFFFFF; --surface-2:#E0EEEE; --ink:#0E2528; --muted:#53706F;
+  --brand:var(--ac-l,#017D84); --brand-2:var(--ac2-l,#00535F); --brand-ink:#FFFFFF; --gold:#0FB3A6;
+  --ok:#1F8A5B; --warn:#C98A0B; --bad:#C2412D; --line:rgba(14,37,40,.10);
+  --shadow:0 1px 2px rgba(14,37,40,.06),0 8px 24px rgba(14,37,40,.06);
+  --font:"IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#061A1D; --surface:#0D252A; --surface-2:#143238; --ink:#E2F3F2; --muted:#8DB1B1;
+    --brand:var(--ac-d,#0E8A86); --brand-2:var(--ac2-d,#0A4A51); --brand-ink:#FFFFFF; --gold:#5FCFC1;
+    --ok:#3CC487; --warn:#E5A93A; --bad:#EE6B55; --line:rgba(226,243,242,.10);
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061A1D; --surface:#0D252A; --surface-2:#143238; --ink:#E2F3F2; --muted:#8DB1B1;
+  --brand:var(--ac-d,#0E8A86); --brand-2:var(--ac2-d,#0A4A51); --brand-ink:#FFFFFF; --gold:#5FCFC1;
+  --ok:#3CC487; --warn:#E5A93A; --bad:#EE6B55; --line:rgba(226,243,242,.10);
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+  color-scheme:dark;
+}
+

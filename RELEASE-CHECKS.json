@@ -80,6 +80,11 @@
    "suite": "i18n-coverage",
    "exitCode": 0,
    "output": "PASS English coverage: no new untranslated message (322 known non-UI or fragment entries)\nPASS Modern Standard Arabic coverage: no new untranslated message (40 known non-UI or fragment entries)\n"
+  },
+  {
+   "suite": "lint",
+   "exitCode": 0,
+   "output": "PASS lint: 2 inline scripts, no problems\n"
   }
  ]
 }

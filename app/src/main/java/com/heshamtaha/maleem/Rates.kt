@@ -29,7 +29,7 @@ object Rates {
         return o.toString()
     }
 
-    /** A file we accept: base USD, a recent-enough date, and at least a few positive numbers. */
+    /** A file we accept: base USD, a positive "updated" time (how old it is is judged later, where it is shown), and at least a few positive numbers. */
     private fun valid(j: JSONObject): Boolean {
         if (j.optString("base") != "USD") return false
         val r = j.optJSONObject("rates") ?: return false
