@@ -15,6 +15,9 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --prefix tests --ignore-scripts
+      - run: node tools/build-www.cjs --check
+      - run: node tools/code-map.cjs --check
+      - run: node tools/build-locales.cjs --check
       - run: npx --prefix tests playwright install --with-deps chromium
       - run: node tests/regression.cjs
       - run: node tests/full-audit.cjs
@@ -38,6 +41,7 @@ jobs:
       - run: node tests/home-chips.cjs
       - run: node tests/nudge.cjs
       - run: node tests/i18n-coverage.cjs
+      - run: node tests/lint.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
