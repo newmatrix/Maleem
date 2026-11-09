@@ -1,6 +1,6 @@
 /* localStorage full: warn instead of silently keeping the data in memory only */
 let storageWarnAt=0;
-function storageFull(){const now=Date.now(); if(now-storageWarnAt<60000) return; storageWarnAt=now;
+function storageFull(){const now=Date.now(); if(now-storageWarnAt<60000) return; storageWarnAt=now; errLog('app','storage full');
   setTimeout(()=>{try{toast('⚠️ مساحة التخزين اتملت، والتعديلات الجديدة مش هتتحفظ لما تقفل التطبيق. اعمل نسخة احتياطية حالًا، وشيل الصورة الشخصية أو امسح بيانات قديمة.',null,null,9000)}catch(e){}},0)}
 function persist(){if(!lsSet(KEY,JSON.stringify(S))) storageFull(); mbSyncName()}
 
@@ -30,7 +30,7 @@ let S = {expenses:[], budget:0, theme:'system', pin:null, lastBackup:null};
 try{const raw=lsGet(KEY); if(raw){S=Object.assign(S,JSON.parse(raw))}}catch(e){}
 const AB = window.AndroidBridge || null;
 let syncT;
-function save(){userTextCache=null;persist(); if(S.space) spQueue(); if(AB){clearTimeout(syncT);syncT=setTimeout(()=>{try{syncNative()}catch(e){}},800)}}
+function save(){userTextCache=null;persist(); if(S.space) spQueue(); if(AB){clearTimeout(syncT);syncT=setTimeout(()=>{try{syncNative()}catch(e){logErr('sync',e)}},800)}}
 function syncCats(){
   if(!Array.isArray(S.cats)||!S.cats.length) S.cats=CATS.map(c=>({...c}));
   if(!S.cats.some(c=>c.id==='other')) S.cats.push({...CATS[CATS.length-1]});
@@ -45,6 +45,7 @@ if(!S.payday) S.payday=1;
 if(S.remind===undefined) S.remind=true;
 if(!Number.isInteger(S.remindAt)||S.remindAt<0||S.remindAt>=1440) S.remindAt=1380;
 if(!Array.isArray(S.debts)) S.debts=[];
+if(!Array.isArray(S.trash)) S.trash=[];
 if(!Array.isArray(S.gams)) S.gams=[];
 if(S.dueRemind===undefined) S.dueRemind=true;
 if(!S.dueSeen) S.dueSeen={};
@@ -104,7 +105,7 @@ let userTextCache=null;
 function isUserText(text){const k=String(text||'').trim();if(!k)return false;
   if(!userTextCache){const values=new Set(),add=x=>{if(typeof x==='string'&&x.trim())values.add(x.trim())};
     add(S.profile?.name);add(S.profile?.name?.trim().split(/\s+/)[0]);
-    for(const list of [S.expenses,S.debts,S.accounts,S.inflows,S.gold,S.goals,S.gams,S.fixed,S.incomes,S.plans,S.insts])
+    for(const list of [S.expenses,S.debts,S.accounts,S.inflows,S.gold,S.goals,S.gams,S.fixed,S.incomes,S.plans,S.insts,(S.trash||[]).map(t=>t&&t.d).filter(Boolean)])
       if(Array.isArray(list))for(const x of list)for(const p of ['person','name','src','party','byName'])add(x[p]);
     for(const c of S.cats||[])if(!CATS.some(d=>d.id===c.id&&d.name===c.name))add(c.name);
     userTextCache=values;
@@ -473,6 +474,19 @@ function ratesRefresh(force,cb){
       .then(r=>{ if(!r.ok){RT.err='http'; RT.why='http'+r.status; return null} return r.json() }).then(j=>{ if(j){ if(ratesLoad({data:j,checkedAt:Date.now()})) setTimeout(()=>{try{curFixPending()}catch(e){}},0); else RT.err='bad' } ratesDone() }).catch(e=>{RT.err='net'; RT.why=(e&&e.name==='AbortError')?'timeout8':String((e&&e.message)||e).slice(0,40); ratesDone()});
   }catch(e){ratesDone()}
 }
+/* ===== Trash: what the person deletes stays here for 30 days. Each entry = {id, k: kind, ts: when deleted, i: place in its list, d: the record, m: extra links (installments)}.
+   Not in backups and not shared: it is only this phone's safety net. ===== */
+const TRASH_DAYS=30, TRASH_MAX=150;
+const TRASH_CLEAN={xp:x=>cleanExpense(x,true),debt:x=>cleanDebt(x,S.currency),gam:cleanGam,inc:cleanIncome,goal:cleanGoal,fix:cleanFixed,plan:cleanPlan,inst:cleanInst};
+function cleanTrash(l){
+  const seen=new Set();
+  return (Array.isArray(l)?l:[]).map(t=>{
+    if(!t||typeof t!=='object'||!isId(t.id)||!TRASH_CLEAN[t.k]||seen.has(t.id)) return null;
+    const ts=numIn(t.ts,0,MAXTS,0), d=ts?TRASH_CLEAN[t.k](t.d):null; if(!d) return null; seen.add(t.id);
+    const o={id:t.id,k:t.k,ts,i:intIn(t.i,0,100000,0),d};
+    if(t.k==='inst'&&Array.isArray(t.m)) o.m=t.m.filter(q=>Array.isArray(q)&&isId(q[0])&&isId(q[1])).slice(0,120).map(q=>[q[0],q[1]]);
+    return o}).filter(Boolean).slice(0,TRASH_MAX);
+}
 const CLEAN={debts:cleanDebt,gams:cleanGam,incomes:cleanIncome,goals:cleanGoal,fixed:cleanFixed};
 /* clean whatever is already stored on the phone (older versions, old backups) */
 curMerge([]); // the currencies this person added, before anything is checked against CURRENCIES
@@ -481,6 +495,7 @@ curMerge([]); // the currencies this person added, before anything is checked ag
   S.expenses=arr(S.expenses).map(x=>cleanExpense(x,true)).filter(Boolean);
   Object.keys(CLEAN).forEach(k=>{S[k]=arr(S[k]).map(CLEAN[k]).filter(Boolean)});
   S.fixedLog=cleanFixedLog(S.fixedLog);
+  S.trash=cleanTrash(S.trash);
   S.plans=arr(S.plans).map(cleanPlan).filter(Boolean);
   S.gold=arr(S.gold).map(cleanGold).filter(Boolean); S.goldPx=cleanGoldPx(S.goldPx); S.ipFee=cleanIpFee(S.ipFee); S.manRates=cleanManRates(S.manRates); S.fbEmail=str(S.fbEmail,100);
   S.closedP=cleanClosed(S.closedP);

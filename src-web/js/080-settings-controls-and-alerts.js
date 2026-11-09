@@ -196,11 +196,11 @@ $('#wipeConfirm').onclick=()=>{
   const sel=k=>wipeSel[k]&&WIPE_OPTS.find(o=>o[0]===k)[2](); if(!WIPE_OPTS.some(([k])=>sel(k))) return;
   if(sel('inc')&&!sel('exp')&&S.expenses.some(e=>e.fund==='free')){toast(TX('غيّر مصدر مصاريف الدخل الحر أو امسحها مع الدخل.'));return}
   if(sel('exp')&&S.space) spDetach();
-  const keys=['budget','expenses','debts','gams','plans','alerted','dueSeen','accounts','transfers','bMoves','insts','instPays','inflows','lastAcc','gold','goldPx'];
+  const keys=['budget','expenses','debts','gams','plans','alerted','dueSeen','accounts','transfers','bMoves','insts','instPays','inflows','lastAcc','gold','goldPx','trash'];
   const old=JSON.parse(JSON.stringify(keys.reduce((o,k)=>(o[k]=S[k],o),{})));
   const bal={}; S.accounts.forEach(a=>{bal[a.id]=accBal(a.id)});
-  if(sel('exp')){S.expenses=[];S.alerted={};S.dueSeen={}}
-  if(sel('obl')){S.debts=[];S.gams=[];S.insts=[];S.instPays=[];S.plans=[]}
+  if(sel('exp')){S.expenses=[];S.alerted={};S.dueSeen={};S.trash=trashAll().filter(t=>t.k!=='xp')}
+  if(sel('obl')){S.debts=[];S.gams=[];S.insts=[];S.instPays=[];S.plans=[];S.trash=trashAll().filter(t=>!['debt','gam','inst','plan'].includes(t.k))}
   if(sel('inc')){S.budget=Math.max(0,r2(S.budget-S.inflows.filter(x=>x.fund==='permanent').reduce((a,x)=>a+x.amount,0)));S.inflows=[];}
   if(sel('gold')){S.gold=[];S.goldPx={}}
   if(sel('tr')||sel('acc')){S.transfers=[];S.bMoves=[]}

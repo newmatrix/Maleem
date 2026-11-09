@@ -1,5 +1,5 @@
 /* receipts whose expense is gone (deleted, wiped, restored over) */
-function rcPrune(){const live=new Set(S.expenses.map(e=>e.id)); [...RC.ids].forEach(id=>{if(!live.has(id)) rcDel(id)})}
+function rcPrune(){trashSweep(); const live=new Set(S.expenses.map(e=>e.id).concat(trashAll().filter(t=>t.k==='xp').map(t=>t.d.id))); [...RC.ids].forEach(id=>{if(!live.has(id)) rcDel(id)})}
 /* phone photos are big: keep a sharp but small JPEG (longest side 1600px) */
 function rcShrink(file){return new Promise((res,rej)=>{
   const u=URL.createObjectURL(file), img=new Image();

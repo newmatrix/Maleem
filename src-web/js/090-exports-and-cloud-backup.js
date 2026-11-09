@@ -234,6 +234,7 @@ function applyBackup(p,at,onUndo){
   /* every record goes through the same cleaners used for stored data: a crafted file can't inject HTML or break the screens */
   {const seen=new Set(); S.expenses=(Array.isArray(p.expenses)?p.expenses:[]).map(x=>cleanExpense(x,false)).filter(Boolean)
     .map(e=>{if(seen.has(e.id)) e.id=uid(); seen.add(e.id); return e})}
+  {const old=trashAll(); S.trash=[]; old.forEach(trashLetGo)} // the trash belongs to the data it was made from
   if(p.budget!==undefined) S.budget=numIn(p.budget,0,MAXAMT,0);
   {const cs=Array.isArray(p.cats)?p.cats.map(cleanCat).filter(Boolean):[]; if(cs.length) S.cats=cs}
   S.budgetMode= ['fixed','open'].includes(p.budgetMode)? p.budgetMode : (S.budget>0?'fixed':S.budgetMode);

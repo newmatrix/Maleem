@@ -430,10 +430,9 @@ function delExpense(id){
   rows.forEach(r=>r.classList.add('removing'));
   setTimeout(()=>{
     const j=S.expenses.findIndex(e=>e.id===id); if(j<0)return;
-    const [x]=S.expenses.splice(j,1); save();renderAll();checkAlerts();
-    if(RC.ids.has(x.id)) setTimeout(()=>{if(!S.expenses.some(e=>e.id===x.id)) rcDel(x.id)},4000);
+    const [x]=S.expenses.splice(j,1); const tid=trashPut('xp',x,j); save();renderAll();checkAlerts(); // its receipt photo stays with it in the trash
     toast('اتحذف المصروف','تراجع',()=>{
-      justAdded=x.id;
+      trashDel(tid); justAdded=x.id;
       if(S.space&&x.sp===S.space.code&&expenseCanManage(x))S.space.manual=Array.from(new Set([...(S.space.manual||[]),String(x.id)]));
       S.expenses.push(x);save();renderAll();justAdded=null
     },3000);

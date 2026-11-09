@@ -197,11 +197,14 @@ const fbName=()=>$('#fbName').value.trim().slice(0,60), fbEmail=()=>$('#fbEmail'
 function fbPaint(){
   document.querySelectorAll('#fbKind button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.fk===fbKind?'true':'false'));
   $('#fbText').placeholder= fbKind==='bug'? 'اشرح المشكلة: عملت إيه وإيه اللي حصل؟' : 'اكتب اقتراحك بالتفصيل...';
+  $('#fbAttachRow').hidden=!(fbKind==='bug'&&errLogRead().length>0);
   if(!$('#fbName').value) $('#fbName').value=(S.profile&&S.profile.name)||'';
   if(!$('#fbEmail').value) $('#fbEmail').value=S.fbEmail||'';
 }
+const fbAttachOn=()=>fbKind==='bug'&&!$('#fbAttachRow').hidden&&$('#fbAttach').checked; // the person ticked «أرفق تقرير الأخطاء»
+const fbBody=web=>{const t=$('#fbText').value.trim(); return fbAttachOn()? t.slice(0,web?700:1250)+'\n\n'+errReport(web?450:700) : t.slice(0,web?1200:2000)};
 function fbBrowser(){
-  const meta='\u2014 \u0645\u0644\u064A\u0645 '+((UPD.st&&UPD.st.curName)||'')+(AB?' \u00B7 Android':' \u00B7 web'), txt=($('#fbText').value.trim().slice(0,1200)+'\n\n'+meta);
+  const meta='\u2014 \u0645\u0644\u064A\u0645 '+((UPD.st&&UPD.st.curName)||'')+(AB?' \u00B7 Android':' \u00B7 web'), txt=(fbBody(true)+'\n\n'+meta);
   const q=(k,v)=>'&'+k+'='+encodeURIComponent(v);
   const a=document.createElement('a'); a.href='https://docs.google.com/forms/d/e/'+FB.form+'/viewform?usp=pp_url'+q(FB.name,fbName())+q(FB.email,fbEmail())+q(FB.kind,FB[fbKind])+q(FB.text,txt);
   a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove();
@@ -215,11 +218,11 @@ $('#fbSend').onclick=()=>{
   E(''); S.fbEmail=email; save();
   if(!(AB&&AB.feedbackSend)){ fbBrowser(); toast('فتحتلك الفورم. دوس «إرسال» هناك'); return } // the web version: no way to post from the page
   fbBusy=true; $('#fbSend').disabled=true; $('#fbSend').textContent='بيتبعت...'; $('#fbOpen').hidden=true;
-  try{AB.feedbackSend(fbName(),email,fbKind,text)}catch(err){window.__fbDone('net')}
+  try{AB.feedbackSend(fbName(),email,fbKind,fbBody(false))}catch(err){window.__fbDone('net')}
 };
 window.__fbDone=err=>{
   fbBusy=false; $('#fbSend').disabled=false; $('#fbSend').textContent='ابعت';
-  if(!err){ $('#fbText').value=''; $('#fbMsg').textContent=''; $('#fbOpen').hidden=true; toast('وصلني، شكرًا ليك 🙏'); setGo(null); return }
+  if(!err){ $('#fbText').value=''; $('#fbAttach').checked=false; $('#fbMsg').textContent=''; $('#fbOpen').hidden=true; toast('وصلني، شكرًا ليك 🙏'); setGo(null); return }
   const known={rate:'استنى دقيقة قبل ما تبعت حاجة تانية',net:'مفيش نت دلوقتي، جرّب تاني لما النت يشتغل',bad:'اكتب الاقتراح أو المشكلة الأول'};
   $('#fbMsg').textContent=known[err]||'ما قدرتش أبعتها من التطبيق. تقدر تبعتها من الفورم في المتصفح';
   $('#fbOpen').hidden=!!known[err];

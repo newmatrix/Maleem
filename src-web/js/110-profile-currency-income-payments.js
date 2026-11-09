@@ -266,8 +266,8 @@ function openIncome(id){
       if(x) Object.assign(x,{name:v.name,amount}); else S.incomes.push({id:uid(),name:v.name,amount});
       save();renderAll();toast(x?'اتعدل الدخل':`اتضاف ${v.name}: ${fmt(amount)} ${CS()}`)}});
 }
-function deleteIncome(id){const i=S.incomes.findIndex(x=>x.id===id); if(i<0) return; const [x]=S.incomes.splice(i,1); save();renderAll();
-  toast('اتحذف '+x.name,'تراجع',()=>{S.incomes.splice(i,0,x);save();renderAll()},3000)}
+function deleteIncome(id){const i=S.incomes.findIndex(x=>x.id===id); if(i<0) return; const [x]=S.incomes.splice(i,1); const tid=trashPut('inc',x,i); save();renderAll();
+  toast('اتحذف '+x.name,'تراجع',()=>{trashDel(tid);S.incomes.splice(i,0,x);save();renderAll()},3000)}
 
 /* payment methods */
 function renderPayReport(list,total){

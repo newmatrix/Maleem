@@ -157,7 +157,7 @@ function closeSheets(){
   wpCloseAll();
   rcStage=null; capOpen=null; trCaps=null; inCap=null; dCap=null; payCap=null; RF=null;
   closePayMenu(); closeDateMenu(); closeKindMenu();
-  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','curSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet','rsSheet','accSheet','trSheet','mvSheet','freeSheet','moneySheet','instSheet','iiSheet','ipSheet','inSheet','caSheet','pkSheet','curAddSheet','dAddSheet','dLogSheet','sugSheet','rcnSheet','clsSheet','gdSheet','rfSheet'].forEach(i=>$('#'+i).classList.remove('open'));
+  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','curSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet','rsSheet','accSheet','trSheet','mvSheet','freeSheet','moneySheet','instSheet','iiSheet','ipSheet','inSheet','caSheet','pkSheet','curAddSheet','dAddSheet','dLogSheet','sugSheet','rcnSheet','clsSheet','gdSheet','rfSheet','trashSheet'].forEach(i=>$('#'+i).classList.remove('open'));
   $('#noteInput').blur();$('#catName').blur();amtIn.blur();
   if(pinMode){pinMode=null;$('#pinToggle').checked=!!hasPin()}
 }

@@ -6,6 +6,7 @@ const fs=require('fs'),path=require('path');
 const ROOT=path.resolve(__dirname,'..'), JS=path.join(ROOT,'src-web/js'), OUT=path.join(ROOT,'docs/CODE-MAP.md');
 const WHAT={
  "000-constants": "Default categories (CATS) and the CAT lookup, safe localStorage wrappers (lsGet / lsSet).",
+ "001-error-log": "Local error log: catches script errors, unhandled promises and console.error(Error) into a small cleaned list on the phone (errLog / errReport); outside the app data and the backups.",
  "010-state-and-storage": "Storage and the state S: persistence, member keys, save(); the translation engine (trText / TX / trNode) and language; payment methods; the currency table and custom currencies.",
  "020-theme-and-toast": "Theme / palette / font, toast messages, the list row of an expense.",
  "030-home": "Home (expenses) screen helpers: pay periods (periodOf, daysLeft), forecast and daily allowance, the eye toggle, closing a period, renderHome.",
@@ -23,6 +24,8 @@ const WHAT={
  "090-exports-and-cloud-backup": "Exports (Excel / PDF), file saving, the yearly report, backup file writing and restoring (applyBackup).",
  "091-import-from-files": "Importing expenses from Excel / CSV / PDF, category guess and the review sheet.",
  "092-categories": "Category management.",
+ "093-trash": "Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet.",
+ "094-error-log-ui": "The error log card in the feedback page: count, see / copy the report, clear.",
  "100-debts-and-gameyas": "Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text.",
  "110-profile-currency-income-payments": "Me / profile, app currency change and exchange rates, income list, payment methods.",
  "120-google-drive-updates-reminder": "Google Drive backup and restore (driveCall, restore sheet), app updates (check / download), the developer message and the periodic support reminder (nudge).",

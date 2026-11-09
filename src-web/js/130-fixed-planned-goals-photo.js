@@ -76,16 +76,16 @@ function openFixed(id,pre){
   const input=toggle.querySelector('input');input.checked=status.value!=='paused';input.onchange=()=>{status.value=input.checked?'active':'paused'};
 
 }
-function deleteFixed(id){const i=S.fixed.findIndex(x=>x.id===id); if(i<0) return; const [f]=S.fixed.splice(i,1); save();renderAll();
-  toast('اتحذف '+f.name,'تراجع',()=>{S.fixed.splice(i,0,f);save();renderAll()},3000)}
+function deleteFixed(id){const i=S.fixed.findIndex(x=>x.id===id); if(i<0) return; const [f]=S.fixed.splice(i,1); const tid=trashPut('fix',f,i); save();renderAll();
+  toast('اتحذف '+f.name,'تراجع',()=>{trashDel(tid);S.fixed.splice(i,0,f);save();renderAll()},3000)}
 $('#addFixed').onclick=()=>openFixed();
 document.addEventListener('click',e=>{const b=e.target.closest('[data-fpay]'); if(!b) return; e.stopPropagation();
   const [fid,mk]=b.dataset.fpay.split(':'), f=S.fixed.find(x=>x.id===fid); if(!f||f.paused||S.fixedLog[fid+':'+mk]) return;
   openSheet(null,{amount:+f.amount||'',cat:f.cat,note:f.name,fx:{id:fid,mk}})});
 $('#fxSkip').onclick=()=>{
   if(plPending){ const id=plPending, i=S.plans.findIndex(x=>x.id===id); plPending=null; closeSheets();
-    if(i<0) return; const [x]=S.plans.splice(i,1); save(); renderAll();
-    toast(`اتشال ${x.name} من المصروفات الجاية`,'تراجع',()=>{S.plans.splice(i,0,x);save();renderAll()},3000); return }
+    if(i<0) return; const [x]=S.plans.splice(i,1); const tid=trashPut('plan',x,i); save(); renderAll();
+    toast(`اتشال ${x.name} من المصروفات الجاية`,'تراجع',()=>{trashDel(tid);S.plans.splice(i,0,x);save();renderAll()},3000); return }
   if(!fxPending) return; const {id,mk}=fxPending, k=id+':'+mk;
   S.fixedLog[k]='skip'; fxPending=null; save(); closeSheets(); renderAll();
   toast(TX('تم تخطي الاستحقاق'),'تراجع',()=>{delete S.fixedLog[k];save();renderAll()},3000);
@@ -109,8 +109,8 @@ function openPlan(id,pre){
       S.plans.push({id:uid(),name:v.name,cat,amount,due:v.due,created:Date.now()}); save();renderAll();
       toast(`اتضاف ${v.name}، وهيفكّرك يوم ${dkToDMY(v.due)}`)}});
 }
-function deletePlan(id){const i=S.plans.findIndex(x=>x.id===id); if(i<0) return; const [x]=S.plans.splice(i,1); save();renderAll();
-  toast('اتحذف '+x.name,'تراجع',()=>{S.plans.splice(i,0,x);save();renderAll()},3000)}
+function deletePlan(id){const i=S.plans.findIndex(x=>x.id===id); if(i<0) return; const [x]=S.plans.splice(i,1); const tid=trashPut('plan',x,i); save();renderAll();
+  toast('اتحذف '+x.name,'تراجع',()=>{trashDel(tid);S.plans.splice(i,0,x);save();renderAll()},3000)}
 $('#addPlan').onclick=()=>openPlan();
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ppay]'); if(!b) return; e.stopPropagation();
   const x=S.plans.find(y=>y.id===b.dataset.ppay); if(!x) return;
@@ -125,8 +125,8 @@ function openGoal(id){
       if(g) Object.assign(g,{name:v.name,target,saved,e:v.e}); else S.goals.push({id:uid(),name:v.name,target,saved,e:v.e,created:Date.now()});
       save();renderAll();toast(g?'اتعدل الهدف':`اتضاف هدف ${v.name}`)}});
 }
-function deleteGoal(id){const i=S.goals.findIndex(x=>x.id===id); if(i<0) return; const [g]=S.goals.splice(i,1); save();renderAll();
-  toast('اتحذف هدف '+g.name,'تراجع',()=>{S.goals.splice(i,0,g);save();renderAll()},3000)}
+function deleteGoal(id){const i=S.goals.findIndex(x=>x.id===id); if(i<0) return; const [g]=S.goals.splice(i,1); const tid=trashPut('goal',g,i); save();renderAll();
+  toast('اتحذف هدف '+g.name,'تراجع',()=>{trashDel(tid);S.goals.splice(i,0,g);save();renderAll()},3000)}
 function depositGoal(id){
   const g=S.goals.find(x=>x.id===id); if(!g) return;
   openForm({title:`ضيف فلوس لـ ${g.name}`, save:'ضيف', fields:[{key:'amount',type:'money',label:`فاضل ${fmt(g.target-(g.saved||0))} ${CS()}`}],

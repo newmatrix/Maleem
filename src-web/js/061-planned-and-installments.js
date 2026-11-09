@@ -30,8 +30,8 @@ function deleteInst(id){
   const i=S.insts.findIndex(x=>x.id===id); if(i<0) return; const p=S.insts[i], ids=new Set(p.items.map(x=>x.id));
   if(S.instPays.some(x=>ids.has(x.item))){toast('التقسيط ده عليه مدفوعات متسجلة من غير مصروف. احذفها الأول من داخل كل قسط عشان الأرصدة متتلخبطش',null,null,6000);return}
   const linked=S.expenses.filter(e=>e.inst&&ids.has(e.inst)).map(e=>[e,e.inst]);
-  S.insts.splice(i,1); linked.forEach(([e])=>{delete e.inst}); save();renderAll();
-  toast('اتحذف «'+p.name+'» (الأقساط اللي دفعتها فاضلة في مصاريفك)','تراجع',()=>{S.insts.splice(Math.min(i,S.insts.length),0,p);linked.forEach(([e,v])=>{e.inst=v});save();renderAll()},5000);
+  S.insts.splice(i,1); const tid=trashPut('inst',p,i,linked.map(([e,v])=>[e.id,v])); linked.forEach(([e])=>{delete e.inst}); save();renderAll();
+  toast('اتحذف «'+p.name+'» (الأقساط اللي دفعتها فاضلة في مصاريفك)','تراجع',()=>{trashDel(tid);S.insts.splice(Math.min(i,S.insts.length),0,p);linked.forEach(([e,v])=>{e.inst=v});save();renderAll()},5000);
 }
 
 /* --- one installment: change its amount / date, see and delete its payments --- */

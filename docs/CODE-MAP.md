@@ -6,7 +6,8 @@
 | الملف | الأسطر | الغرض |
 |---|---:|---|
 | `000-constants.js` | 44 | Default categories (CATS) and the CAT lookup, safe localStorage wrappers (lsGet / lsSet). |
-| `010-state-and-storage.js` | 498 | Storage and the state S: persistence, member keys, save(); the translation engine (trText / TX / trNode) and language; payment methods; the currency table and custom currencies. |
+| `001-error-log.js` | 37 | Local error log: catches script errors, unhandled promises and console.error(Error) into a small cleaned list on the phone (errLog / errReport); outside the app data and the backups. |
+| `010-state-and-storage.js` | 513 | Storage and the state S: persistence, member keys, save(); the translation engine (trText / TX / trNode) and language; payment methods; the currency table and custom currencies. |
 | `020-theme-and-toast.js` | 111 | Theme / palette / font, toast messages, the list row of an expense. |
 | `030-home.js` | 176 | Home (expenses) screen helpers: pay periods (periodOf, daysLeft), forecast and daily allowance, the eye toggle, closing a period, renderHome. |
 | `031-reports.js` | 122 | Reports screen, report periods and the category detail. |
@@ -15,14 +16,16 @@
 | `050-expense-form.js` | 283 | Expense form (date menu, time wheels, funding and payment menus, openSheet / closeSheets) and account helpers (ACC, accBal, moneyTotals, exchange-rate lookups). |
 | `060-accounts-and-money-card.js` | 382 | Accounts: list, sheet, reconciliation, transfers, cash withdrawals, the "my money" card, moving money to the budget. |
 | `061-planned-and-installments.js` | 114 | Installments: add / edit / delete, one installment and paying it (plus PT_TXT and the income-in helper). |
-| `062-income-and-budget.js` | 427 | Budget and pay-cycle helpers, income stats and the income list / sheet, InstaPay fee setting, shared-space settings (fb…), gold purchases, end-of-period forecast. |
-| `070-voice-entry.js` | 489 | Voice entry: spoken numbers, dates, category guess, debt / gam'eya / installment phrases. |
+| `062-income-and-budget.js` | 430 | Budget and pay-cycle helpers, income stats and the income list / sheet, InstaPay fee setting, shared-space settings (fb…), gold purchases, end-of-period forecast. |
+| `070-voice-entry.js` | 488 | Voice entry: spoken numbers, dates, category guess, debt / gam'eya / installment phrases. |
 | `080-settings-controls-and-alerts.js` | 280 | Settings controls, widgets and the Quick Settings tile, budget alerts, daily reminder time, low-balance alerts. |
 | `081-lock-and-members.js` | 241 | PIN / password / fingerprint lock and the local members list. |
-| `082-settings-pages.js` | 83 | Settings home list, one page per section, and the settings search. |
-| `090-exports-and-cloud-backup.js` | 342 | Exports (Excel / PDF), file saving, the yearly report, backup file writing and restoring (applyBackup). |
+| `082-settings-pages.js` | 86 | Settings home list, one page per section, and the settings search. |
+| `090-exports-and-cloud-backup.js` | 343 | Exports (Excel / PDF), file saving, the yearly report, backup file writing and restoring (applyBackup). |
 | `091-import-from-files.js` | 403 | Importing expenses from Excel / CSV / PDF, category guess and the review sheet. |
 | `092-categories.js` | 179 | Category management. |
+| `093-trash.js` | 74 | Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet. |
+| `094-error-log-ui.js` | 14 | The error log card in the feedback page: count, see / copy the report, clear. |
 | `100-debts-and-gameyas.js` | 541 | Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text. |
 | `110-profile-currency-income-payments.js` | 366 | Me / profile, app currency change and exchange rates, income list, payment methods. |
 | `120-google-drive-updates-reminder.js` | 314 | Google Drive backup and restore (driveCall, restore sheet), app updates (check / download), the developer message and the periodic support reminder (nudge). |
@@ -40,10 +43,15 @@ Default categories (CATS) and the CAT lookup, safe localStorage wrappers (lsGet 
 
 `CATS` `CATS_MORE` `CAT` `mem` `lsGet` `lsSet`
 
+### 001-error-log.js
+Local error log: catches script errors, unhandled promises and console.error(Error) into a small cleaned list on the phone (errLog / errReport); outside the app data and the backups.
+
+`ERRLOG_KEY` `errAddr` `errText` `errStack` `errLogRead` `errBurst` `errLog` `logErr` `errClear` `errWhen` `errReport`
+
 ### 010-state-and-storage.js
 Storage and the state S: persistence, member keys, save(); the translation engine (trText / TX / trNode) and language; payment methods; the currency table and custom currencies.
 
-`storageWarnAt` `storageFull` `persist` `MKEY` `mbKey` `rcDbName` `fbAppName` `MB` `ME` `KEY` `mbSave` `mbSyncName` `fileTag` `S` `AB` `syncT` `save` `syncCats` `LANG_NAMES` `LANG` `I18D` `HAS_AR` `dayCount` `trText` `trKey` `TX` `userTextCache` `isUserText` `TR_ATTRS` `trNode` `langSel` `LANG_UI` `langPaint` `PAYS` `PAY` `payOf` `CURRENCIES` `CS` `CUR_BASE` `CUR_SKIP` `CUR_DN` `curNameAr` `curNameEn` `curAddCustom` `curMerge` `esc` `cleanE` `colr` `fmt` `money` `pad` `dayKey` `monKey` `LOC` `monthName` `monthOnly` `dayName` `timeStr` `daysIn` `nextMonth` `ofMonth` `sum` `byCat` `uid` `isId` `idOr` `numIn` `intIn` `str` `isDK` `isMK` `isPhoto` `MAXAMT` `r2` `cleanOwner` `cleanExpense` `cleanDebt` `cleanGam` `cleanIncome` `cleanGoal` `cleanFixed` `cleanPlan` `FXLOG_KEY` `cleanFixedLog` `cleanCat` `ACC_TYPES` `cleanAcc` `cleanTr` `cleanBMove` `budOf` `budgetExpenses` `budgetSpent` `freeIncomeBalance` `freeIncomeActive` `incomeFundLabel` `incomeChangeError` `changeIncome` `paintExpenseFund` `paintIncomeFund` `cleanInst` `cleanInflow` `GOLD_KS` `cleanGold` `cleanManRates` `cleanIpFee` `cleanGoldPx` `cleanInstPay` `cleanPay` `cleanCap` `cleanProfile` `RT` `ratesLoad` `rateFor` `manRate` `usdRate` `ratesDone` `ratesRefresh` `CLEAN`
+`storageWarnAt` `storageFull` `persist` `MKEY` `mbKey` `rcDbName` `fbAppName` `MB` `ME` `KEY` `mbSave` `mbSyncName` `fileTag` `S` `AB` `syncT` `save` `syncCats` `LANG_NAMES` `LANG` `I18D` `HAS_AR` `dayCount` `trText` `trKey` `TX` `userTextCache` `isUserText` `TR_ATTRS` `trNode` `langSel` `LANG_UI` `langPaint` `PAYS` `PAY` `payOf` `CURRENCIES` `CS` `CUR_BASE` `CUR_SKIP` `CUR_DN` `curNameAr` `curNameEn` `curAddCustom` `curMerge` `esc` `cleanE` `colr` `fmt` `money` `pad` `dayKey` `monKey` `LOC` `monthName` `monthOnly` `dayName` `timeStr` `daysIn` `nextMonth` `ofMonth` `sum` `byCat` `uid` `isId` `idOr` `numIn` `intIn` `str` `isDK` `isMK` `isPhoto` `MAXAMT` `r2` `cleanOwner` `cleanExpense` `cleanDebt` `cleanGam` `cleanIncome` `cleanGoal` `cleanFixed` `cleanPlan` `FXLOG_KEY` `cleanFixedLog` `cleanCat` `ACC_TYPES` `cleanAcc` `cleanTr` `cleanBMove` `budOf` `budgetExpenses` `budgetSpent` `freeIncomeBalance` `freeIncomeActive` `incomeFundLabel` `incomeChangeError` `changeIncome` `paintExpenseFund` `paintIncomeFund` `cleanInst` `cleanInflow` `GOLD_KS` `cleanGold` `cleanManRates` `cleanIpFee` `cleanGoldPx` `cleanInstPay` `cleanPay` `cleanCap` `cleanProfile` `RT` `ratesLoad` `rateFor` `manRate` `usdRate` `ratesDone` `ratesRefresh` `TRASH_DAYS` `TRASH_CLEAN` `cleanTrash` `CLEAN`
 
 ### 020-theme-and-toast.js
 Theme / palette / font, toast messages, the list row of an expense.
@@ -88,7 +96,7 @@ Installments: add / edit / delete, one installment and paying it (plus PT_TXT an
 ### 062-income-and-budget.js
 Budget and pay-cycle helpers, income stats and the income list / sheet, InstaPay fee setting, shared-space settings (fb…), gold purchases, end-of-period forecast.
 
-`obligations30` `inflowStats` `reservePerPayment` `paintPayType` `incomeVisibleCount` `renderIncome` `inEdit` `inNum` `openInSheet` `IN_BASE` `inKey` `inSrcOptions` `paintInChips` `KIND_ITEMS` `closeKindMenu` `openKindMenu` `paintIpFee` `FB` `fbKind` `fbName` `fbPaint` `fbBrowser` `GOLD_K` `goldPer` `gdTitle` `sgn` `sgnCol` `goldStats` `goldNow` `renderGold` `gdEdit` `gdPaintK` `gdPer` `openGold` `forecastEnd` `renderForecast` `renderMoneyReport` `repTab` `paintRepTab` `mePage` `ME_TITLES` `ME_ICO` `ME_GROUPS` `meGo` `renderMeHome`
+`obligations30` `inflowStats` `reservePerPayment` `paintPayType` `incomeVisibleCount` `renderIncome` `inEdit` `inNum` `openInSheet` `IN_BASE` `inKey` `inSrcOptions` `paintInChips` `KIND_ITEMS` `closeKindMenu` `openKindMenu` `paintIpFee` `FB` `fbKind` `fbName` `fbPaint` `fbAttachOn` `fbBody` `fbBrowser` `GOLD_K` `goldPer` `gdTitle` `sgn` `sgnCol` `goldStats` `goldNow` `renderGold` `gdEdit` `gdPaintK` `gdPer` `openGold` `forecastEnd` `renderForecast` `renderMoneyReport` `repTab` `paintRepTab` `mePage` `ME_TITLES` `ME_ICO` `ME_GROUPS` `meGo` `renderMeHome`
 
 ### 070-voice-entry.js
 Voice entry: spoken numbers, dates, category guess, debt / gam'eya / installment phrases.
@@ -124,6 +132,16 @@ Importing expenses from Excel / CSV / PDF, category guess and the review sheet.
 Category management.
 
 `EMOJIS` `COLORS` `catEdit` `renderCatList` `sortSuppress` `sortable` `commitCatOrder` `paintCatSheet` `openCatSheet` `catSugList` `openCatSug` `deleteCat`
+
+### 093-trash.js
+Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet.
+
+`TRASH_LABEL` `TRASH_ARR` `trashAll` `trashLetGo` `trashSweep` `trashPut` `trashDel` `trashRestore` `trashForever` `trashEmpty` `trashInfo` `trashAgo` `renderTrash` `openTrash`
+
+### 094-error-log-ui.js
+The error log card in the feedback page: count, see / copy the report, clear.
+
+`errPaint`
 
 ### 100-debts-and-gameyas.js
 Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text.

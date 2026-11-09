@@ -242,8 +242,8 @@ $('#debtSave').onclick=()=>{
 function deleteDebt(id){
   const i=S.debts.findIndex(d=>d.id===id); if(i<0) return;
   if(debtAccRows(S.debts[i]).some(p=>p.acc)){toast('السلفة دي مربوطة بحساب (هي أو زياداتها أو دفعاتها). فك الربط من «تعديل السلفة» واحذف الدفعات المربوطة من داخل «سدد/استلمت» الأول عشان الأرصدة متتلخبطش',null,null,7000);return}
-  const [x]=S.debts.splice(i,1); save();renderAll();
-  toast('اتحذفت سلفة '+x.person,'تراجع',()=>{S.debts.splice(i,0,x);save();renderAll()},3000);
+  const [x]=S.debts.splice(i,1); const tid=trashPut('debt',x,i); save();renderAll();
+  toast('اتحذفت سلفة '+x.person,'تراجع',()=>{trashDel(tid);S.debts.splice(i,0,x);save();renderAll()},3000);
 }
 function openPaySheet(id,pre){
   const x=S.debts.find(d=>d.id===id); if(!x) return; payFor=id;
@@ -469,8 +469,8 @@ $('#gamSave').onclick=()=>{
 };
 function deleteGam(id){
   const i=S.gams.findIndex(g=>g.id===id); if(i<0) return;
-  const [g]=S.gams.splice(i,1); save();renderAll();
-  toast('اتحذفت '+g.name+' (الأقساط المدفوعة فاضلة في مصاريفك)','تراجع',()=>{S.gams.splice(i,0,g);save();renderAll()},3000);
+  const [g]=S.gams.splice(i,1); const tid=trashPut('gam',g,i); save();renderAll();
+  toast('اتحذفت '+g.name+' (الأقساط المدفوعة فاضلة في مصاريفك)','تراجع',()=>{trashDel(tid);S.gams.splice(i,0,g);save();renderAll()},3000);
 }
 const HOME_BLOCKS=[['upcoming','المواعيد القريبة','#upcoming'],['caps','العمليات اللي لقطها مليم من الإشعارات','#capBox'],['summary','ملخص الشهر','#sumBox'],['close','كارت «قفّل الفترة»','#closeCard'],['today','مصاريف النهارده','#todayBlock']];
 function applyHomeShow(){ const h=S.homeHide||{}; HOME_BLOCKS.forEach(([k,,sel])=>{ const el=document.querySelector(sel); if(el) el.hidden=!!h[k] }) }

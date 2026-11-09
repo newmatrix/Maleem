@@ -7,13 +7,14 @@ function pageTopSmooth(){[document.body,document.scrollingElement||document.docu
 const SET_T_NAMES={}; document.querySelectorAll('#setGroups [data-set-go]').forEach(b=>{SET_T_NAMES[b.dataset.setGo]=b.querySelector('b').textContent});
 function setGo(p,quiet){
   if(p==='data'){openWipe();return} // one action, no page of its own: the row opens the confirm sheet
+  if(p==='trash'){openTrash();return} // same: the row opens the trash sheet
   if(p==='update'){updManualCheck();return} // same: the row looks for an update right away
   if(p&&!setPage) setHomeY=pageY();
   if(setPage==='space'&&p!=='space'){try{spPanelClose()}catch(e){}}
   setPage=p||null;
   $('#setHome').hidden=!!setPage;
   document.querySelectorAll('#v-settings>.set-page').forEach(x=>{x.hidden=x.dataset.page!==setPage});
-  if(setPage==='feedback') fbPaint();
+  if(setPage==='feedback'){fbPaint();errPaint()}
   if(setPage==='lang') langPaint(LANG);
   if(setPage){const el=document.querySelector(`#v-settings>.set-page[data-page="${setPage}"]`); if(!quiet){el.classList.remove('sub-anim');void el.offsetWidth;el.classList.add('sub-anim')} pageTo(0)}
   else{renderSetHome(); if(!quiet){const h=$('#setHome');h.classList.remove('sub-anim');void h.offsetWidth;h.classList.add('sub-anim')} pageTo(quiet?0:setHomeY)}
@@ -29,6 +30,7 @@ function renderSetHome(){
   setSub('security',()=>!hasPin()?'من غير قفل':(S.lockKind==='pass'?'كلمة سر':'رقم سري')+(S.bio&&AB?' وبصمة':''));
   setSub('appearance',()=>(SET_THEME[S.theme]||'تابع للنظام')+(S.style&&STYLES[S.style]?' · ستايل '+STYLES[S.style].name:'')+(lookId()!=='classic'?' · شكل '+LOOKS.find(x=>x.id===lookId()).name:''));
   setSub('cats',()=>S.cats.length+' فئة');
+  setSub('trash',()=>{trashSweep(); const n=trashAll().length; return n===0?'فاضية':n===1?'عنصر واحد':n===2?'عنصرين':n<=10?n+' عناصر':n+' عنصر'});
   setSub('pays',()=>{const n=S.pays.length; return n===1?'طريقة واحدة':n===2?'طريقتين':n<=10?n+' طرق':n+' طريقة'});
   setSub('alerts',()=>S.remind?'التذكير اليومي '+fmtRemAt(S.remindAt):'التذكير اليومي مقفول');
   setSub('capture',()=>capState().on?'شغال':'مقفول');
@@ -53,12 +55,13 @@ const SET_IDX=[
   ['cats','الفئات','فئه تصنيف ترتيب','catList'],['cats','إضافة فئة جديدة','فئه','addCat'],['cats','حد شهري للفئة','ميزانيه فئه حد اقصي','catList'],
   ['pays','طرق الدفع','كاش فيزا محفظه انستاباي الافتراضيه','payList'],['pays','إضافة طريقة دفع','','addPay'],
   ['alerts','تنبيه قرب نهاية الميزانية','80% ميزانيه','row80'],['alerts','نسبة التنبيه','ميزانيه','rowPct'],['alerts','التذكير اليومي','تذكير','remindToggle'],['alerts','وقت التذكير','ساعه','remindTimeRow'],
-  ['alerts','تذكير بالمواعيد','سلف جمعيات مصاريف ثابته','dueToggle'],['alerts','الملخص الشهري','ملخص','sumToggle'],['feedback','اقتراحات وملاحظات','اقتراح مشكلة شكوى ابلاغ رأي فكرة تواصل المطور','fbText'],['alerts','التذكير في الميعاد بالظبط','منبهات بطاريه','exactRow'],
+  ['alerts','تذكير بالمواعيد','سلف جمعيات مصاريف ثابته','dueToggle'],['alerts','الملخص الشهري','ملخص','sumToggle'],['feedback','اقتراحات وملاحظات','اقتراح مشكلة شكوى ابلاغ رأي فكرة تواصل المطور','fbText'],['feedback','سجل الأخطاء','اخطاء خطأ عطل مشكلة تقرير تعليق سجل log crash','errCard'],['alerts','التذكير في الميعاد بالظبط','منبهات بطاريه','exactRow'],
   ['capture','التسجيل من إشعارات البنك','رسايل بنك محفظه انستاباي لقط تلقائي','capToggle'],['capture','تطبيقات بتتجاهلها','','capBlockedWrap'],['capture','رسوم إنستاباي','رسوم انستاباي تحويل عموله','ipFeeToggle'],
   ['widget','إضافة ويدجت','شاشه رئيسيه','wgAddS'],['widget','بلاطة مصروف بالصوت','اعدادات سريعه صوت','wgAddTile'],['widget','إخفاء المبالغ في الويدجت','','wgHide'],
   ['space','المساحة المشتركة','مشاركه اسره كود','spaceCard'],['space','إنشاء مساحة','','spCreate'],['space','الانضمام بكود','انضمام','spJoin'],['space','الخروج من المساحة','','spLeave'],
   ['backup','اعمل نسخة احتياطية دلوقتي','نسخه جوجل درايف backup','backupBtn'],['backup','استعادة نسخة احتياطية','استرجاع رجوع النسخه من جوجل درايف','restoreBtn'],['backup','نسخ احتياطي تلقائي','تلقائي مده كل قد ايه','autoBkRow'],['backup','Google Drive','جوجل درايف ربط حساب رفع سحابه ايميل','bkAuto'],
   ['update','دوّر على تحديث','تحديث نسخه جديده اصدار ابديت update التحديثات',''],
+  ['trash','سلة المحذوفات','محذوفات استرجاع استرجع رجوع رجع مسح بالغلط حذف زباله سله',''],
   ['data','مسح كل المصاريف والالتزامات','حذف تصفير','']
 ].map(([p,t,k,el])=>({p,t,el,n:normAr(t+' '+TX(t)+' '+k+' '+(SET_T_NAMES[p]||'')+' '+TX(SET_T_NAMES[p]||''))}));
 function setVisiblePage(p){const r=$('#si-'+p); return !(r&&r.hidden)}
