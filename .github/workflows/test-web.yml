@@ -45,6 +45,12 @@ jobs:
       - run: node tests/backup-encrypt.cjs
       - run: node tests/money-sum.cjs
       - run: node tests/search-sheet.cjs
+      - run: node tests/quick-wins.cjs
+      - run: node tests/upcoming-income.cjs
+      - run: node tests/refund-log.cjs
+      - run: node tests/installment-every.cjs
+      - run: node tests/capture-currency.cjs
+      - run: node tests/shortcuts.cjs
       - run: node tests/i18n-coverage.cjs
       - run: node tests/lint.cjs
       - uses: actions/upload-artifact@v4
