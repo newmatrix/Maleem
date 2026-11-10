@@ -9,7 +9,7 @@ function obligations30(){
 function inflowStats(){
   const now=Date.now(), from=now-90*864e5, L=S.inflows.filter(x=>x.ts>=from&&x.ts<=now+864e5);
   if(!L.length) return null;
-  const first=Math.min(...L.map(x=>x.ts)), span=Math.max(14,Math.min(90,Math.ceil((now-first)/864e5)+1)), tot=L.reduce((a,x)=>a+x.amount,0);
+  const first=Math.min(...L.map(x=>x.ts)), span=Math.max(14,Math.min(90,Math.ceil((now-first)/864e5)+1)), tot=r2(L.reduce((a,x)=>a+x.amount,0));
   const l60=S.inflows.filter(x=>x.ts>=now-60*864e5&&x.ts<=now+864e5).length;
   const per30= S.payType==='weekly'?30.4/7 : S.payType==='biweekly'?30.4/14 : S.payType==='monthly'?1 : Math.max(1,l60/2);
   return {n:L.length,week:r2(tot/span*7),month:r2(tot/span*30.4),per30};

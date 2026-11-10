@@ -22,8 +22,8 @@ function cleanMoney(v){
 }
 function bindMoney(el,box){el.addEventListener('input',()=>{if(/[\-−–]/.test(el.value))toast(TX('المبلغ السالب غير مسموح. اكتب مبلغًا موجبًا'));const v=cleanMoney(el.value);if(el.value!==v)el.value=v;box&&box.classList.remove('err')});
   el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el.blur()}})}
-const debtPaid=x=>(x.payments||[]).reduce((a,p)=>a+p.amount,0);
-const debtAdded=x=>(x.adds||[]).reduce((a,p)=>a+p.amount,0);
+const debtPaid=x=>r2((x.payments||[]).reduce((a,p)=>a+p.amount,0));
+const debtAdded=x=>r2((x.adds||[]).reduce((a,p)=>a+p.amount,0));
 const debtTotal=x=>r2(x.amount+debtAdded(x));
 const debtRem=x=>Math.max(0,Math.round((debtTotal(x)-debtPaid(x))*100)/100);
 const openSheetEl=id=>{$('#scrim').classList.add('open');$('#'+id).classList.add('open')};

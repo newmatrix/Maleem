@@ -131,3 +131,11 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 .me-page[data-mepage="budget"]>.card+.card{margin-top:14px}
 /* section titles on the budget and accounts pages sit at the reading-direction start: right in Arabic, left in English (flex-end above was the opposite side) */
 .me-page[data-mepage="budget"]>.card>.card-h,.me-page[data-mepage="accounts"]>.card>.card-h{justify-content:space-between}
+#todayBlock .sec-end{display:flex;align-items:center;gap:8px}
+.sec-search{width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--brand) 12%,transparent);color:var(--brand)}
+.sec-search:active{transform:scale(.92)}
+.sec-search svg{width:19px;height:19px}
+#searchSheet{height:92%;display:flex;flex-direction:column}
+#searchSheet h2{flex:none}
+#searchSheet .search-field{flex:none}
+#searchSheet #searchRes{padding-bottom:12px}

@@ -126,14 +126,31 @@ $('#addCat').onclick=()=>openCatSheet();
 /* suggested categories: the ones people use most in money apps that this person does not have yet */
 const catSugList=()=>{const have=new Set(S.cats.map(c=>c.id)), names=new Set(S.cats.map(c=>normAr(c.name)));
   return CATS.concat(CATS_MORE).filter(c=>c.id!=='other'&&!have.has(c.id)&&!names.has(normAr(c.name)))};
+const catSugGroups=()=>{const L=catSugList(), have=new Set(L.map(c=>c.id)), out=[], basic=L.filter(c=>CATS.some(d=>d.id===c.id));
+  if(basic.length) out.push(['الفئات الأساسية',basic]);
+  CAT_GROUPS.forEach(g=>{const l=g[1].filter(c=>have.has(c.id)); if(l.length) out.push([g[0],l])});
+  return out};
 function openCatSug(){
-  const L=catSugList();
-  if(!L.length){toast('عندك كل الفئات المقترحة بالفعل');return}
-  $('#sugList').innerHTML=`<label class="pay-row" style="cursor:pointer"><span class="txt"><b>تحديد الكل</b></span><input type="checkbox" id="sugAll" style="width:22px;height:22px"></label>`+L.map(c=>`<label class="pay-row" style="cursor:pointer;--cc:${colr(c.c)}"><span class="txt">${esc(c.e)} ${esc(c.name)}</span><input type="checkbox" data-sug="${esc(c.id)}" style="width:22px;height:22px"></label>`).join('');
+  if(!catSugList().length){toast('عندك كل الفئات المقترحة بالفعل');return}
+  $('#sugSearch').value='';
+  $('#sugList').innerHTML=`<label class="pay-row" style="cursor:pointer"><span class="txt"><b>تحديد الكل</b></span><input type="checkbox" id="sugAll" style="width:22px;height:22px"></label>`
+    +catSugGroups().map(([n,l],gi)=>`<div class="sug-g" data-sg="${gi}"><b>${esc(n)}</b><button type="button" class="linkbtn" data-sgall="${gi}">تحديد الكل</button></div>`
+      +l.map(c=>`<label class="pay-row sug-row" data-g="${gi}" data-name="${esc(normAr(n+' '+c.name))}" style="cursor:pointer;--cc:${colr(c.c)}"><span class="txt">${esc(c.e)} ${esc(c.name)}</span><input type="checkbox" data-sug="${esc(c.id)}" style="width:22px;height:22px"></label>`).join('')).join('')
+    +`<p class="hint center" id="sugNone" hidden>مفيش فئة بالاسم ده</p>`;
   $('#sugErr').textContent=''; openSheetEl('sugSheet');
 }
 $('#addCatSug').onclick=openCatSug;
-$('#sugList').onchange=e=>{ if(e.target.id==='sugAll'){document.querySelectorAll('#sugList [data-sug]').forEach(c=>{c.checked=e.target.checked})} };
+const sugRows=g=>[...document.querySelectorAll('#sugList .sug-row'+(g===undefined?'':`[data-g="${g}"]`))].filter(r=>!r.classList.contains('sug-off'));
+$('#sugList').onchange=e=>{ if(e.target.id==='sugAll'){sugRows().forEach(r=>{r.querySelector('input').checked=e.target.checked})} };
+$('#sugList').onclick=e=>{const b=e.target.closest('[data-sgall]'); if(!b) return;
+  const rows=sugRows(b.dataset.sgall), all=rows.length&&rows.every(r=>r.querySelector('input').checked);
+  rows.forEach(r=>{r.querySelector('input').checked=!all})};
+$('#sugSearch').addEventListener('input',()=>{
+  const q=normAr($('#sugSearch').value.trim());
+  document.querySelectorAll('#sugList .sug-row').forEach(r=>r.classList.toggle('sug-off',!!q&&!r.dataset.name.includes(q)));
+  document.querySelectorAll('#sugList .sug-g').forEach(h=>h.classList.toggle('sug-off',!sugRows(h.dataset.sg).length));
+  $('#sugNone').hidden=sugRows().length>0;
+});
 $('#sugCancel').onclick=closeSheets;
 $('#sugSave').onclick=()=>{
   const ids=[...document.querySelectorAll('#sugList [data-sug]:checked')].map(c=>c.dataset.sug);

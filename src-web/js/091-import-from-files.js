@@ -345,7 +345,7 @@ function impRender(){
       <small>${x.day?dkToDMY(x.day):'من غير تاريخ'}${x.dup?' · متسجل قبل كده':''}</small>
       <select data-imp-cat aria-label="الفئة">${impCatOpts(x.cat)}</select></div>
     <span class="imp-amt">${money(x.amount)}</span></div>`).join('');
-  const total=on.reduce((a,x)=>a+x.amount,0);
+  const total=r2(on.reduce((a,x)=>a+x.amount,0));
   $('#impSave').disabled=!on.length;
   $('#impSave').textContent=on.length?`سجّل ${on.length} مصروف (${fmt(total)} ${CS()})`:'اختار بنود الأول';
 }

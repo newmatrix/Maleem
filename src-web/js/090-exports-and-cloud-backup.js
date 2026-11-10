@@ -297,7 +297,8 @@ async function bkRestore(b,at){
 }
 $('#restoreFile').onchange=async e=>{
   const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
-  let b=null; try{b=bkParse(await f.text())}catch(err){}
+  let b=null; try{b=await bkOpen(await f.text())}catch(err){}
+  if(b&&b.cancel){toast('اتلغت الاستعادة');return}
   if(!b){toast('الملف ده مش نسخة احتياطية من مليم');return}
   bkRestore(b,b.o.at||f.lastModified||Date.now());
 };

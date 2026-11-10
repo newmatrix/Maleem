@@ -26,6 +26,7 @@ const WHAT={
  "092-categories": "Category management.",
  "093-trash": "Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet.",
  "094-error-log-ui": "The error log card in the feedback page: count, see / copy the report, clear.",
+ "095-backup-encryption": "Optional backup encryption: AES-GCM with a key from a password (bkeSeal / bkOpen), the password prompt while restoring, and the settings row with its sheet.",
  "100-debts-and-gameyas": "Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text.",
  "110-profile-currency-income-payments": "Me / profile, app currency change and exchange rates, income list, payment methods.",
  "120-google-drive-updates-reminder": "Google Drive backup and restore (driveCall, restore sheet), app updates (check / download), the developer message and the periodic support reminder (nudge).",

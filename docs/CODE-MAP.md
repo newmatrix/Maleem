@@ -5,13 +5,13 @@
 
 | الملف | الأسطر | الغرض |
 |---|---:|---|
-| `000-constants.js` | 44 | Default categories (CATS) and the CAT lookup, safe localStorage wrappers (lsGet / lsSet). |
+| `000-constants.js` | 147 | Default categories (CATS) and the CAT lookup, safe localStorage wrappers (lsGet / lsSet). |
 | `001-error-log.js` | 37 | Local error log: catches script errors, unhandled promises and console.error(Error) into a small cleaned list on the phone (errLog / errReport); outside the app data and the backups. |
 | `010-state-and-storage.js` | 513 | Storage and the state S: persistence, member keys, save(); the translation engine (trText / TX / trNode) and language; payment methods; the currency table and custom currencies. |
 | `020-theme-and-toast.js` | 111 | Theme / palette / font, toast messages, the list row of an expense. |
 | `030-home.js` | 176 | Home (expenses) screen helpers: pay periods (periodOf, daysLeft), forecast and daily allowance, the eye toggle, closing a period, renderHome. |
-| `031-reports.js` | 122 | Reports screen, report periods and the category detail. |
-| `032-search.js` | 114 | Search over every movement and its filters. |
+| `031-reports.js` | 121 | Reports screen, report periods and the category detail. |
+| `032-search.js` | 132 | Search over every movement and its filters. |
 | `040-navigation-and-sheets.js` | 185 | Settings render, renderAll, tab navigation (go), the amount box with its calculator, category grid, note suggestions. |
 | `050-expense-form.js` | 283 | Expense form (date menu, time wheels, funding and payment menus, openSheet / closeSheets) and account helpers (ACC, accBal, moneyTotals, exchange-rate lookups). |
 | `060-accounts-and-money-card.js` | 382 | Accounts: list, sheet, reconciliation, transfers, cash withdrawals, the "my money" card, moving money to the budget. |
@@ -21,14 +21,15 @@
 | `080-settings-controls-and-alerts.js` | 280 | Settings controls, widgets and the Quick Settings tile, budget alerts, daily reminder time, low-balance alerts. |
 | `081-lock-and-members.js` | 241 | PIN / password / fingerprint lock and the local members list. |
 | `082-settings-pages.js` | 86 | Settings home list, one page per section, and the settings search. |
-| `090-exports-and-cloud-backup.js` | 343 | Exports (Excel / PDF), file saving, the yearly report, backup file writing and restoring (applyBackup). |
+| `090-exports-and-cloud-backup.js` | 344 | Exports (Excel / PDF), file saving, the yearly report, backup file writing and restoring (applyBackup). |
 | `091-import-from-files.js` | 403 | Importing expenses from Excel / CSV / PDF, category guess and the review sheet. |
-| `092-categories.js` | 179 | Category management. |
+| `092-categories.js` | 196 | Category management. |
 | `093-trash.js` | 74 | Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet. |
 | `094-error-log-ui.js` | 14 | The error log card in the feedback page: count, see / copy the report, clear. |
+| `095-backup-encryption.js` | 94 | Optional backup encryption: AES-GCM with a key from a password (bkeSeal / bkOpen), the password prompt while restoring, and the settings row with its sheet. |
 | `100-debts-and-gameyas.js` | 541 | Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text. |
-| `110-profile-currency-income-payments.js` | 366 | Me / profile, app currency change and exchange rates, income list, payment methods. |
-| `120-google-drive-updates-reminder.js` | 314 | Google Drive backup and restore (driveCall, restore sheet), app updates (check / download), the developer message and the periodic support reminder (nudge). |
+| `110-profile-currency-income-payments.js` | 367 | Me / profile, app currency change and exchange rates, income list, payment methods. |
+| `120-google-drive-updates-reminder.js` | 320 | Google Drive backup and restore (driveCall, restore sheet), app updates (check / download), the developer message and the periodic support reminder (nudge). |
 | `130-fixed-planned-goals-photo.js` | 165 | Recurring (fixed) expenses with their schedule rules, planned expenses, goals, profile photo. |
 | `140-native-sync-effects-welcome.js` | 125 | Syncing reminders / widget with Android, press pulse and vibration, welcome screen. |
 | `150-shared-space.js` | 603 | The shared space (Firebase Firestore): create / join / approve, sharing choices, shared records. |
@@ -41,7 +42,7 @@
 ### 000-constants.js
 Default categories (CATS) and the CAT lookup, safe localStorage wrappers (lsGet / lsSet).
 
-`CATS` `CATS_MORE` `CAT` `mem` `lsGet` `lsSet`
+`CATS` `CAT_GROUPS` `CATS_MORE` `CAT` `mem` `lsGet` `lsSet`
 
 ### 001-error-log.js
 Local error log: catches script errors, unhandled promises and console.error(Error) into a small cleaned list on the phone (errLog / errReport); outside the app data and the backups.
@@ -71,7 +72,7 @@ Reports screen, report periods and the category detail.
 ### 032-search.js
 Search over every movement and its filters.
 
-`normAr` `sfNum` `sfDay` `sfSelected` `sfCategoryLabel` `sfGet` `sfFill` `sfPass` `searchOthers` `sfCompare` `renderSearch` `SF_CHEV` `sfPaintPicks` `sfChoiceId` `sfCloseChoice` `sfCalendarPaint` `sfCalendarChoose` `searchT`
+`normAr` `sfNum` `sfDay` `sfSelected` `sfCategoryLabel` `sfGet` `sfFill` `sfPass` `searchOthers` `sfCompare` `renderSearch` `SF_CHEV` `sfPaintPicks` `sfChoiceId` `sfCloseChoice` `sfCalendarPaint` `sfCalendarChoose` `searchT` `SQ` `sqActive` `sqPaint` `srBack` `openSearch`
 
 ### 040-navigation-and-sheets.js
 Settings render, renderAll, tab navigation (go), the amount box with its calculator, category grid, note suggestions.
@@ -131,7 +132,7 @@ Importing expenses from Excel / CSV / PDF, category guess and the review sheet.
 ### 092-categories.js
 Category management.
 
-`EMOJIS` `COLORS` `catEdit` `renderCatList` `sortSuppress` `sortable` `commitCatOrder` `paintCatSheet` `openCatSheet` `catSugList` `openCatSug` `deleteCat`
+`EMOJIS` `COLORS` `catEdit` `renderCatList` `sortSuppress` `sortable` `commitCatOrder` `paintCatSheet` `openCatSheet` `catSugList` `catSugGroups` `openCatSug` `sugRows` `deleteCat`
 
 ### 093-trash.js
 Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet.
@@ -142,6 +143,11 @@ Trash (30 days): trashPut is called by every delete function; restore, delete fo
 The error log card in the feedback page: count, see / copy the report, clear.
 
 `errPaint`
+
+### 095-backup-encryption.js
+Optional backup encryption: AES-GCM with a key from a password (bkeSeal / bkOpen), the password prompt while restoring, and the settings row with its sheet.
+
+`BKE_KEY` `bkeOk` `bkeB64` `bkeCfg` `bkeOn` `bkeAad` `bkeDerive` `bkeSave` `bkeSeal` `bkSniffEnc` `bkeIsEnv` `bkeDecrypt` `bkOpen` `bkePassRes` `bkePrompt` `bkePassDone` `bkePassClose` `bkePaint` `openBkEnc`
 
 ### 100-debts-and-gameyas.js
 Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text.

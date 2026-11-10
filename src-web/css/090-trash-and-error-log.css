@@ -8,3 +8,15 @@
 .tr-btns .btn.sm{min-height:36px;padding:6px 12px;font-size:.84rem}
 .tr-none{padding:18px 0}
 .err-box{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--surface-2);color:var(--ink);font:.74rem/1.45 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:40vh;overflow:auto;text-align:left}
+#trashEmpty[hidden]+#trashClose{grid-column:1/-1;justify-self:center;width:min(100%,280px)}
+.sug-g{display:flex;justify-content:space-between;align-items:center;margin:16px 4px 2px;font-size:.85rem;color:var(--muted)}
+.sug-g b{color:var(--ink);font-size:.95rem}
+.sug-g .linkbtn{padding:0;font-size:.8rem}
+.sug-off{display:none!important}
+#sugSheet .search-field{margin-top:6px}
+#sugSheet .sheet-actions{position:sticky;bottom:calc(-14px - env(safe-area-inset-bottom,0px));background:var(--surface);padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px));margin-top:10px;z-index:2}
+.sq-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sq-chips button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;font:inherit;font-size:.85rem}
+.sq-chips button[aria-pressed=true]{background:color-mix(in srgb,var(--brand) 14%,transparent);border-color:var(--brand);color:var(--brand);font-weight:700}
+#searchSheet .sq-chips{flex:none}
+#bkPassSheet{z-index:63} /* above the restore sheet (62): the password is asked while that one is open */

@@ -1,0 +1,3 @@
+آخر 7 أيام => Last 7 days
+الأكبر => Biggest
+بحث سريع => Quick search

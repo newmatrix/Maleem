@@ -96,6 +96,7 @@ object Updater {
         if (busy) { done("busy"); return }
         busy = true
         Thread {
+            var live: HttpURLConnection? = null
             try {
                 val start = URL(url)
                 if (!hostOk(start)) { done("url"); return@Thread }
@@ -125,6 +126,7 @@ object Updater {
                     }
                     break
                 }
+                live = conn // closed in finally, whatever way we leave (too big, I/O error...)
                 val rc = conn.responseCode
                 val append = rc == 206
                 if (rc == 416) { conn.disconnect(); part.delete(); done("retry"); return@Thread }
@@ -158,7 +160,7 @@ object Updater {
                 done(null)
             } catch (_: Exception) {
                 done("net") // the half-downloaded file stays, the next try continues it
-            } finally { busy = false }
+            } finally { try { live?.disconnect() } catch (_: Exception) {}; busy = false }
         }.start()
     }
 

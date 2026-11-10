@@ -42,7 +42,7 @@ function sfCompare(a,b){
   return dir*(a.ts-b.ts)||String(a.id).localeCompare(String(b.id));
 }
 function renderSearch(){
-  sfPaintPicks();
+  sfPaintPicks(); sqPaint();
   const q=normAr($('#searchIn').value.trim()), f=sfGet();
   $('#sfBtn').classList.toggle('on',f.on); $('#sfBtn').textContent=f.on?'فلاتر شغالة':'فلاتر'; $('#sfClear').hidden=!f.on;
   const words=q?q.split(/\s+/):[], numQ=/^\d+(\.\d+)?$/.test(q)? parseFloat(q) : null;
@@ -50,7 +50,7 @@ function renderSearch(){
     if(!sfPass(x,f)) return false;
     if(!q) return true;
     if(numQ!==null && x.amount===numQ) return true;
-    const hay=normAr((x.note||'')+' '+(CAT[x.cat]||CAT.other).name+' '+PAY[payOf(x)].name);
+    const hay=normAr((x.note||'')+' '+(CAT[x.cat]||CAT.other).name+' '+PAY[payOf(x)].name+(numQ===null?' '+shortDate(x.ts)+' '+new Date(x.ts).toLocaleDateString(LOC,{weekday:'long',month:'long'}):''));
     return words.every(w=>hay.includes(w));
   }).sort(sfCompare);
   const oth= q&&!f.on? searchOthers(words,numQ).slice(0,100) : [];
@@ -103,12 +103,30 @@ $('#sfCalendarCancel').onclick=()=>$('#sfCalendar').close();
 let searchT;
 $('#searchIn').addEventListener('input',()=>{clearTimeout(searchT);searchT=setTimeout(renderSearch,150)});
 $('#searchIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#searchIn').blur()}});
-$('#searchBtn').onclick=()=>{sfFill();showSub('search')};
+/* quick searches under the box: today / last 7 days / this month (date filters) and the biggest first (sort); tap again to undo */
+const SQ=()=>{const t=todayKey(), w=dayKey(new Date().setDate(new Date().getDate()-6)), m=monKey(Date.now())+'-01';
+  return {today:{from:t,to:t},week:{from:w,to:t},month:{from:m,to:t},big:{sort:'amount-desc'}}};
+function sqActive(k){const q=SQ()[k], v=id=>$('#'+id).value;
+  return q.sort? v('sfSort')===q.sort : v('sfFrom')===q.from&&v('sfTo')===q.to}
+function sqPaint(){document.querySelectorAll('#sqChips [data-sq]').forEach(b=>b.setAttribute('aria-pressed',sqActive(b.dataset.sq)))}
+$('#sqChips').onclick=e=>{const b=e.target.closest('[data-sq]'); if(!b) return;
+  const k=b.dataset.sq, q=SQ()[k], on=sqActive(k);
+  if(q.sort) $('#sfSort').value=on?'time-desc':q.sort;
+  else {$('#sfFrom').value=on?'':q.from; $('#sfTo').value=on?'':q.to}
+  renderSearch()};
+/* after you edit or delete a result the search comes back, with the same words and filters */
+let srBack=false;
+$('#searchRes').addEventListener('click',e=>{if(e.target.closest('[data-more],[data-rc]')||!e.target.closest('.xp')) return;
+  srBack=true; $('#searchSheet').classList.remove('open'); // the expense form opens in its place (it would sit behind the search otherwise)
+  setTimeout(()=>{if(!$('#sheet').classList.contains('open')){srBack=false; openSearch()}},0)},true); // a read-only expense does not open: bring the search back
+new MutationObserver(()=>{if(!srBack||$('#sheet').classList.contains('open')) return; srBack=false;
+  setTimeout(()=>{if(!document.querySelector('.sheet.open')) openSearch()},320)}).observe($('#sheet'),{attributes:true,attributeFilter:['class']});
+function openSearch(){closeSheets();sfFill();renderSearch();openSheetEl('searchSheet');setTimeout(()=>$('#searchIn').focus({preventScroll:true}),320)}
+['#searchBtn','#homeSearchBtn'].forEach(id=>$(id).onclick=openSearch);
 $('#sfBtn').onclick=()=>{const p=$('#sfPanel'); p.hidden=!p.hidden; $('#sfBtn').setAttribute('aria-expanded',!p.hidden); if(!p.hidden) sfFill()};
 $('#sfCat').addEventListener('change',()=>{sfCategoryLabel();renderSearch()});
 $('#sfSort').addEventListener('change',renderSearch);
 ['#sfPay','#sfFrom','#sfTo'].forEach(id=>$(id).addEventListener('change',renderSearch));
 ['#sfMin','#sfMax'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(searchT);searchT=setTimeout(renderSearch,200)}));
 $('#sfClear').onclick=()=>{['#sfPay','#sfFrom','#sfTo','#sfMin','#sfMax'].forEach(id=>{$(id).value=''});document.querySelectorAll('#sfCat input').forEach(x=>x.checked=false);sfCategoryLabel();renderSearch()};
-$('#searchBack').onclick=()=>showSub('main');
 

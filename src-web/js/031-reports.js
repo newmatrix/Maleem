@@ -109,13 +109,12 @@ $('#reportCategoryBack').onclick=()=>showSub(reportCategoryReturn);
 ['#reportCategoryList','#dayByDay','#searchRes'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target.closest('[data-more],[data-rc]'))return;const row=e.target.closest('.xp');if(row)openSheet(row.dataset.id)}));
 var repMainY=0; // where the reports' main screen was when a page was opened from it
 function showSub(name,quiet){
-  const ids={main:'#reportsMain',detail:'#reportsDetail',search:'#reportsSearch',category:'#reportsCategory'};
+  const ids={main:'#reportsMain',detail:'#reportsDetail',category:'#reportsCategory'};
   if(name!=='main'&&!$('#reportsMain').hidden) repMainY=pageY();
   Object.entries(ids).forEach(([k,s])=>$(s).hidden=k!==name);
   const el=$(ids[name]); if(!quiet){el.classList.remove('sub-anim');void el.offsetWidth;el.classList.add('sub-anim')}
   if(name==='detail') renderDetail();
   if(name==='category')renderReportCategory();
-  if(name==='search'){renderSearch();setTimeout(()=>$('#searchIn').focus({preventScroll:true}),60)} else $('#searchIn').blur();
   if(!quiet) pageTo(name==='main'?repMainY:0);
 }
 function showDetail(on){showSub(on?'detail':'main')}

@@ -8,7 +8,7 @@ function streaks(){
   sorted.forEach(k=>{const t=dkToTs(k); run= prev!==null&&Math.round((t-prev)/864e5)===1? run+1 : 1; best=Math.max(best,run); prev=t});
   return {cur,best,days:days.size};
 }
-const incomeTotal=()=>S.incomes.reduce((a,x)=>a+(+x.amount||0),0);
+const incomeTotal=()=>r2(S.incomes.reduce((a,x)=>a+(+x.amount||0),0));
 /* the round button next to the greeting opens the "أنا" page: photo if there is one, else the first letter of the name (or م) */
 function paintHomeAv(){
   const P=S.profile||{}, n=(P.name||'').trim(), el=$('#homeAv'); if(!el) return;
@@ -323,7 +323,8 @@ function bkDue(last,n){if(!last) return true; const d0=new Date(last).setHours(0
 async function bkMake(now){
   let rc={out:null,skipped:0}; try{rc=await rcExport()}catch(e){}
   const file={app:'maleem',version:1,at:now,auto:true,data:backupData()}; if(rc.out) file.receipts=rc.out;
-  return {name:`${fileTag()}-auto-${dayKey(now)}.json`, b64:await toB64(new Blob([JSON.stringify(file)])), skipped:rc.skipped||0};
+  let text=JSON.stringify(file); if(bkeOn()) text=await bkeSeal(text,now); // encryption on: the file is sealed, never plain
+  return {name:`${fileTag()}-auto-${dayKey(now)}.json`, b64:await toB64(new Blob([text])), skipped:rc.skipped||0};
 }
 const bkHasData=()=>S.expenses.length||S.debts.length||S.gams.length||S.incomes.length||S.goals.length||S.fixed.length||S.plans.length||S.gold.length;
 async function maybeAutoBackup(){
@@ -361,6 +362,6 @@ async function backupNow(interactive){
     if(to==='device'){done(); toast(devOk?'اتحفظت نسخة على الموبايل في Download/Maleem':'معرفناش نعمل نسخة احتياطية'); return}
     driveSend(f.name,f.b64,!!interactive,(ok,err)=>{done();
       toast(ok?(devOk?'اترفعت نسخة على Google Drive واتحفظت على الموبايل':'اترفعت نسخة على Google Drive'):driveErrMsg(err)+(devOk?'. النسخة اتحفظت على الموبايل بس':''),null,null,ok?3000:6000)});
-  }catch(e){done(); toast('معرفناش نعمل نسخة احتياطية')}
+  }catch(e){done(); toast(e&&e.message==='enc'?'التشفير مش شغّال على الجهاز ده، فمعملناش نسخة':'معرفناش نعمل نسخة احتياطية')}
 }
 

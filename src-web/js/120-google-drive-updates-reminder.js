@@ -70,7 +70,7 @@ armBtn($('#driveUnlink'),'فك الربط','دوس تاني للتأكيد',()=>
 var RS={seq:0,busy:false,email:'',hold:null}; // var on purpose: closeSheets() may run before this line
 const RS_ERR={gms:'الموبايل ده مفيهوش خدمات Google Play، فاستعمل «من ملف على الموبايل»',config:DRIVE_ERR.config,api:DRIVE_ERR.api,
   auth:'جوجل ماسمحش لمليم يوصل للـ Drive بتاع الحساب ده. جرّب تاني',net:'مفيش اتصال بالنت. اتأكد من النت وجرّب تاني',
-  gone:'النسخة دي اتمسحت من Drive. جرّب تاني',big:'النسخة دي كبيرة أوي ومعرفناش نفتحها',bad:'الملف ده مش نسخة سليمة من مليم',
+  gone:'النسخة دي اتمسحت من Drive. جرّب تاني',big:'النسخة دي كبيرة أوي ومعرفناش نفتحها',bad:'الملف ده مش نسخة سليمة من مليم',enc:'النسخة دي مشفّرة وماتفتحتش',
   http:'حصلت مشكلة في Google Drive. جرّب تاني بعد شوية',other:'حصلت مشكلة في Google Drive. جرّب تاني بعد شوية'};
 const rsOpen=()=>$('#rsSheet').classList.contains('open');
 function rsView(v,err){
@@ -119,12 +119,18 @@ function rsFetch(f){
     let txt=''; try{txt=r.ok?String(AB.driveTake()||''):''}catch(e){}
     if(seq!==RS.seq||!rsOpen()) return; RS.busy=false;
     if(!r.ok){rsView('home',RS_ERR[r.err]||RS_ERR.other); return}
-    const b=bkParse(txt); if(!b){rsView('home',RS_ERR.bad); return}
-    const at=+b.o.at>0&&+b.o.at<MAXTS?+b.o.at:(f.at||Date.now());
-    RS.hold={b,at,email:RS.email};
-    rsApply();
+    const finish=b=>{
+      if(seq!==RS.seq||!rsOpen()) return;
+      if(b&&b.cancel){rsView('home',RS_ERR.enc); return}
+      if(!b){rsView('home',RS_ERR.bad); return}
+      const at=+b.o.at>0&&+b.o.at<MAXTS?+b.o.at:(f.at||Date.now());
+      RS.hold={b,at,email:RS.email};
+      rsApply();
+    };
+    if(bkSniffEnc(txt)) bkOpen(txt).then(finish,()=>finish(null)); else finish(bkParse(txt)); // a plain backup stays synchronous
   });
 }
+
 function rsApply(){
   const h=RS.hold; if(!h) return;
   closeSheets(); bkRestore(h.b,h.at);

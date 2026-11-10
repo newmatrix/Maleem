@@ -33,7 +33,7 @@
     <div id="capBox"></div>
     <div id="closeCard"></div>
     <div id="upcoming"></div>
-    <div id="todayBlock"><div class="section-h"><h2><span id="homeExpenseTitle">مصاريف النهارده</span><span class="cnt" id="todayCount"></span></h2><span class="tot" id="todayTotal"></span></div>
+    <div id="todayBlock"><div class="section-h"><h2><span id="homeExpenseTitle">مصاريف النهارده</span><span class="cnt" id="todayCount"></span></h2><div class="sec-end"><span class="tot" id="todayTotal"></span><button type="button" class="sec-search" id="homeSearchBtn" aria-label="بحث في كل الحركات" aria-haspopup="dialog"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button></div></div>
     <div id="todayList"></div></div>
   </section>
 
@@ -101,25 +101,6 @@
       <div class="topbar"><h1 id="reportCategoryTitle"></h1><button type="button" class="back" id="reportCategoryBack" aria-label="رجوع">‹</button></div>
       <div class="card report-category-total"><span id="reportCategoryPeriod" class="hint"></span><strong id="reportCategoryTotal"></strong><span id="reportCategoryCount" class="hint"></span></div>
       <div id="reportCategoryList"></div>
-    </div>
-    <div id="reportsSearch" hidden>
-      <div class="topbar">
-        <h1>بحث في كل الحركات</h1>
-        <button class="back" id="searchBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
-      </div>
-      <div class="field search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="searchIn" type="search" placeholder="مصروف أو تحويل أو دخل أو سلفة أو قسط" autocomplete="off" enterkeyhint="search" aria-label="بحث في كل الحركات"></div>
-      <div class="sf-bar"><button type="button" class="sf-btn" id="sfBtn" aria-expanded="false">فلاتر</button><button type="button" class="linkbtn" id="sfClear" hidden>مسح الفلاتر</button></div>
-      <div class="sf-panel" id="sfPanel" hidden>
-        <details class="sf-categories"><summary id="sfCatSummary">كل الفئات</summary><div id="sfCat" class="sf-cat-options" role="group" aria-label="اختار فئة أو أكتر"></div></details>
-        <div class="sf-field sf-payment"><span>طريقة الدفع</span><select id="sfPay" hidden></select><button type="button" class="sf-pick" id="sfPayPick" aria-haspopup="menu" aria-expanded="false"></button></div>
-        <div class="sf-field"><span>من يوم</span><input id="sfFrom" type="hidden"><button type="button" class="sf-pick" id="sfFromPick" aria-haspopup="dialog"></button></div>
-        <div class="sf-field"><span>لحد يوم</span><input id="sfTo" type="hidden"><button type="button" class="sf-pick" id="sfToPick" aria-haspopup="dialog"></button></div>
-        <label>من مبلغ<input id="sfMin" type="text" inputmode="decimal" placeholder="0"></label>
-        <label>لحد مبلغ<input id="sfMax" type="text" inputmode="decimal" placeholder="—"></label>
-      </div>
-      <div class="sf-sort"><span>ترتيب المصروفات</span><select id="sfSort" hidden><option value="time-desc">الأحدث الأول</option><option value="time-asc">الأقدم الأول</option><option value="amount-desc">المبلغ: من الأكبر للأصغر</option><option value="amount-asc">المبلغ: من الأصغر للأكبر</option><option value="cat-asc">الفئة: أ إلى ي</option><option value="cat-desc">الفئة: ي إلى أ</option></select><button type="button" class="sf-pick" id="sfSortPick" aria-haspopup="menu" aria-expanded="false"></button></div>
-      <p class="search-sum" id="searchSum" aria-live="polite"></p>
-      <div id="searchRes"></div>
     </div>
   </section>
 
@@ -584,6 +565,7 @@
     <div class="card" id="bkCard">
       <h3>النسخ الاحتياطي</h3>
       <p class="hint" id="backupHint"></p>
+      <div class="set-row" id="bkEncRow" style="margin-top:12px"><div class="txt">تشفير النسخ بكلمة سر<small id="bkEncSub"></small></div><button type="button" class="time-chip" id="bkEncChip" aria-label="تشفير النسخ الاحتياطي بكلمة سر">شغّله</button></div>
       <div id="bkAuto" hidden>
         <div id="driveOff"><button class="btn primary" id="driveLink" style="width:100%;margin-top:10px">ربط Google Drive</button></div>
         <div id="driveOn" hidden>
@@ -829,6 +811,24 @@
 </div>
 
 <!-- Savings <-> budget -->
+<div class="sheet" id="searchSheet" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+  <div class="grab"></div>
+  <h2 id="searchTitle">بحث في كل الحركات</h2>
+  <div class="field search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="searchIn" type="search" placeholder="مصروف أو تحويل أو دخل أو سلفة أو قسط" autocomplete="off" enterkeyhint="search" aria-label="بحث في كل الحركات"></div>
+  <div class="sq-chips" id="sqChips" role="group" aria-label="بحث سريع"><button type="button" data-sq="today" aria-pressed="false">النهارده</button><button type="button" data-sq="week" aria-pressed="false">آخر 7 أيام</button><button type="button" data-sq="month" aria-pressed="false">الشهر ده</button><button type="button" data-sq="big" aria-pressed="false">الأكبر</button></div>
+  <div class="sf-bar"><button type="button" class="sf-btn" id="sfBtn" aria-expanded="false">فلاتر</button><button type="button" class="linkbtn" id="sfClear" hidden>مسح الفلاتر</button></div>
+  <div class="sf-panel" id="sfPanel" hidden>
+    <details class="sf-categories"><summary id="sfCatSummary">كل الفئات</summary><div id="sfCat" class="sf-cat-options" role="group" aria-label="اختار فئة أو أكتر"></div></details>
+    <div class="sf-field sf-payment"><span>طريقة الدفع</span><select id="sfPay" hidden></select><button type="button" class="sf-pick" id="sfPayPick" aria-haspopup="menu" aria-expanded="false"></button></div>
+    <div class="sf-field"><span>من يوم</span><input id="sfFrom" type="hidden"><button type="button" class="sf-pick" id="sfFromPick" aria-haspopup="dialog"></button></div>
+    <div class="sf-field"><span>لحد يوم</span><input id="sfTo" type="hidden"><button type="button" class="sf-pick" id="sfToPick" aria-haspopup="dialog"></button></div>
+    <label>من مبلغ<input id="sfMin" type="text" inputmode="decimal" placeholder="0"></label>
+    <label>لحد مبلغ<input id="sfMax" type="text" inputmode="decimal" placeholder="—"></label>
+  </div>
+  <div class="sf-sort"><span>ترتيب المصروفات</span><select id="sfSort" hidden><option value="time-desc">الأحدث الأول</option><option value="time-asc">الأقدم الأول</option><option value="amount-desc">المبلغ: من الأكبر للأصغر</option><option value="amount-asc">المبلغ: من الأصغر للأكبر</option><option value="cat-asc">الفئة: أ إلى ي</option><option value="cat-desc">الفئة: ي إلى أ</option></select><button type="button" class="sf-pick" id="sfSortPick" aria-haspopup="menu" aria-expanded="false"></button></div>
+  <p class="search-sum" id="searchSum" aria-live="polite"></p>
+  <div id="searchRes"></div>
+</div>
 <div class="sheet" id="freeSheet" role="dialog" aria-modal="true" aria-labelledby="freeTitle">
   <div class="grab"></div>
   <h2 id="freeTitle">رصيد الدخل الحر</h2>
@@ -1005,6 +1005,7 @@
   <div class="grab"></div>
   <h2 id="sugTitle">فئات مقترحة</h2>
   <p class="hint center">اختار اللي يناسبك وهيتضافوا لفئاتك. تقدر تعدّل أو تحذف أي واحدة بعد كده.</p>
+  <div class="field search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="sugSearch" type="search" placeholder="دوّر في الفئات المقترحة" autocomplete="off" aria-label="دوّر في الفئات المقترحة"></div>
   <div id="sugList"></div>
   <p class="err-msg" id="sugErr"></p>
   <div class="sheet-actions"><button class="btn primary" id="sugSave">إضافة المختار</button><button class="btn" id="sugCancel">إلغاء</button></div>
@@ -1321,6 +1322,28 @@
   <h2 id="mbPickTitle">مين بيستخدم مليم؟</h2>
   <p>اختار اسمك</p>
   <div class="mb-pick-list" id="mbPickList"></div>
+</div>
+
+<!-- Encrypted backups: turn on / change the password -->
+<div class="sheet" id="bkEncSheet" role="dialog" aria-modal="true" aria-labelledby="bkEncTitle">
+  <div class="grab"></div>
+  <h2 id="bkEncTitle">تشفير النسخ الاحتياطي</h2>
+  <p class="hint center" id="bkEncHint"></p>
+  <div class="field"><input id="bkEncP1" type="password" maxlength="64" autocomplete="new-password" aria-label="كلمة السر" placeholder="كلمة السر"></div>
+  <div class="field"><input id="bkEncP2" type="password" maxlength="64" autocomplete="new-password" aria-label="تأكيد كلمة السر" placeholder="اكتبها تاني للتأكيد"></div>
+  <p class="err-msg" id="bkEncErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="bkEncGo">تشغيل التشفير</button><button class="btn" id="bkEncCancel">إلغاء</button></div>
+  <button class="btn danger" id="bkEncOff" type="button" style="width:100%;margin-top:10px" hidden>إيقاف التشفير</button>
+</div>
+
+<!-- Password for an encrypted backup (asked while restoring) -->
+<div class="sheet" id="bkPassSheet" role="dialog" aria-modal="true" aria-labelledby="bkPassTitle">
+  <div class="grab"></div>
+  <h2 id="bkPassTitle">النسخة دي مشفّرة</h2>
+  <p class="hint center">اكتب كلمة السر اللي اخترتها وقت عمل النسخة.</p>
+  <div class="field"><input id="bkPassIn" type="password" maxlength="64" autocomplete="current-password" aria-label="كلمة السر" placeholder="كلمة السر"></div>
+  <p class="err-msg" id="bkPassErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="bkPassGo">فك التشفير</button><button class="btn" id="bkPassCancel">إلغاء</button></div>
 </div>
 
 <input type="file" id="restoreFile" accept="application/json,.json,text/plain" hidden>

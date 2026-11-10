@@ -1381,6 +1381,14 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 .me-page[data-mepage="budget"]>.card+.card{margin-top:14px}
 /* section titles on the budget and accounts pages sit at the reading-direction start: right in Arabic, left in English (flex-end above was the opposite side) */
 .me-page[data-mepage="budget"]>.card>.card-h,.me-page[data-mepage="accounts"]>.card>.card-h{justify-content:space-between}
+#todayBlock .sec-end{display:flex;align-items:center;gap:8px}
+.sec-search{width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--brand) 12%,transparent);color:var(--brand)}
+.sec-search:active{transform:scale(.92)}
+.sec-search svg{width:19px;height:19px}
+#searchSheet{height:92%;display:flex;flex-direction:column}
+#searchSheet h2{flex:none}
+#searchSheet .search-field{flex:none}
+#searchSheet #searchRes{padding-bottom:12px}
 .tr-list{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px;max-height:52vh;overflow:auto}
 .tr-row{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);background:var(--surface);border-radius:15px;padding:10px 12px}
 .tr-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -1391,6 +1399,18 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 .tr-btns .btn.sm{min-height:36px;padding:6px 12px;font-size:.84rem}
 .tr-none{padding:18px 0}
 .err-box{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--surface-2);color:var(--ink);font:.74rem/1.45 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:40vh;overflow:auto;text-align:left}
+#trashEmpty[hidden]+#trashClose{grid-column:1/-1;justify-self:center;width:min(100%,280px)}
+.sug-g{display:flex;justify-content:space-between;align-items:center;margin:16px 4px 2px;font-size:.85rem;color:var(--muted)}
+.sug-g b{color:var(--ink);font-size:.95rem}
+.sug-g .linkbtn{padding:0;font-size:.8rem}
+.sug-off{display:none!important}
+#sugSheet .search-field{margin-top:6px}
+#sugSheet .sheet-actions{position:sticky;bottom:calc(-14px - env(safe-area-inset-bottom,0px));background:var(--surface);padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px));margin-top:10px;z-index:2}
+.sq-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sq-chips button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;font:inherit;font-size:.85rem}
+.sq-chips button[aria-pressed=true]{background:color-mix(in srgb,var(--brand) 14%,transparent);border-color:var(--brand);color:var(--brand);font-weight:700}
+#searchSheet .sq-chips{flex:none}
+#bkPassSheet{z-index:63} /* above the restore sheet (62): the password is asked while that one is open */
 </style>
 </head>
 <body>
@@ -1414,7 +1434,7 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
     <div id="capBox"></div>
     <div id="closeCard"></div>
     <div id="upcoming"></div>
-    <div id="todayBlock"><div class="section-h"><h2><span id="homeExpenseTitle">مصاريف النهارده</span><span class="cnt" id="todayCount"></span></h2><span class="tot" id="todayTotal"></span></div>
+    <div id="todayBlock"><div class="section-h"><h2><span id="homeExpenseTitle">مصاريف النهارده</span><span class="cnt" id="todayCount"></span></h2><div class="sec-end"><span class="tot" id="todayTotal"></span><button type="button" class="sec-search" id="homeSearchBtn" aria-label="بحث في كل الحركات" aria-haspopup="dialog"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button></div></div>
     <div id="todayList"></div></div>
   </section>
 
@@ -1482,25 +1502,6 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
       <div class="topbar"><h1 id="reportCategoryTitle"></h1><button type="button" class="back" id="reportCategoryBack" aria-label="رجوع">‹</button></div>
       <div class="card report-category-total"><span id="reportCategoryPeriod" class="hint"></span><strong id="reportCategoryTotal"></strong><span id="reportCategoryCount" class="hint"></span></div>
       <div id="reportCategoryList"></div>
-    </div>
-    <div id="reportsSearch" hidden>
-      <div class="topbar">
-        <h1>بحث في كل الحركات</h1>
-        <button class="back" id="searchBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
-      </div>
-      <div class="field search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="searchIn" type="search" placeholder="مصروف أو تحويل أو دخل أو سلفة أو قسط" autocomplete="off" enterkeyhint="search" aria-label="بحث في كل الحركات"></div>
-      <div class="sf-bar"><button type="button" class="sf-btn" id="sfBtn" aria-expanded="false">فلاتر</button><button type="button" class="linkbtn" id="sfClear" hidden>مسح الفلاتر</button></div>
-      <div class="sf-panel" id="sfPanel" hidden>
-        <details class="sf-categories"><summary id="sfCatSummary">كل الفئات</summary><div id="sfCat" class="sf-cat-options" role="group" aria-label="اختار فئة أو أكتر"></div></details>
-        <div class="sf-field sf-payment"><span>طريقة الدفع</span><select id="sfPay" hidden></select><button type="button" class="sf-pick" id="sfPayPick" aria-haspopup="menu" aria-expanded="false"></button></div>
-        <div class="sf-field"><span>من يوم</span><input id="sfFrom" type="hidden"><button type="button" class="sf-pick" id="sfFromPick" aria-haspopup="dialog"></button></div>
-        <div class="sf-field"><span>لحد يوم</span><input id="sfTo" type="hidden"><button type="button" class="sf-pick" id="sfToPick" aria-haspopup="dialog"></button></div>
-        <label>من مبلغ<input id="sfMin" type="text" inputmode="decimal" placeholder="0"></label>
-        <label>لحد مبلغ<input id="sfMax" type="text" inputmode="decimal" placeholder="—"></label>
-      </div>
-      <div class="sf-sort"><span>ترتيب المصروفات</span><select id="sfSort" hidden><option value="time-desc">الأحدث الأول</option><option value="time-asc">الأقدم الأول</option><option value="amount-desc">المبلغ: من الأكبر للأصغر</option><option value="amount-asc">المبلغ: من الأصغر للأكبر</option><option value="cat-asc">الفئة: أ إلى ي</option><option value="cat-desc">الفئة: ي إلى أ</option></select><button type="button" class="sf-pick" id="sfSortPick" aria-haspopup="menu" aria-expanded="false"></button></div>
-      <p class="search-sum" id="searchSum" aria-live="polite"></p>
-      <div id="searchRes"></div>
     </div>
   </section>
 
@@ -1965,6 +1966,7 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
     <div class="card" id="bkCard">
       <h3>النسخ الاحتياطي</h3>
       <p class="hint" id="backupHint"></p>
+      <div class="set-row" id="bkEncRow" style="margin-top:12px"><div class="txt">تشفير النسخ بكلمة سر<small id="bkEncSub"></small></div><button type="button" class="time-chip" id="bkEncChip" aria-label="تشفير النسخ الاحتياطي بكلمة سر">شغّله</button></div>
       <div id="bkAuto" hidden>
         <div id="driveOff"><button class="btn primary" id="driveLink" style="width:100%;margin-top:10px">ربط Google Drive</button></div>
         <div id="driveOn" hidden>
@@ -2210,6 +2212,24 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
 </div>
 
 <!-- Savings <-> budget -->
+<div class="sheet" id="searchSheet" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+  <div class="grab"></div>
+  <h2 id="searchTitle">بحث في كل الحركات</h2>
+  <div class="field search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="searchIn" type="search" placeholder="مصروف أو تحويل أو دخل أو سلفة أو قسط" autocomplete="off" enterkeyhint="search" aria-label="بحث في كل الحركات"></div>
+  <div class="sq-chips" id="sqChips" role="group" aria-label="بحث سريع"><button type="button" data-sq="today" aria-pressed="false">النهارده</button><button type="button" data-sq="week" aria-pressed="false">آخر 7 أيام</button><button type="button" data-sq="month" aria-pressed="false">الشهر ده</button><button type="button" data-sq="big" aria-pressed="false">الأكبر</button></div>
+  <div class="sf-bar"><button type="button" class="sf-btn" id="sfBtn" aria-expanded="false">فلاتر</button><button type="button" class="linkbtn" id="sfClear" hidden>مسح الفلاتر</button></div>
+  <div class="sf-panel" id="sfPanel" hidden>
+    <details class="sf-categories"><summary id="sfCatSummary">كل الفئات</summary><div id="sfCat" class="sf-cat-options" role="group" aria-label="اختار فئة أو أكتر"></div></details>
+    <div class="sf-field sf-payment"><span>طريقة الدفع</span><select id="sfPay" hidden></select><button type="button" class="sf-pick" id="sfPayPick" aria-haspopup="menu" aria-expanded="false"></button></div>
+    <div class="sf-field"><span>من يوم</span><input id="sfFrom" type="hidden"><button type="button" class="sf-pick" id="sfFromPick" aria-haspopup="dialog"></button></div>
+    <div class="sf-field"><span>لحد يوم</span><input id="sfTo" type="hidden"><button type="button" class="sf-pick" id="sfToPick" aria-haspopup="dialog"></button></div>
+    <label>من مبلغ<input id="sfMin" type="text" inputmode="decimal" placeholder="0"></label>
+    <label>لحد مبلغ<input id="sfMax" type="text" inputmode="decimal" placeholder="—"></label>
+  </div>
+  <div class="sf-sort"><span>ترتيب المصروفات</span><select id="sfSort" hidden><option value="time-desc">الأحدث الأول</option><option value="time-asc">الأقدم الأول</option><option value="amount-desc">المبلغ: من الأكبر للأصغر</option><option value="amount-asc">المبلغ: من الأصغر للأكبر</option><option value="cat-asc">الفئة: أ إلى ي</option><option value="cat-desc">الفئة: ي إلى أ</option></select><button type="button" class="sf-pick" id="sfSortPick" aria-haspopup="menu" aria-expanded="false"></button></div>
+  <p class="search-sum" id="searchSum" aria-live="polite"></p>
+  <div id="searchRes"></div>
+</div>
 <div class="sheet" id="freeSheet" role="dialog" aria-modal="true" aria-labelledby="freeTitle">
   <div class="grab"></div>
   <h2 id="freeTitle">رصيد الدخل الحر</h2>
@@ -2386,6 +2406,7 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
   <div class="grab"></div>
   <h2 id="sugTitle">فئات مقترحة</h2>
   <p class="hint center">اختار اللي يناسبك وهيتضافوا لفئاتك. تقدر تعدّل أو تحذف أي واحدة بعد كده.</p>
+  <div class="field search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="sugSearch" type="search" placeholder="دوّر في الفئات المقترحة" autocomplete="off" aria-label="دوّر في الفئات المقترحة"></div>
   <div id="sugList"></div>
   <p class="err-msg" id="sugErr"></p>
   <div class="sheet-actions"><button class="btn primary" id="sugSave">إضافة المختار</button><button class="btn" id="sugCancel">إلغاء</button></div>
@@ -2704,6 +2725,28 @@ html[lang="en"] #cats .cat{font-size:.68rem;letter-spacing:-.01em;overflow-wrap:
   <div class="mb-pick-list" id="mbPickList"></div>
 </div>
 
+<!-- Encrypted backups: turn on / change the password -->
+<div class="sheet" id="bkEncSheet" role="dialog" aria-modal="true" aria-labelledby="bkEncTitle">
+  <div class="grab"></div>
+  <h2 id="bkEncTitle">تشفير النسخ الاحتياطي</h2>
+  <p class="hint center" id="bkEncHint"></p>
+  <div class="field"><input id="bkEncP1" type="password" maxlength="64" autocomplete="new-password" aria-label="كلمة السر" placeholder="كلمة السر"></div>
+  <div class="field"><input id="bkEncP2" type="password" maxlength="64" autocomplete="new-password" aria-label="تأكيد كلمة السر" placeholder="اكتبها تاني للتأكيد"></div>
+  <p class="err-msg" id="bkEncErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="bkEncGo">تشغيل التشفير</button><button class="btn" id="bkEncCancel">إلغاء</button></div>
+  <button class="btn danger" id="bkEncOff" type="button" style="width:100%;margin-top:10px" hidden>إيقاف التشفير</button>
+</div>
+
+<!-- Password for an encrypted backup (asked while restoring) -->
+<div class="sheet" id="bkPassSheet" role="dialog" aria-modal="true" aria-labelledby="bkPassTitle">
+  <div class="grab"></div>
+  <h2 id="bkPassTitle">النسخة دي مشفّرة</h2>
+  <p class="hint center">اكتب كلمة السر اللي اخترتها وقت عمل النسخة.</p>
+  <div class="field"><input id="bkPassIn" type="password" maxlength="64" autocomplete="current-password" aria-label="كلمة السر" placeholder="كلمة السر"></div>
+  <p class="err-msg" id="bkPassErr"></p>
+  <div class="sheet-actions"><button class="btn primary" id="bkPassGo">فك التشفير</button><button class="btn" id="bkPassCancel">إلغاء</button></div>
+</div>
+
 <input type="file" id="restoreFile" accept="application/json,.json,text/plain" hidden>
 <input type="file" id="impFile" accept=".pdf,.xlsx,.xlsm,.csv,.tsv,.txt,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain" hidden>
 <div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="toastAct" hidden></button><i class="tbar" id="tbar"></i></div>
@@ -2741,21 +2784,124 @@ const CATS = [
   {id:'gift',  name:'هدايا',    e:'🎁', c:'#DB2777'},
   {id:'other', name:'أخرى',     e:'📦', c:'#64748B'}
 ];
-/* more categories people use in money apps: not on by default, offered in Settings > الفئات > فئات مقترحة */
-const CATS_MORE = [
-  {id:'rent',   name:'إيجار',            e:'🏘️', c:'#92400E'},
-  {id:'school', name:'حضانة ومدارس',     e:'🎒', c:'#2563EB'},
-  {id:'sport',  name:'رياضة وجيم',       e:'🏋️', c:'#DC2626'},
-  {id:'pets',   name:'حيوانات أليفة',    e:'🐾', c:'#CA8A04'},
-  {id:'repair', name:'صيانة وإصلاحات',   e:'🔧', c:'#57534E'},
-  {id:'furn',   name:'أثاث وأجهزة',      e:'🛋️', c:'#9A3412'},
-  {id:'insur',  name:'تأمين',            e:'🛡️', c:'#1D4ED8'},
-  {id:'tax',    name:'رسوم وضرائب',      e:'🏛️', c:'#64748B'},
-  {id:'bank',   name:'رسوم بنكية',       e:'🏦', c:'#0F766E'},
-  {id:'game',   name:'ألعاب',            e:'🎮', c:'#7C3AED'},
-  {id:'work',   name:'شغل وأدوات',       e:'💼', c:'#0891B2'},
-  {id:'events', name:'مناسبات وأفراح',   e:'🎉', c:'#BE185D'}
+/* more categories people use in money apps: not on by default, offered in Settings > الفئات > فئات مقترحة (grouped) */
+const CAT_GROUPS = [
+  ['أكل وشرب', [
+    {id:'delivery', name:'توصيل أكل', e:'🛵', c:'#EA580C'},
+    {id:'bakery', name:'مخبوزات وحلويات', e:'🥐', c:'#D97706'},
+    {id:'veg', name:'خضار وفاكهة', e:'🥬', c:'#16A34A'},
+    {id:'meat', name:'لحوم ودواجن وأسماك', e:'🥩', c:'#B91C1C'},
+    {id:'water', name:'مياه ومشروبات', e:'🥤', c:'#0284C7'},
+    {id:'snacks', name:'سناكس وعصائر', e:'🍿', c:'#F59E0B'},
+    {id:'smoke', name:'سجائر ومعسل', e:'🚬', c:'#57534E'}
+  ]],
+  ['مواصلات وعربية', [
+    {id:'taxi', name:'تاكسي وتطبيقات توصيل', e:'🚕', c:'#CA8A04'},
+    {id:'metro', name:'مترو وقطار', e:'🚇', c:'#2563EB'},
+    {id:'park', name:'جراج وانتظار', e:'🅿️', c:'#475569'},
+    {id:'toll', name:'رسوم طرق', e:'🛣️', c:'#64748B'},
+    {id:'carins', name:'ترخيص وتأمين العربية', e:'📄', c:'#1D4ED8'},
+    {id:'carwash', name:'غسيل العربية', e:'🧼', c:'#0EA5E9'},
+    {id:'battery', name:'بطارية وإطارات', e:'🔋', c:'#3F3F46'},
+    {id:'fines', name:'مخالفات وغرامات', e:'🚨', c:'#DC2626'},
+    {id:'flight', name:'تذاكر طيران', e:'🎫', c:'#0891B2'},
+    {id:'bike', name:'دراجة وسكوتر', e:'🚲', c:'#15803D'}
+  ]],
+  ['البيت والفواتير', [
+    {id:'rent', name:'إيجار', e:'🏘️', c:'#92400E'},
+    {id:'elec', name:'كهرباء', e:'⚡', c:'#EAB308'},
+    {id:'wbill', name:'مياه المنزل', e:'🚰', c:'#0EA5E9'},
+    {id:'gas', name:'غاز', e:'🔥', c:'#EA580C'},
+    {id:'net', name:'إنترنت المنزل', e:'🌐', c:'#0D9488'},
+    {id:'clean', name:'نظافة ومنظفات', e:'🧹', c:'#14B8A6'},
+    {id:'maid', name:'عمالة منزلية', e:'🧺', c:'#A16207'},
+    {id:'garden', name:'حديقة ونباتات', e:'🌱', c:'#22C55E'},
+    {id:'decor', name:'ديكور وأدوات منزلية', e:'🖼️', c:'#B45309'},
+    {id:'furn', name:'أثاث وأجهزة', e:'🛋️', c:'#9A3412'},
+    {id:'electr', name:'إلكترونيات وإكسسوارات', e:'💻', c:'#0369A1'},
+    {id:'repair', name:'صيانة وإصلاحات', e:'🔧', c:'#57534E'},
+    {id:'mort', name:'قسط شقة أو عقار', e:'🏢', c:'#7C2D12'},
+    {id:'building', name:'رسوم العمارة والحراسة', e:'🏙️', c:'#78716C'},
+    {id:'reno', name:'تشطيب وتجديد', e:'🏗️', c:'#A8A29E'},
+    {id:'pets', name:'حيوانات أليفة', e:'🐾', c:'#CA8A04'}
+  ]],
+  ['اتصالات وتقنية', [
+    {id:'software', name:'برامج وتطبيقات', e:'💾', c:'#6D28D9'},
+    {id:'cloud', name:'تخزين سحابي ودومين', e:'☁️', c:'#0EA5E9'},
+    {id:'ship', name:'شحن وبريد', e:'🚚', c:'#92400E'},
+    {id:'ai', name:'اشتراكات الذكاء الاصطناعي', e:'🤖', c:'#7C3AED'}
+  ]],
+  ['صحة وجمال', [
+    {id:'doctor', name:'دكتور وكشف', e:'🩺', c:'#059669'},
+    {id:'pharmacy', name:'صيدلية', e:'🩹', c:'#10B981'},
+    {id:'dental', name:'أسنان', e:'🦷', c:'#38BDF8'},
+    {id:'lab', name:'تحاليل وأشعة', e:'🔬', c:'#6366F1'},
+    {id:'glasses', name:'نظارات وعدسات', e:'👓', c:'#0F766E'},
+    {id:'salon', name:'صالون وحلاق', e:'✂️', c:'#DB2777'},
+    {id:'spa', name:'سبا ومساج', e:'💆', c:'#A78BFA'},
+    {id:'perfume', name:'عطور', e:'🧴', c:'#C026D3'},
+    {id:'vitamin', name:'فيتامينات ومكملات', e:'🍊', c:'#F97316'},
+    {id:'therapy', name:'علاج نفسي وطبيعي', e:'🧠', c:'#7C3AED'}
+  ]],
+  ['تسوق وملابس', [
+    {id:'shoes', name:'أحذية وشنط', e:'👟', c:'#9333EA'},
+    {id:'jewel', name:'مجوهرات وساعات', e:'⌚', c:'#CA8A04'},
+    {id:'gold', name:'ذهب وفضة', e:'🥇', c:'#B7791F'},
+    {id:'stationery', name:'أدوات مكتبية', e:'✏️', c:'#2563EB'},
+    {id:'books', name:'كتب', e:'📖', c:'#7C3AED'},
+    {id:'online', name:'تسوق أونلاين', e:'📲', c:'#F43F5E'},
+    {id:'baby', name:'مستلزمات أطفال', e:'🍼', c:'#FB923C'},
+    {id:'toys', name:'ألعاب أطفال', e:'🧩', c:'#F97316'}
+  ]],
+  ['ترفيه وهوايات', [
+    {id:'culture', name:'سينما ومسرح', e:'🎭', c:'#E11D48'},
+    {id:'hotel', name:'فنادق وإقامة', e:'🏨', c:'#0E7490'},
+    {id:'trip', name:'مصايف ورحلات', e:'🏖️', c:'#0EA5E9'},
+    {id:'camp', name:'كامبينج وطبيعة', e:'⛺', c:'#15803D'},
+    {id:'music', name:'موسيقى وبودكاست', e:'🎧', c:'#7C3AED'},
+    {id:'hobby', name:'هوايات', e:'🎨', c:'#D946EF'},
+    {id:'photo', name:'تصوير', e:'📷', c:'#475569'},
+    {id:'club', name:'نادي وعضويات', e:'🏊', c:'#16A34A'},
+    {id:'party', name:'حفلات وسهرات', e:'🎤', c:'#C026D3'},
+    {id:'sport', name:'رياضة وجيم', e:'🏋️', c:'#DC2626'},
+    {id:'game', name:'ألعاب', e:'🎮', c:'#7C3AED'}
+  ]],
+  ['تعليم وتطوير', [
+    {id:'school', name:'حضانة ومدارس', e:'🎒', c:'#2563EB'},
+    {id:'tutor', name:'دروس خصوصية', e:'📝', c:'#4F46E5'},
+    {id:'uni', name:'جامعة ومصاريف دراسية', e:'🎓', c:'#1D4ED8'},
+    {id:'courses', name:'كورسات وتدريب', e:'💡', c:'#F59E0B'},
+    {id:'suppl', name:'زي ومستلزمات مدرسية', e:'📐', c:'#0284C7'},
+    {id:'allow', name:'مصروف الأولاد', e:'💵', c:'#84CC16'}
+  ]],
+  ['مناسبات ودين', [
+    {id:'events', name:'مناسبات وأفراح', e:'🎉', c:'#BE185D'},
+    {id:'ramadan', name:'رمضان والعيد', e:'🌙', c:'#0F766E'},
+    {id:'hajj', name:'حج وعمرة', e:'🕋', c:'#166534'},
+    {id:'zakat', name:'زكاة وكفارات', e:'🕌', c:'#047857'},
+    {id:'courtesy', name:'مجاملات وواجبات', e:'🎊', c:'#BE185D'}
+  ]],
+  ['مصاريف مالية', [
+    {id:'insur', name:'تأمين', e:'🛡️', c:'#1D4ED8'},
+    {id:'tax', name:'رسوم وضرائب', e:'🏛️', c:'#64748B'},
+    {id:'bank', name:'رسوم بنكية', e:'🏦', c:'#0F766E'},
+    {id:'loans', name:'أقساط وقروض', e:'📉', c:'#7C2D12'},
+    {id:'gov', name:'أوراق ومصاريف حكومية', e:'📑', c:'#475569'},
+    {id:'invest', name:'استثمار', e:'📈', c:'#16A34A'},
+    {id:'saving', name:'ادخار', e:'🐷', c:'#EC4899'},
+    {id:'lawyer', name:'محامي وقضايا', e:'⚖️', c:'#1E293B'},
+    {id:'tips', name:'بقشيش', e:'💸', c:'#F59E0B'}
+  ]],
+  ['شغل ومشروع', [
+    {id:'work', name:'شغل وأدوات', e:'💼', c:'#0891B2'},
+    {id:'ads', name:'إعلانات وتسويق', e:'📣', c:'#EA580C'},
+    {id:'office', name:'مكتب ومستلزمات شغل', e:'🗄️', c:'#0E7490'},
+    {id:'staff', name:'مرتبات وعمالة', e:'👷', c:'#0F766E'},
+    {id:'stock', name:'خامات وبضاعة', e:'🏭', c:'#78716C'},
+    {id:'tools', name:'اشتراكات وأدوات شغل', e:'🧰', c:'#0369A1'}
+  ]]
 ];
+const CATS_MORE = CAT_GROUPS.flatMap(g=>g[1]);
 
 let CAT = {};
 const mem = {};
@@ -3017,8 +3163,8 @@ const timeStr = ts=>new Date(ts).toLocaleTimeString(LOC,{hour:'numeric',minute:'
 const daysIn = mk=>{const [y,m]=mk.split('-').map(Number);return new Date(y,m,0).getDate()};
 const nextMonth = mk=>{const [y,m]=mk.split('-').map(Number);return monKey(new Date(y,m,1))};
 const ofMonth = mk=>S.expenses.filter(x=>monKey(x.ts)===mk);
-const sum = arr=>arr.reduce((a,x)=>a+x.amount,0);
-const byCat = arr=>{const o={};arr.forEach(x=>{o[x.cat]=(o[x.cat]||0)+x.amount});return o};
+const sum = arr=>r2(arr.reduce((a,x)=>a+x.amount,0)); // cents never drift: 0.1+0.2 is 0.3 here
+const byCat = arr=>{const o={};arr.forEach(x=>{o[x.cat]=(o[x.cat]||0)+x.amount});Object.keys(o).forEach(k=>{o[k]=r2(o[k])});return o};
 const uid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
 /* ===== Data validation =====
@@ -3141,8 +3287,8 @@ function budOf(P){ const k=P&&P.key; let b=+S.budget||0; (S.bMoves||[]).forEach(
 function budgetExpenses(P){return ofPeriod(P).filter(e=>e.fund!=='free')}
 function budgetSpent(P){return sum(budgetExpenses(P))}
 function freeIncomeBalance(skipExpense,skipIncome){
-  const income=(S.inflows||[]).filter(x=>x.id!==skipIncome&&x.fund==='free').reduce((a,x)=>a+x.amount,0);
-  const spent=(S.expenses||[]).filter(x=>x.id!==skipExpense&&x.fund==='free').reduce((a,x)=>a+x.amount,0);
+  const income=r2((S.inflows||[]).filter(x=>x.id!==skipIncome&&x.fund==='free').reduce((a,x)=>a+x.amount,0));
+  const spent=r2((S.expenses||[]).filter(x=>x.id!==skipExpense&&x.fund==='free').reduce((a,x)=>a+x.amount,0));
   return r2(income-spent);
 }
 function freeIncomeActive(){return S.inflows.some(x=>x.fund==='free')||S.expenses.some(e=>e.fund==='free')}
@@ -3709,13 +3855,12 @@ $('#reportCategoryBack').onclick=()=>showSub(reportCategoryReturn);
 ['#reportCategoryList','#dayByDay','#searchRes'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target.closest('[data-more],[data-rc]'))return;const row=e.target.closest('.xp');if(row)openSheet(row.dataset.id)}));
 var repMainY=0; // where the reports' main screen was when a page was opened from it
 function showSub(name,quiet){
-  const ids={main:'#reportsMain',detail:'#reportsDetail',search:'#reportsSearch',category:'#reportsCategory'};
+  const ids={main:'#reportsMain',detail:'#reportsDetail',category:'#reportsCategory'};
   if(name!=='main'&&!$('#reportsMain').hidden) repMainY=pageY();
   Object.entries(ids).forEach(([k,s])=>$(s).hidden=k!==name);
   const el=$(ids[name]); if(!quiet){el.classList.remove('sub-anim');void el.offsetWidth;el.classList.add('sub-anim')}
   if(name==='detail') renderDetail();
   if(name==='category')renderReportCategory();
-  if(name==='search'){renderSearch();setTimeout(()=>$('#searchIn').focus({preventScroll:true}),60)} else $('#searchIn').blur();
   if(!quiet) pageTo(name==='main'?repMainY:0);
 }
 function showDetail(on){showSub(on?'detail':'main')}
@@ -3764,7 +3909,7 @@ function sfCompare(a,b){
   return dir*(a.ts-b.ts)||String(a.id).localeCompare(String(b.id));
 }
 function renderSearch(){
-  sfPaintPicks();
+  sfPaintPicks(); sqPaint();
   const q=normAr($('#searchIn').value.trim()), f=sfGet();
   $('#sfBtn').classList.toggle('on',f.on); $('#sfBtn').textContent=f.on?'فلاتر شغالة':'فلاتر'; $('#sfClear').hidden=!f.on;
   const words=q?q.split(/\s+/):[], numQ=/^\d+(\.\d+)?$/.test(q)? parseFloat(q) : null;
@@ -3772,7 +3917,7 @@ function renderSearch(){
     if(!sfPass(x,f)) return false;
     if(!q) return true;
     if(numQ!==null && x.amount===numQ) return true;
-    const hay=normAr((x.note||'')+' '+(CAT[x.cat]||CAT.other).name+' '+PAY[payOf(x)].name);
+    const hay=normAr((x.note||'')+' '+(CAT[x.cat]||CAT.other).name+' '+PAY[payOf(x)].name+(numQ===null?' '+shortDate(x.ts)+' '+new Date(x.ts).toLocaleDateString(LOC,{weekday:'long',month:'long'}):''));
     return words.every(w=>hay.includes(w));
   }).sort(sfCompare);
   const oth= q&&!f.on? searchOthers(words,numQ).slice(0,100) : [];
@@ -3825,14 +3970,32 @@ $('#sfCalendarCancel').onclick=()=>$('#sfCalendar').close();
 let searchT;
 $('#searchIn').addEventListener('input',()=>{clearTimeout(searchT);searchT=setTimeout(renderSearch,150)});
 $('#searchIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#searchIn').blur()}});
-$('#searchBtn').onclick=()=>{sfFill();showSub('search')};
+/* quick searches under the box: today / last 7 days / this month (date filters) and the biggest first (sort); tap again to undo */
+const SQ=()=>{const t=todayKey(), w=dayKey(new Date().setDate(new Date().getDate()-6)), m=monKey(Date.now())+'-01';
+  return {today:{from:t,to:t},week:{from:w,to:t},month:{from:m,to:t},big:{sort:'amount-desc'}}};
+function sqActive(k){const q=SQ()[k], v=id=>$('#'+id).value;
+  return q.sort? v('sfSort')===q.sort : v('sfFrom')===q.from&&v('sfTo')===q.to}
+function sqPaint(){document.querySelectorAll('#sqChips [data-sq]').forEach(b=>b.setAttribute('aria-pressed',sqActive(b.dataset.sq)))}
+$('#sqChips').onclick=e=>{const b=e.target.closest('[data-sq]'); if(!b) return;
+  const k=b.dataset.sq, q=SQ()[k], on=sqActive(k);
+  if(q.sort) $('#sfSort').value=on?'time-desc':q.sort;
+  else {$('#sfFrom').value=on?'':q.from; $('#sfTo').value=on?'':q.to}
+  renderSearch()};
+/* after you edit or delete a result the search comes back, with the same words and filters */
+let srBack=false;
+$('#searchRes').addEventListener('click',e=>{if(e.target.closest('[data-more],[data-rc]')||!e.target.closest('.xp')) return;
+  srBack=true; $('#searchSheet').classList.remove('open'); // the expense form opens in its place (it would sit behind the search otherwise)
+  setTimeout(()=>{if(!$('#sheet').classList.contains('open')){srBack=false; openSearch()}},0)},true); // a read-only expense does not open: bring the search back
+new MutationObserver(()=>{if(!srBack||$('#sheet').classList.contains('open')) return; srBack=false;
+  setTimeout(()=>{if(!document.querySelector('.sheet.open')) openSearch()},320)}).observe($('#sheet'),{attributes:true,attributeFilter:['class']});
+function openSearch(){closeSheets();sfFill();renderSearch();openSheetEl('searchSheet');setTimeout(()=>$('#searchIn').focus({preventScroll:true}),320)}
+['#searchBtn','#homeSearchBtn'].forEach(id=>$(id).onclick=openSearch);
 $('#sfBtn').onclick=()=>{const p=$('#sfPanel'); p.hidden=!p.hidden; $('#sfBtn').setAttribute('aria-expanded',!p.hidden); if(!p.hidden) sfFill()};
 $('#sfCat').addEventListener('change',()=>{sfCategoryLabel();renderSearch()});
 $('#sfSort').addEventListener('change',renderSearch);
 ['#sfPay','#sfFrom','#sfTo'].forEach(id=>$(id).addEventListener('change',renderSearch));
 ['#sfMin','#sfMax'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(searchT);searchT=setTimeout(renderSearch,200)}));
 $('#sfClear').onclick=()=>{['#sfPay','#sfFrom','#sfTo','#sfMin','#sfMax'].forEach(id=>{$(id).value=''});document.querySelectorAll('#sfCat input').forEach(x=>x.checked=false);sfCategoryLabel();renderSearch()};
-$('#searchBack').onclick=()=>showSub('main');
 
 /* Settings */
 function renderSettings(){
@@ -3875,7 +4038,7 @@ function renderSettings(){
 function renderAll(){
   userTextCache=null;
   /* each screen renders on its own: a problem in one of them must not leave the whole app blank */
-  [renderMe,renderMeHome,renderGold,paintIpFee,renderIncome,renderAccounts,renderHome,renderDebts,renderReports,()=>{if(!$('#reportsDetail').hidden)renderDetail()},()=>{if(!$('#reportsCategory').hidden)renderReportCategory()},()=>{if(!$('#reportsSearch').hidden)renderSearch()},renderSettings]
+  [renderMe,renderMeHome,renderGold,paintIpFee,renderIncome,renderAccounts,renderHome,renderDebts,renderReports,()=>{if(!$('#reportsDetail').hidden)renderDetail()},()=>{if(!$('#reportsCategory').hidden)renderReportCategory()},()=>{if($('#searchSheet').classList.contains('open'))renderSearch()},bkePaint,renderSettings]
     .forEach(f=>{try{f()}catch(e){console.error(e)}});
 }
 
@@ -4178,8 +4341,8 @@ function closeSheets(){
   wpCloseAll();
   rcStage=null; capOpen=null; trCaps=null; inCap=null; dCap=null; payCap=null; RF=null;
   closePayMenu(); closeDateMenu(); closeKindMenu();
-  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','curSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet','rsSheet','accSheet','trSheet','mvSheet','freeSheet','moneySheet','instSheet','iiSheet','ipSheet','inSheet','caSheet','pkSheet','curAddSheet','dAddSheet','dLogSheet','sugSheet','rcnSheet','clsSheet','gdSheet','rfSheet','trashSheet'].forEach(i=>$('#'+i).classList.remove('open'));
-  $('#noteInput').blur();$('#catName').blur();amtIn.blur();
+  $('#scrim').classList.remove('open');$('#sheet').classList.remove('open');$('#pinSheet').classList.remove('open');$('#expSheet').classList.remove('open');$('#catSheet').classList.remove('open');['debtSheet','paySheet','gamSheet','wipeSheet','curSheet','formSheet','timeSheet','pctSheet','autoBkSheet','dateSheet','capSheet','impSheet','credSheet','mbSheet','updSheet','rsSheet','accSheet','trSheet','mvSheet','freeSheet','moneySheet','instSheet','iiSheet','ipSheet','inSheet','caSheet','pkSheet','curAddSheet','dAddSheet','dLogSheet','sugSheet','rcnSheet','clsSheet','gdSheet','rfSheet','trashSheet','searchSheet','bkEncSheet','bkPassSheet'].forEach(i=>$('#'+i).classList.remove('open'));
+  $('#noteInput').blur();$('#catName').blur();$('#searchIn').blur();bkePassDone(null);amtIn.blur();
   if(pinMode){pinMode=null;$('#pinToggle').checked=!!hasPin()}
 }
 $('#fab').onclick=()=>{ if(tab==='debts'){ obTab==='gams'? openGamSheet() : obTab==='insts'? openInstSheet() : openDebtSheet() } else openSheet() };
@@ -4809,7 +4972,7 @@ function obligations30(){
 function inflowStats(){
   const now=Date.now(), from=now-90*864e5, L=S.inflows.filter(x=>x.ts>=from&&x.ts<=now+864e5);
   if(!L.length) return null;
-  const first=Math.min(...L.map(x=>x.ts)), span=Math.max(14,Math.min(90,Math.ceil((now-first)/864e5)+1)), tot=L.reduce((a,x)=>a+x.amount,0);
+  const first=Math.min(...L.map(x=>x.ts)), span=Math.max(14,Math.min(90,Math.ceil((now-first)/864e5)+1)), tot=r2(L.reduce((a,x)=>a+x.amount,0));
   const l60=S.inflows.filter(x=>x.ts>=now-60*864e5&&x.ts<=now+864e5).length;
   const per30= S.payType==='weekly'?30.4/7 : S.payType==='biweekly'?30.4/14 : S.payType==='monthly'?1 : Math.max(1,l60/2);
   return {n:L.length,week:r2(tot/span*7),month:r2(tot/span*30.4),per30};
@@ -6622,7 +6785,8 @@ async function bkRestore(b,at){
 }
 $('#restoreFile').onchange=async e=>{
   const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
-  let b=null; try{b=bkParse(await f.text())}catch(err){}
+  let b=null; try{b=await bkOpen(await f.text())}catch(err){}
+  if(b&&b.cancel){toast('اتلغت الاستعادة');return}
   if(!b){toast('الملف ده مش نسخة احتياطية من مليم');return}
   bkRestore(b,b.o.at||f.lastModified||Date.now());
 };
@@ -7013,7 +7177,7 @@ function impRender(){
       <small>${x.day?dkToDMY(x.day):'من غير تاريخ'}${x.dup?' · متسجل قبل كده':''}</small>
       <select data-imp-cat aria-label="الفئة">${impCatOpts(x.cat)}</select></div>
     <span class="imp-amt">${money(x.amount)}</span></div>`).join('');
-  const total=on.reduce((a,x)=>a+x.amount,0);
+  const total=r2(on.reduce((a,x)=>a+x.amount,0));
   $('#impSave').disabled=!on.length;
   $('#impSave').textContent=on.length?`سجّل ${on.length} مصروف (${fmt(total)} ${CS()})`:'اختار بنود الأول';
 }
@@ -7197,14 +7361,31 @@ $('#addCat').onclick=()=>openCatSheet();
 /* suggested categories: the ones people use most in money apps that this person does not have yet */
 const catSugList=()=>{const have=new Set(S.cats.map(c=>c.id)), names=new Set(S.cats.map(c=>normAr(c.name)));
   return CATS.concat(CATS_MORE).filter(c=>c.id!=='other'&&!have.has(c.id)&&!names.has(normAr(c.name)))};
+const catSugGroups=()=>{const L=catSugList(), have=new Set(L.map(c=>c.id)), out=[], basic=L.filter(c=>CATS.some(d=>d.id===c.id));
+  if(basic.length) out.push(['الفئات الأساسية',basic]);
+  CAT_GROUPS.forEach(g=>{const l=g[1].filter(c=>have.has(c.id)); if(l.length) out.push([g[0],l])});
+  return out};
 function openCatSug(){
-  const L=catSugList();
-  if(!L.length){toast('عندك كل الفئات المقترحة بالفعل');return}
-  $('#sugList').innerHTML=`<label class="pay-row" style="cursor:pointer"><span class="txt"><b>تحديد الكل</b></span><input type="checkbox" id="sugAll" style="width:22px;height:22px"></label>`+L.map(c=>`<label class="pay-row" style="cursor:pointer;--cc:${colr(c.c)}"><span class="txt">${esc(c.e)} ${esc(c.name)}</span><input type="checkbox" data-sug="${esc(c.id)}" style="width:22px;height:22px"></label>`).join('');
+  if(!catSugList().length){toast('عندك كل الفئات المقترحة بالفعل');return}
+  $('#sugSearch').value='';
+  $('#sugList').innerHTML=`<label class="pay-row" style="cursor:pointer"><span class="txt"><b>تحديد الكل</b></span><input type="checkbox" id="sugAll" style="width:22px;height:22px"></label>`
+    +catSugGroups().map(([n,l],gi)=>`<div class="sug-g" data-sg="${gi}"><b>${esc(n)}</b><button type="button" class="linkbtn" data-sgall="${gi}">تحديد الكل</button></div>`
+      +l.map(c=>`<label class="pay-row sug-row" data-g="${gi}" data-name="${esc(normAr(n+' '+c.name))}" style="cursor:pointer;--cc:${colr(c.c)}"><span class="txt">${esc(c.e)} ${esc(c.name)}</span><input type="checkbox" data-sug="${esc(c.id)}" style="width:22px;height:22px"></label>`).join('')).join('')
+    +`<p class="hint center" id="sugNone" hidden>مفيش فئة بالاسم ده</p>`;
   $('#sugErr').textContent=''; openSheetEl('sugSheet');
 }
 $('#addCatSug').onclick=openCatSug;
-$('#sugList').onchange=e=>{ if(e.target.id==='sugAll'){document.querySelectorAll('#sugList [data-sug]').forEach(c=>{c.checked=e.target.checked})} };
+const sugRows=g=>[...document.querySelectorAll('#sugList .sug-row'+(g===undefined?'':`[data-g="${g}"]`))].filter(r=>!r.classList.contains('sug-off'));
+$('#sugList').onchange=e=>{ if(e.target.id==='sugAll'){sugRows().forEach(r=>{r.querySelector('input').checked=e.target.checked})} };
+$('#sugList').onclick=e=>{const b=e.target.closest('[data-sgall]'); if(!b) return;
+  const rows=sugRows(b.dataset.sgall), all=rows.length&&rows.every(r=>r.querySelector('input').checked);
+  rows.forEach(r=>{r.querySelector('input').checked=!all})};
+$('#sugSearch').addEventListener('input',()=>{
+  const q=normAr($('#sugSearch').value.trim());
+  document.querySelectorAll('#sugList .sug-row').forEach(r=>r.classList.toggle('sug-off',!!q&&!r.dataset.name.includes(q)));
+  document.querySelectorAll('#sugList .sug-g').forEach(h=>h.classList.toggle('sug-off',!sugRows(h.dataset.sg).length));
+  $('#sugNone').hidden=sugRows().length>0;
+});
 $('#sugCancel').onclick=closeSheets;
 $('#sugSave').onclick=()=>{
   const ids=[...document.querySelectorAll('#sugList [data-sug]:checked')].map(c=>c.dataset.sug);
@@ -7336,6 +7517,100 @@ $('#errView').onclick=()=>{
 };
 $('#errCopy').onclick=async()=>{const ok=await copyText(errReport(6000)); toast(ok?'اتنسخ التقرير. الصقه في رسالتك للمطوّر':'معرفتش أنسخ التقرير')};
 armBtn($('#errClear'),'امسح السجل','دوس تاني للتأكيد',()=>{errClear();errPaint();toast('اتمسح سجل الأخطاء')});
+/* ===== Encrypted backups (optional) =====
+   AES-GCM with a key made from a password (PBKDF2-SHA256, 210000 rounds). The password itself is never kept: only the
+   derived key and its salt, on this phone, outside the app data and outside every backup. A backup made with it is
+   {app,enc:1,at,iter,salt,iv,ct} (the time stays readable so the newest can be found; it is also bound into the seal).
+   Restoring asks for the password (or opens by itself on the phone that made it), and then keeps encryption on. */
+const BKE_KEY='maleem.bkenc', BKE_ITER=210000, BKE_MIN=6;
+const bkeOk=()=>!!(window.crypto&&crypto.subtle&&crypto.getRandomValues);
+const bkeB64=u8=>{let s='';for(let i=0;i<u8.length;i+=0x8000) s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s)};
+function bkeCfg(){try{const c=JSON.parse(lsGet(BKE_KEY)||'null'); if(c&&typeof c.salt==='string'&&typeof c.key==='string'&&c.iter>=1e5&&c.iter<=1e6) return c}catch(e){} return null}
+const bkeOn=()=>!!bkeCfg();
+const bkeAad=at=>new TextEncoder().encode('maleem-enc1|'+(+at||0));
+async function bkeDerive(pass,salt,iter){
+  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(String(pass).normalize('NFKC')),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},true,['encrypt','decrypt']);
+}
+async function bkeSave(key,salt,iter){
+  const raw=new Uint8Array(await crypto.subtle.exportKey('raw',key));
+  lsSet(BKE_KEY,JSON.stringify({salt:bkeB64(salt),iter,key:bkeB64(raw)}));
+}
+/* the backup text -> the encrypted text (throws when encryption is on but the phone can't do it: never a silent plain backup) */
+async function bkeSeal(text,at){
+  const c=bkeCfg(); if(!c||!bkeOk()) throw new Error('enc');
+  const key=await crypto.subtle.importKey('raw',b64d(c.key),'AES-GCM',false,['encrypt']), iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:bkeAad(at)},key,new TextEncoder().encode(text)));
+  return JSON.stringify({app:'maleem',enc:1,at,iter:c.iter,salt:c.salt,iv:bkeB64(iv),ct:bkeB64(ct)});
+}
+/* a quick look at the start of the text: is it an encrypted backup (so a password may be needed)? */
+const bkSniffEnc=txt=>/"enc"\s*:\s*1\b/.test(String(txt).slice(0,400));
+const bkeIsEnv=o=>!!(o&&o.app==='maleem'&&o.enc===1&&typeof o.salt==='string'&&typeof o.iv==='string'&&typeof o.ct==='string'&&o.iter>=1e5&&o.iter<=1e6);
+async function bkeDecrypt(o,key){
+  try{return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(o.iv),additionalData:bkeAad(o.at)},key,b64d(o.ct)))}catch(e){return null}
+}
+/* a backup file's text -> {o,p} like bkParse, null (not a Maleem backup) or {cancel:true} (encrypted, and the password was not given) */
+async function bkOpen(txt){
+  let o=null; try{o=JSON.parse(txt)}catch(e){return null}
+  if(!bkeIsEnv(o)) return bkParse(txt);
+  if(!bkeOk()) return {cancel:true};
+  const c=bkeCfg();
+  try{ if(c&&c.salt===o.salt&&c.iter===o.iter){
+    const t=await bkeDecrypt(o,await crypto.subtle.importKey('raw',b64d(c.key),'AES-GCM',false,['decrypt']));
+    if(t!==null) return bkParse(t);
+  } }catch(e){}
+  for(;;){
+    const pass=await bkePrompt(); if(pass===null) return {cancel:true};
+    let key=null; try{key=await bkeDerive(pass,b64d(o.salt),o.iter)}catch(e){}
+    const t=key?await bkeDecrypt(o,key):null;
+    if(t!==null){
+      const b=bkParse(t); bkePassClose();
+      if(b){ try{await bkeSave(key,b64d(o.salt),o.iter)}catch(e){} } // restoring keeps the protection on
+      return b;
+    }
+    $('#bkPassErr').textContent='كلمة السر غلط أو الملف اتعدّل';
+  }
+}
+/* ---- password prompt while restoring ---- */
+let bkePassRes=null;
+function bkePrompt(){return new Promise(res=>{
+  bkePassRes=res; const go=$('#bkPassGo'); go.disabled=false; go.textContent='فك التشفير'; $('#bkPassIn').value='';
+  if(!$('#bkPassSheet').classList.contains('open')){$('#bkPassErr').textContent=''; openSheetEl('bkPassSheet'); setTimeout(()=>$('#bkPassIn').focus({preventScroll:true}),320)}
+  else $('#bkPassIn').focus({preventScroll:true});
+})}
+function bkePassDone(v){const r=bkePassRes; bkePassRes=null; if(r) r(v)}
+function bkePassClose(){$('#bkPassSheet').classList.remove('open'); if(!document.querySelector('.sheet.open')) $('#scrim').classList.remove('open')}
+$('#bkPassGo').onclick=()=>{
+  const v=$('#bkPassIn').value; if(!v){$('#bkPassErr').textContent='اكتب كلمة السر'; return}
+  $('#bkPassErr').textContent=''; const go=$('#bkPassGo'); go.disabled=true; go.textContent='لحظة...'; bkePassDone(v);
+};
+$('#bkPassIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#bkPassGo').click()}});
+$('#bkPassCancel').onclick=()=>{bkePassDone(null); bkePassClose()};
+/* ---- the settings row and its sheet ---- */
+function bkePaint(){
+  const chip=$('#bkEncChip'); if(!chip) return; const on=bkeOn(), ok=bkeOk();
+  chip.textContent=on?'شغّال':'شغّله'; chip.disabled=!ok&&!on;
+  $('#bkEncSub').textContent=!ok&&!on?'مش متاح هنا (محتاج تطبيق الموبايل)':on?'شغّال: النسخ الجاية متشفّرة بكلمة سر':'مقفول: النسخة ملف عادي يقراه أي حد معاه الملف';
+}
+function openBkEnc(){
+  const on=bkeOn(); $('#bkEncP1').value=$('#bkEncP2').value=''; $('#bkEncErr').textContent='';
+  $('#bkEncHint').textContent=on?'التشفير شغّال. لو كتبت كلمة سر جديدة هتتطبق على النسخ الجاية بس، والنسخ القديمة بتفضل بكلمة سرها القديمة.':'النسخة هتتشفّر بكلمة سر قبل ما تتحفظ على الموبايل أو Drive، فمحدش يقدر يفتحها من غيرها. لو نسيت كلمة السر مفيش أي طريقة تفتح بيها النسخ، فاحفظها في مكان أمان.';
+  $('#bkEncGo').textContent=on?'تغيير كلمة السر':'تشغيل التشفير'; $('#bkEncGo').disabled=false; $('#bkEncOff').hidden=!on;
+  closeSheets(); openSheetEl('bkEncSheet');
+}
+$('#bkEncChip').onclick=openBkEnc; $('#bkEncCancel').onclick=closeSheets;
+$('#bkEncGo').onclick=async()=>{
+  const p1=$('#bkEncP1').value, p2=$('#bkEncP2').value, err=$('#bkEncErr');
+  if(!bkeOk()){err.textContent='التشفير مش متاح هنا'; return}
+  if(p1.length<BKE_MIN){err.textContent='كلمة السر لازم تكون 6 حروف أو أرقام على الأقل'; $('#bkEncP1').focus(); return}
+  if(p1!==p2){err.textContent='الكلمتين مش زي بعض'; $('#bkEncP2').focus(); return}
+  const go=$('#bkEncGo'), was=bkeOn(), t0=go.textContent; go.disabled=true; go.textContent='لحظة...';
+  try{ const salt=crypto.getRandomValues(new Uint8Array(16)); await bkeSave(await bkeDerive(p1,salt,BKE_ITER),salt,BKE_ITER) }
+  catch(e){go.disabled=false; go.textContent=t0; err.textContent='التشفير مش متاح هنا'; return}
+  closeSheets(); bkePaint(); toast(was?'اتغيّرت كلمة السر':'اتشغّل تشفير النسخ');
+};
+armBtn($('#bkEncOff'),'إيقاف التشفير','دوس تاني للتأكيد',()=>{lsSet(BKE_KEY,''); closeSheets(); bkePaint(); toast('اتقفل تشفير النسخ. النسخ الجاية من غير تشفير')});
+bkePaint();
 /* ===== Obligations: debts & gam'eyas ===== */
 let obTab='debts', dueNotifItems=[];
 const todayStart=()=>{const t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate()).getTime()};
@@ -7360,8 +7635,8 @@ function cleanMoney(v){
 }
 function bindMoney(el,box){el.addEventListener('input',()=>{if(/[\-−–]/.test(el.value))toast(TX('المبلغ السالب غير مسموح. اكتب مبلغًا موجبًا'));const v=cleanMoney(el.value);if(el.value!==v)el.value=v;box&&box.classList.remove('err')});
   el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el.blur()}})}
-const debtPaid=x=>(x.payments||[]).reduce((a,p)=>a+p.amount,0);
-const debtAdded=x=>(x.adds||[]).reduce((a,p)=>a+p.amount,0);
+const debtPaid=x=>r2((x.payments||[]).reduce((a,p)=>a+p.amount,0));
+const debtAdded=x=>r2((x.adds||[]).reduce((a,p)=>a+p.amount,0));
 const debtTotal=x=>r2(x.amount+debtAdded(x));
 const debtRem=x=>Math.max(0,Math.round((debtTotal(x)-debtPaid(x))*100)/100);
 const openSheetEl=id=>{$('#scrim').classList.add('open');$('#'+id).classList.add('open')};
@@ -7887,7 +8162,7 @@ function streaks(){
   sorted.forEach(k=>{const t=dkToTs(k); run= prev!==null&&Math.round((t-prev)/864e5)===1? run+1 : 1; best=Math.max(best,run); prev=t});
   return {cur,best,days:days.size};
 }
-const incomeTotal=()=>S.incomes.reduce((a,x)=>a+(+x.amount||0),0);
+const incomeTotal=()=>r2(S.incomes.reduce((a,x)=>a+(+x.amount||0),0));
 /* the round button next to the greeting opens the "أنا" page: photo if there is one, else the first letter of the name (or م) */
 function paintHomeAv(){
   const P=S.profile||{}, n=(P.name||'').trim(), el=$('#homeAv'); if(!el) return;
@@ -8202,7 +8477,8 @@ function bkDue(last,n){if(!last) return true; const d0=new Date(last).setHours(0
 async function bkMake(now){
   let rc={out:null,skipped:0}; try{rc=await rcExport()}catch(e){}
   const file={app:'maleem',version:1,at:now,auto:true,data:backupData()}; if(rc.out) file.receipts=rc.out;
-  return {name:`${fileTag()}-auto-${dayKey(now)}.json`, b64:await toB64(new Blob([JSON.stringify(file)])), skipped:rc.skipped||0};
+  let text=JSON.stringify(file); if(bkeOn()) text=await bkeSeal(text,now); // encryption on: the file is sealed, never plain
+  return {name:`${fileTag()}-auto-${dayKey(now)}.json`, b64:await toB64(new Blob([text])), skipped:rc.skipped||0};
 }
 const bkHasData=()=>S.expenses.length||S.debts.length||S.gams.length||S.incomes.length||S.goals.length||S.fixed.length||S.plans.length||S.gold.length;
 async function maybeAutoBackup(){
@@ -8240,7 +8516,7 @@ async function backupNow(interactive){
     if(to==='device'){done(); toast(devOk?'اتحفظت نسخة على الموبايل في Download/Maleem':'معرفناش نعمل نسخة احتياطية'); return}
     driveSend(f.name,f.b64,!!interactive,(ok,err)=>{done();
       toast(ok?(devOk?'اترفعت نسخة على Google Drive واتحفظت على الموبايل':'اترفعت نسخة على Google Drive'):driveErrMsg(err)+(devOk?'. النسخة اتحفظت على الموبايل بس':''),null,null,ok?3000:6000)});
-  }catch(e){done(); toast('معرفناش نعمل نسخة احتياطية')}
+  }catch(e){done(); toast(e&&e.message==='enc'?'التشفير مش شغّال على الجهاز ده، فمعملناش نسخة':'معرفناش نعمل نسخة احتياطية')}
 }
 
 /* ===== Google Drive (Android): link a Google account once ===== */
@@ -8315,7 +8591,7 @@ armBtn($('#driveUnlink'),'فك الربط','دوس تاني للتأكيد',()=>
 var RS={seq:0,busy:false,email:'',hold:null}; // var on purpose: closeSheets() may run before this line
 const RS_ERR={gms:'الموبايل ده مفيهوش خدمات Google Play، فاستعمل «من ملف على الموبايل»',config:DRIVE_ERR.config,api:DRIVE_ERR.api,
   auth:'جوجل ماسمحش لمليم يوصل للـ Drive بتاع الحساب ده. جرّب تاني',net:'مفيش اتصال بالنت. اتأكد من النت وجرّب تاني',
-  gone:'النسخة دي اتمسحت من Drive. جرّب تاني',big:'النسخة دي كبيرة أوي ومعرفناش نفتحها',bad:'الملف ده مش نسخة سليمة من مليم',
+  gone:'النسخة دي اتمسحت من Drive. جرّب تاني',big:'النسخة دي كبيرة أوي ومعرفناش نفتحها',bad:'الملف ده مش نسخة سليمة من مليم',enc:'النسخة دي مشفّرة وماتفتحتش',
   http:'حصلت مشكلة في Google Drive. جرّب تاني بعد شوية',other:'حصلت مشكلة في Google Drive. جرّب تاني بعد شوية'};
 const rsOpen=()=>$('#rsSheet').classList.contains('open');
 function rsView(v,err){
@@ -8364,12 +8640,18 @@ function rsFetch(f){
     let txt=''; try{txt=r.ok?String(AB.driveTake()||''):''}catch(e){}
     if(seq!==RS.seq||!rsOpen()) return; RS.busy=false;
     if(!r.ok){rsView('home',RS_ERR[r.err]||RS_ERR.other); return}
-    const b=bkParse(txt); if(!b){rsView('home',RS_ERR.bad); return}
-    const at=+b.o.at>0&&+b.o.at<MAXTS?+b.o.at:(f.at||Date.now());
-    RS.hold={b,at,email:RS.email};
-    rsApply();
+    const finish=b=>{
+      if(seq!==RS.seq||!rsOpen()) return;
+      if(b&&b.cancel){rsView('home',RS_ERR.enc); return}
+      if(!b){rsView('home',RS_ERR.bad); return}
+      const at=+b.o.at>0&&+b.o.at<MAXTS?+b.o.at:(f.at||Date.now());
+      RS.hold={b,at,email:RS.email};
+      rsApply();
+    };
+    if(bkSniffEnc(txt)) bkOpen(txt).then(finish,()=>finish(null)); else finish(bkParse(txt)); // a plain backup stays synchronous
   });
 }
+
 function rsApply(){
   const h=RS.hold; if(!h) return;
   closeSheets(); bkRestore(h.b,h.at);

@@ -217,8 +217,8 @@ const timeStr = ts=>new Date(ts).toLocaleTimeString(LOC,{hour:'numeric',minute:'
 const daysIn = mk=>{const [y,m]=mk.split('-').map(Number);return new Date(y,m,0).getDate()};
 const nextMonth = mk=>{const [y,m]=mk.split('-').map(Number);return monKey(new Date(y,m,1))};
 const ofMonth = mk=>S.expenses.filter(x=>monKey(x.ts)===mk);
-const sum = arr=>arr.reduce((a,x)=>a+x.amount,0);
-const byCat = arr=>{const o={};arr.forEach(x=>{o[x.cat]=(o[x.cat]||0)+x.amount});return o};
+const sum = arr=>r2(arr.reduce((a,x)=>a+x.amount,0)); // cents never drift: 0.1+0.2 is 0.3 here
+const byCat = arr=>{const o={};arr.forEach(x=>{o[x.cat]=(o[x.cat]||0)+x.amount});Object.keys(o).forEach(k=>{o[k]=r2(o[k])});return o};
 const uid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
 /* ===== Data validation =====
@@ -341,8 +341,8 @@ function budOf(P){ const k=P&&P.key; let b=+S.budget||0; (S.bMoves||[]).forEach(
 function budgetExpenses(P){return ofPeriod(P).filter(e=>e.fund!=='free')}
 function budgetSpent(P){return sum(budgetExpenses(P))}
 function freeIncomeBalance(skipExpense,skipIncome){
-  const income=(S.inflows||[]).filter(x=>x.id!==skipIncome&&x.fund==='free').reduce((a,x)=>a+x.amount,0);
-  const spent=(S.expenses||[]).filter(x=>x.id!==skipExpense&&x.fund==='free').reduce((a,x)=>a+x.amount,0);
+  const income=r2((S.inflows||[]).filter(x=>x.id!==skipIncome&&x.fund==='free').reduce((a,x)=>a+x.amount,0));
+  const spent=r2((S.expenses||[]).filter(x=>x.id!==skipExpense&&x.fund==='free').reduce((a,x)=>a+x.amount,0));
   return r2(income-spent);
 }
 function freeIncomeActive(){return S.inflows.some(x=>x.fund==='free')||S.expenses.some(e=>e.fund==='free')}

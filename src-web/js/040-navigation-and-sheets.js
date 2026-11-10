@@ -39,7 +39,7 @@ function renderSettings(){
 function renderAll(){
   userTextCache=null;
   /* each screen renders on its own: a problem in one of them must not leave the whole app blank */
-  [renderMe,renderMeHome,renderGold,paintIpFee,renderIncome,renderAccounts,renderHome,renderDebts,renderReports,()=>{if(!$('#reportsDetail').hidden)renderDetail()},()=>{if(!$('#reportsCategory').hidden)renderReportCategory()},()=>{if(!$('#reportsSearch').hidden)renderSearch()},renderSettings]
+  [renderMe,renderMeHome,renderGold,paintIpFee,renderIncome,renderAccounts,renderHome,renderDebts,renderReports,()=>{if(!$('#reportsDetail').hidden)renderDetail()},()=>{if(!$('#reportsCategory').hidden)renderReportCategory()},()=>{if($('#searchSheet').classList.contains('open'))renderSearch()},bkePaint,renderSettings]
     .forEach(f=>{try{f()}catch(e){console.error(e)}});
 }
 
