@@ -168,18 +168,20 @@ window.__voiceError=code=>{if(!voiceOn) return; voiceClose();
     :code===9?'لازم تسمح للمايك من إعدادات التطبيق'
     :code===-1?'خدمة التعرف على الكلام مش متاحة على جهازك'
     :code===8?'المايك مشغول، جرّب تاني':'حصلت مشكلة في المايك، جرّب تاني')};
-window.__voiceResult=alts=>{if(!voiceOn) return; voiceClose();
-  const list=(Array.isArray(alts)?alts:[alts]).filter(Boolean);
+/* what to do with the spoken sentences: the matching sheet opens filled in, nothing is saved by itself */
+function voiceApply(list){
   if(tab==='debts'&&list.length){ obVoiceResult(list); return }
   const all=list.map(parseVoice), best=all.find(p=>p.amount)||all[0]||{amount:null,cat:null,note:'',yday:false};
   if(!list.length){toast('ما سمعتش حاجة واضحة، جرّب تاني');return}
   const insAll=list.map(parseVoiceIn).filter(Boolean), ins=insAll.find(x=>x.amount)||insAll[0];
   if(ins){ openInSheet(null,ins.amount?{amount:ins.amount}:null); $('#inSrc').value=ins.src; paintInChips(); if(ins.yday) $('#inDay').value=yestKey();
     toast(!ins.amount?'فهمتها دخل، بس ما سمعتش المبلغ. اكتبه وادوس حفظ':'فهمتها دخل، راجع البيانات وادوس حفظ',null,null,3200); return }
-  /* never saved automatically: the add sheet opens filled in so you can check it first */
   openSheet(null,{amount:best.amount,cat:best.cat,note:best.note});
   if(best.yday){selDay=yestKey();paintDate()}
-  toast(!best.amount?'ما سمعتش المبلغ، اكتبه وادوس حفظ':!best.cat?'مش متأكد من الفئة، اختارها وادوس حفظ':'راجع البيانات وادوس حفظ',null,null,3200)};
+  toast(!best.amount?'ما سمعتش المبلغ، اكتبه وادوس حفظ':!best.cat?'مش متأكد من الفئة، اختارها وادوس حفظ':'راجع البيانات وادوس حفظ',null,null,3200)}
+window.__voiceResult=alts=>{if(!voiceOn) return; voiceClose();
+  const list=(Array.isArray(alts)?alts:[alts]).filter(Boolean);
+  voiceApply(list)};
 /* ===== Voice entry for التزاماتي: سلف، جمعيات، تقسيط =====
    Same rule as the expenses mic: the speech service gives text, everything after that runs on the phone,
    and nothing is saved by itself: the matching sheet opens filled in so you can check it first. */
@@ -468,6 +470,7 @@ $('#menu').onclick=e=>{const b=e.target.closest('[data-act]');if(!b||!menuFor)re
   else if(kind==='pay'){ if(b.dataset.act==='edit') openPayForm(id); else deletePay(id) }
   else if(kind==='fix'){ if(b.dataset.act==='edit') openFixed(id); else deleteFixed(id) }
   else if(kind==='plan'){ if(b.dataset.act==='edit') openPlan(id); else deletePlan(id) }
+  else if(kind==='ipl'){ if(b.dataset.act==='edit') openIPlan(id); else deleteIPlan(id) }
   else if(kind==='goal'){ if(b.dataset.act==='edit') openGoal(id); else deleteGoal(id) }
   else if(kind==='photo'){ if(b.dataset.act==='edit') $('#photoFile').click(); else removePhoto() }
   else { const a=b.dataset.act; if(a==='edit') openSheet(id); else if(a==='date') openDateSheet(id); else if(a==='cashwd') expToCash(id); else if(a==='refund') openRefund({exp:id,fixed:true}); else delExpense(id) }};

@@ -74,8 +74,9 @@ $('#addIn').onclick=()=>openInSheet();
 
 var inEdit=null;
 const inNum=el=>{const v=evalExpr(el.value); return Number.isFinite(v)?v:0};
+let iplPending=null; // the expected income this sheet is recording: it goes away when saved
 function openInSheet(id,pre){
-  const x=id?S.inflows.find(z=>z.id===id):null; inEdit=x?x.id:null; inCap=null;
+  const x=id?S.inflows.find(z=>z.id===id):null; inEdit=x?x.id:null; inCap=null; iplPending=!x&&pre&&pre.ipl&&S.iplans.some(z=>z.id===pre.ipl)?pre.ipl:null;
   $('#inTitle').textContent=x?'تعديل دخل':'استلمت دخل'; $('#inSave').textContent=x?'حفظ التعديل':'حفظ'; $('#inDel').hidden=!x;
   $('#inAmt').value=x?String(x.amount):''; $('#inCur').textContent=CS(); $('#inAmtBox').classList.remove('err');
   $('#inSrc').value=x?x.src:''; $('#inSrcList').innerHTML=S.incomes.map(i=>`<option value="${esc(i.name)}">`).join('');
@@ -160,6 +161,7 @@ $('#inSave').onclick=()=>{
   if(rec.fund==='period')rec.fundPk=periodOf(rec.ts).key;
   const fundingError=incomeChangeError(old,rec);if(fundingError){E(fundingError);return}
   changeIncome(old,rec);
+  if(iplPending&&!old){S.iplans=S.iplans.filter(z=>z.id!==iplPending)} iplPending=null;
   if(inCap) S.capQ=(S.capQ||[]).filter(q=>q.id!==inCap);
   if(S.accounts.length) S.lastAcc=ac?ac.id:'';
   // Budget destination above is the only income-to-budget action; optional allocation is descriptive.
@@ -403,9 +405,9 @@ $('#repSeg').onclick=e=>{const b=e.target.closest('[data-rt]'); if(!b||b.dataset
 
 /* ===== "أنا": a home of grouped rows, each opening its own page (like Settings) ===== */
 var mePage=null, meHomeY=0;
-const ME_TITLES={"accounts": "الحسابات", "fixed": "المصاريف الثابتة والجاية", "saving": "الادخار", "gold": "الدهب", "budget": "الميزانية وطريقة القبض والدخل", "data": "بياناتي", "stats": "إحصائياتي", "home": "الصفحة الرئيسية"};
-const ME_ICO={gold:'<path d="M3 18l3-8h12l3 8z"/><path d="M8.5 10L10 5h4l1.5 5"/>',accounts:'<path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14.5" r="1"/>',income:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M8 13l4 4 4-4"/>',budget:'<path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/>',saving:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',sources:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',fixed:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',data:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',stats:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>'};
-const ME_GROUPS=[['',[['stats','#E07A2E']]],['فلوسي',[['home','#0EA5A4'],['accounts','#0E7490'],['budget','#C79A2B'],['saving','#8B5CF6'],['gold','#D4A017']]],['الالتزامات الثابتة',[['fixed','#D9466F']]],['عنّي',[['data','#475569']]]];
+const ME_TITLES={"accounts": "الحسابات", "fixed": "المصاريف الثابتة والجاية", "saving": "الادخار", "refunds": "المبالغ المرجوعة", "gold": "الدهب", "budget": "الميزانية وطريقة القبض والدخل", "data": "بياناتي", "stats": "إحصائياتي", "home": "الصفحة الرئيسية"};
+const ME_ICO={refunds:'<path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-3"/>',gold:'<path d="M3 18l3-8h12l3 8z"/><path d="M8.5 10L10 5h4l1.5 5"/>',accounts:'<path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14.5" r="1"/>',income:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M8 13l4 4 4-4"/>',budget:'<path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/>',saving:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',sources:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',fixed:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',data:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',stats:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>'};
+const ME_GROUPS=[['',[['stats','#E07A2E']]],['فلوسي',[['home','#0EA5A4'],['accounts','#0E7490'],['refunds','#16A34A'],['budget','#C79A2B'],['saving','#8B5CF6'],['gold','#D4A017']]],['الالتزامات الثابتة',[['fixed','#D9466F']]],['عنّي',[['data','#475569']]]];
 $('#meGroups').innerHTML=ME_GROUPS.map(([g,rows])=>`${g?`<div class="set-gt">${g}</div>`:''}<div class="card set-list"${g?'':' style="margin-top:0"'}>${rows.map(([k,c])=>`<button type="button" class="set-item" data-me-go="${k}" id="mi-${k}"><span class="si" style="--c:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ME_ICO[k]}</svg></span><span class="st"><b>${ME_TITLES[k]}</b><small id="ms-${k}"></small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>`).join('')}</div>`).join('');
 function meGo(p,quiet){
   if(p&&!mePage) meHomeY=pageY();
@@ -421,7 +423,7 @@ function renderMeHome(){
   sub('accounts',n?`${n===1?'حساب واحد':n===2?'حسابين':n<=10?n+' حسابات':n+' حساب'} · الإجمالي ${fmt(mt.tot)} ${CS()}`:'ضيف حساباتك وأرصدتها');
   sub('budget',(S.budgetMode==='fixed'&&S.budget>0?fmt(S.budget)+' '+CS()+(budOf(periodOf(Date.now()))!==S.budget?' · الفترة دي '+fmt(budOf(periodOf(Date.now()))):''):'ميزانية مفتوحة')+' · قبض '+(PT_TXT[S.payType]||''));
   {const st=goldStats(); sub('gold', st.by.length? st.by.slice(0,2).map(b=>b.k==='coin'?`${fmt(b.qty)} جنيه ذهب`:`${fmt(b.qty)} جرام عيار ${b.k}`).join(' · ')+(st.by.length>2?' · ...':'') : S.gold.length?'كله اتباع':'سجّل مشترياتك من الدهب')}
-  sub('saving',S.saveTarget>0?`هدف ${fmt(S.saveTarget)} ${CS()} في الشهر`:S.goals.length?S.goals.length+' أهداف ادخار':'حدد هدف ادخارك');
+  sub('refunds',S.refunds.length?`${S.refunds.length===1?'عملية واحدة':S.refunds.length===2?'عمليتين':S.refunds.length<=10?S.refunds.length+' عمليات':S.refunds.length+' عملية'} · ${fmt(r2(S.refunds.reduce((a,x)=>a+x.amount,0)))} ${CS()}`:'الفلوس اللي رجعتلك من مصروفات'); sub('saving',S.saveTarget>0?`هدف ${fmt(S.saveTarget)} ${CS()} في الشهر`:S.goals.length?S.goals.length+' أهداف ادخار':'حدد هدف ادخارك');
   sub('fixed',(S.fixed.length||S.plans.length)? [S.fixed.length?`${S.fixed.length} ${S.fixed.length<=10?'مصاريف':'مصروف'} · ${fmt(S.fixed.reduce((a,f)=>a+(+f.amount||0),0))} ${CS()}`:'',S.plans.length?`${S.plans.length} جاية`:''].filter(Boolean).join(' · ') : 'الإيجار والنت والاشتراكات والمصروفات الجاية');
   sub('data',((S.profile&&S.profile.name)||'اسمك')+' · '+((CURRENCIES.find(c=>c.id===S.currency)||{n:''}).n));
   sub('stats',S.expenses.length?`${S.expenses.length} ${S.expenses.length<=10?'مصاريف':'مصروف'} متسجلة`:'لسه مفيش مصاريف');

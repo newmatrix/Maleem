@@ -56,6 +56,9 @@ if(!Array.isArray(S.goals)) S.goals=[];
 if(!S.saveTarget) S.saveTarget=0;
 if(!Array.isArray(S.fixed)) S.fixed=[];
 if(!Array.isArray(S.plans)) S.plans=[];
+  if(!Array.isArray(S.iplans)) S.iplans=[];
+  if(!Array.isArray(S.refunds)) S.refunds=[];
+  if(!S.capCurBy||typeof S.capCurBy!=='object'||Array.isArray(S.capCurBy)) S.capCurBy={};
 if(!Array.isArray(S.gold)) S.gold=[];
 if(!S.ipFee||typeof S.ipFee!=='object') S.ipFee={};
 if(!S.manRates||typeof S.manRates!=='object') S.manRates={};
@@ -105,7 +108,7 @@ let userTextCache=null;
 function isUserText(text){const k=String(text||'').trim();if(!k)return false;
   if(!userTextCache){const values=new Set(),add=x=>{if(typeof x==='string'&&x.trim())values.add(x.trim())};
     add(S.profile?.name);add(S.profile?.name?.trim().split(/\s+/)[0]);
-    for(const list of [S.expenses,S.debts,S.accounts,S.inflows,S.gold,S.goals,S.gams,S.fixed,S.incomes,S.plans,S.insts,(S.trash||[]).map(t=>t&&t.d).filter(Boolean)])
+    for(const list of [S.expenses,S.debts,S.accounts,S.inflows,S.gold,S.goals,S.gams,S.fixed,S.incomes,S.plans,S.iplans,S.insts,(S.trash||[]).map(t=>t&&t.d).filter(Boolean)])
       if(Array.isArray(list))for(const x of list)for(const p of ['person','name','src','party','byName'])add(x[p]);
     for(const c of S.cats||[])if(!CATS.some(d=>d.id===c.id&&d.name===c.name))add(c.name);
     userTextCache=values;
@@ -166,6 +169,7 @@ if(!Array.isArray(S.instPays)) S.instPays=[];
 if(!['off','sum','split'].includes(S.moneyView)) S.moneyView='sum';
 if(typeof S.lastAcc!=='string') S.lastAcc='';
 if(!S.homeHide||typeof S.homeHide!=='object') S.homeHide={};
+S.fabPin=S.fabPin===true;
 if(!Number.isInteger(S.autoBkDays)||S.autoBkDays<0||S.autoBkDays>30) S.autoBkDays=7;
 /* Google Drive backup (per member, this phone only: not part of the backup file) */
 if(!(S.drive&&typeof S.drive==='object'&&typeof S.drive.email==='string'&&S.drive.email)) S.drive=null;
@@ -303,6 +307,16 @@ function cleanPlan(p){
   if(!p||typeof p!=='object'||!isDK(p.due)) return null;
   return {id:idOr(p.id),name:str(p.name,60).trim()||'مصروف جاي',cat:isId(p.cat)?p.cat:'other',amount:r2(numIn(p.amount,0,MAXAMT,0)),due:p.due,created:numIn(p.created,0,MAXTS,0)};
 }
+/* an income you expect on a day (one time): reminds you, then «استلمت» opens the income sheet filled in */
+function cleanIplan(p){
+  if(!p||typeof p!=='object'||!isDK(p.due)) return null;
+  return {id:idOr(p.id),name:str(p.name,60).trim()||'دخل جاي',amount:r2(numIn(p.amount,0,MAXAMT,0)),due:p.due,created:numIn(p.created,0,MAXTS,0)};
+}
+/* a log of every «رجعتلي منها فلوس»: what came back, when, and where (the expense itself just gets smaller or goes away) */
+function cleanRefund(x){
+  if(!x||typeof x!=='object') return null; const amount=r2(numIn(x.amount,0,MAXAMT,0)), ts=+x.ts; if(!(amount>0)||!(ts>=0&&ts<MAXTS)) return null;
+  return {id:idOr(x.id),ts,amount,cat:isId(x.cat)?x.cat:'other',note:str(x.note,80),full:x.full===true,acc:isId(x.acc)?x.acc:'',accName:str(x.accName,40)};
+}
 const FXLOG_KEY=/^[A-Za-z0-9_-]{1,64}:\d{4}-\d{2}(?:-\d{2})?$/;
 function cleanFixedLog(l){const o={}; if(l&&typeof l==='object') Object.keys(l).forEach(k=>{if(FXLOG_KEY.test(k)&&(l[k]==='done'||l[k]==='skip')) o[k]=l[k]}); return o}
 function cleanCat(c){if(!(c&&isId(c.id))) return null; const o={id:c.id,name:str(c.name,30).trim()||'فئة',e:cleanE(c.e)||'📦',c:colr(c.c)}; const l=+c.lim; if(l>0&&l<1e9) o.lim=Math.round(l*100)/100; return o}
@@ -437,6 +451,8 @@ function cleanCap(x){
   return {id:x.id,at,amount:r2(amount),cur:str(x.cur,8),merchant:str(x.merchant,40).trim(),method:['card','wallet','instapay'].includes(x.method)?x.method:'',dir:x.dir==='in'?'in':'out',
     source:str(x.source,40).trim(),pkg:typeof x.pkg==='string'&&/^[A-Za-z0-9_.]{1,200}$/.test(x.pkg)?x.pkg:'',text:str(x.text,300)};
 }
+/* the currency of every operation captured from one app (package name -> currency id), for senders whose messages carry no usable currency */
+function cleanCapCur(v){const o={}; if(v&&typeof v==='object'&&!Array.isArray(v)) Object.keys(v).slice(0,60).forEach(k=>{ if(/^[A-Za-z0-9_.]{1,200}$/.test(k)&&typeof v[k]==='string'&&CURRENCIES.some(c=>c.id===v[k])) o[k]=v[k] }); return o}
 function cleanProfile(p){p=p&&typeof p==='object'?p:{}; return {name:str(p.name,60),age:intIn(p.age,5,120,null),photo:isPhoto(p.photo)?p.photo:null}}
 /* ===== Exchange rates =====
    rates.json (base USD) is refreshed daily by a GitHub workflow and read by Kotlin (Rates.kt), which keeps the last good copy.
@@ -477,7 +493,7 @@ function ratesRefresh(force,cb){
 /* ===== Trash: what the person deletes stays here for 30 days. Each entry = {id, k: kind, ts: when deleted, i: place in its list, d: the record, m: extra links (installments)}.
    Not in backups and not shared: it is only this phone's safety net. ===== */
 const TRASH_DAYS=30, TRASH_MAX=150;
-const TRASH_CLEAN={xp:x=>cleanExpense(x,true),debt:x=>cleanDebt(x,S.currency),gam:cleanGam,inc:cleanIncome,goal:cleanGoal,fix:cleanFixed,plan:cleanPlan,inst:cleanInst};
+const TRASH_CLEAN={xp:x=>cleanExpense(x,true),debt:x=>cleanDebt(x,S.currency),gam:cleanGam,inc:cleanIncome,goal:cleanGoal,fix:cleanFixed,plan:cleanPlan,ipl:cleanIplan,inst:cleanInst};
 function cleanTrash(l){
   const seen=new Set();
   return (Array.isArray(l)?l:[]).map(t=>{
@@ -496,7 +512,7 @@ curMerge([]); // the currencies this person added, before anything is checked ag
   Object.keys(CLEAN).forEach(k=>{S[k]=arr(S[k]).map(CLEAN[k]).filter(Boolean)});
   S.fixedLog=cleanFixedLog(S.fixedLog);
   S.trash=cleanTrash(S.trash);
-  S.plans=arr(S.plans).map(cleanPlan).filter(Boolean);
+  S.plans=arr(S.plans).map(cleanPlan).filter(Boolean); S.iplans=arr(S.iplans).map(cleanIplan).filter(Boolean); S.capCurBy=cleanCapCur(S.capCurBy); S.refunds=arr(S.refunds).map(cleanRefund).filter(Boolean).sort((a,b)=>b.ts-a.ts).slice(0,300);
   S.gold=arr(S.gold).map(cleanGold).filter(Boolean); S.goldPx=cleanGoldPx(S.goldPx); S.ipFee=cleanIpFee(S.ipFee); S.manRates=cleanManRates(S.manRates); S.fbEmail=str(S.fbEmail,100);
   S.closedP=cleanClosed(S.closedP);
   {const ids=new Set(); S.accounts=arr(S.accounts).map(cleanAcc).filter(a=>a&&!ids.has(a.id)&&ids.add(a.id)); S.transfers=arr(S.transfers).map(cleanTr).filter(Boolean); S.bMoves=arr(S.bMoves).map(cleanBMove).filter(Boolean); S.insts=arr(S.insts).map(cleanInst).filter(Boolean); S.instPays=arr(S.instPays).map(cleanInstPay).filter(Boolean); S.inflows=arr(S.inflows).map(cleanInflow).filter(Boolean)}

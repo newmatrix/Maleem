@@ -58,6 +58,20 @@ function renderMe(){
      return `<div class="crow" style="--cc:${colr(c.c)}"><div class="tile">${esc(c.e)}</div><div class="n">${esc(x.name)}<small>${x.amount?fmt(x.amount)+' '+CS():'مبلغ مش محدد'} · ${dkToDMY(x.due)} · <span class="due ${dueCls(n)}">${relDay(n)}</span></small></div><button class="paybtn" style="--cc:var(--brand)" data-ppay="${esc(x.id)}">سجّل</button><button class="more" data-obmore="plan:${esc(x.id)}" aria-label="خيارات ${esc(x.name)}" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button></div>`}).join('')
      : '<p class="hint" style="padding:8px 0">مفيش مصروفات جاية.</p>'}
 
+  // the log of money that came back from expenses
+  {const L=S.refunds, tot=L.reduce((a,x)=>a+x.amount,0);
+   $('#rfTotal').innerHTML= tot? `${money(r2(tot))} ${CS()}` : '';
+   $('#rfLog').innerHTML= L.length? L.map(x=>{const c=CAT[x.cat]||CAT.other;
+     return `<div class="crow" style="--cc:${colr(c.c)}"><div class="tile">${esc(c.e)}</div><div class="n">${esc(x.note||c.name)}<small>${esc(TX('رجع'))} ${fmt(x.amount)} ${CS()} · ${dkToDMY(dayKey(x.ts))} · ${x.full?TX('كله'):TX('جزء منه')}${x.accName?' · '+esc(x.accName):''}</small></div></div>`}).join('')
+     : '<p class="hint" style="padding:8px 0">لسه مفيش مبالغ مرجوعة.</p>'}
+
+  // expected incomes (one time)
+  {const ps=S.iplans.slice().sort((a,b)=>a.due<b.due?-1:a.due>b.due?1:0), tot=ps.reduce((a,x)=>a+(+x.amount||0),0);
+   $('#ilTotal').innerHTML= tot? `${money(tot)} ${CS()}` : '';
+   $('#ilList').innerHTML= ps.length? ps.map(x=>{const n=diffDays(x.due);
+     return `<div class="crow" style="--cc:#16A34A"><div class="tile">💰</div><div class="n">${esc(x.name)}<small>${x.amount?fmt(x.amount)+' '+CS():'مبلغ مش محدد'} · ${dkToDMY(x.due)} · <span class="due ${dueCls(n)}">${relDay(n)}</span></small></div><button class="paybtn" style="--cc:#16A34A" data-ipin="${esc(x.id)}">استلمت</button><button class="more" data-obmore="ipl:${esc(x.id)}" aria-label="خيارات ${esc(x.name)}" aria-haspopup="menu" aria-expanded="false">${ICON_MORE}</button></div>`}).join('')
+     : '<p class="hint" style="padding:8px 0">مفيش دخل جاي.</p>'}
+
   // saving
   if(document.activeElement!==$('#saveTargetIn')) $('#saveTargetIn').value=S.saveTarget||'';
   $('#goalList').innerHTML=S.goals.map(g=>{const pct=Math.min(100,(g.saved||0)/g.target*100), done=(g.saved||0)>=g.target;
@@ -126,7 +140,7 @@ function curPickCustom(c){
 var CURX=null; // the change waiting for the person to confirm: {from,to,k,at}
 const CUR_NAME=id=>(CURRENCIES.find(c=>c.id===id)||{n:id}).n;
 const CUR_SHARED_TYPES={debts:'السلف',gams:'الجمعيات',goals:'أهداف الادخار',incomes:'الدخل',fixed:'المصاريف الثابتة'};
-const curHasMoney=()=>!!(S.expenses.length||S.budget>0||S.saveTarget>0||S.incomes.length||S.goals.length||S.debts.length||S.gams.length||S.fixed.length||S.plans.length||S.insts.length||S.inflows.length||S.gold.length||S.bMoves.length||S.cats.some(c=>c.lim>0));
+const curHasMoney=()=>!!(S.expenses.length||S.budget>0||S.saveTarget>0||S.incomes.length||S.goals.length||S.debts.length||S.gams.length||S.fixed.length||S.plans.length||S.iplans.length||S.refunds.length||S.insts.length||S.inflows.length||S.gold.length||S.bMoves.length||S.cats.some(c=>c.lim>0));
 function curSharedBlock(){
   if(!S.space) return [];
   let p; try{p=spNormPrefs(S.space.sharePrefs,true)}catch(e){return []}
@@ -192,20 +206,20 @@ function curScaleAll(k,from,keepO){
   S.debts.forEach(d=>{if(!d.cur)d.cur=from}); // Debt units remain independent of the display currency.
   S.gams.forEach(g=>{g.inst=sc(g.inst)||0.01});
   S.fixed.forEach(f=>{f.amount=sc(f.amount)});
-  S.plans.forEach(x=>{x.amount=sc(x.amount)});
+  S.plans.forEach(x=>{x.amount=sc(x.amount)}); S.iplans.forEach(x=>{x.amount=sc(x.amount)}); S.refunds.forEach(x=>{x.amount=sc(x.amount)});
   S.insts.forEach(p=>p.items.forEach(i=>{i.amount=sc(i.amount)||0.01})); S.instPays.forEach(x=>{x.amount=sc(x.amount)||0.01});
   S.inflows.forEach(x=>{x.amount=sc(x.amount)||0.01; if(x.alloc){x.alloc={spend:sc(x.alloc.spend),bills:sc(x.alloc.bills),save:sc(x.alloc.save)}}});
   S.gold.forEach(g=>{g.price=sc(g.price)||0.01; if(g.sold) g.sold.price=sc(g.sold.price)||0.01}); GOLD_KS.forEach(k=>{if(S.goldPx[k]>0) S.goldPx[k]=sc(S.goldPx[k])});
   S.cats.forEach(c=>{if(c.lim>0) c.lim=sc(c.lim)}); syncCats();
 }
 function curApply(x){
-  const snap=JSON.parse(JSON.stringify({currency:S.currency,expenses:S.expenses,budget:S.budget,bMoves:S.bMoves,saveTarget:S.saveTarget,incomes:S.incomes,goals:S.goals,debts:S.debts,gams:S.gams,fixed:S.fixed,plans:S.plans,cats:S.cats,insts:S.insts,instPays:S.instPays,inflows:S.inflows,gold:S.gold,goldPx:S.goldPx,cloud:spCloudExpenses}));
+  const snap=JSON.parse(JSON.stringify({currency:S.currency,expenses:S.expenses,budget:S.budget,bMoves:S.bMoves,saveTarget:S.saveTarget,incomes:S.incomes,goals:S.goals,debts:S.debts,gams:S.gams,fixed:S.fixed,plans:S.plans,iplans:S.iplans,refunds:S.refunds,cats:S.cats,insts:S.insts,instPays:S.instPays,inflows:S.inflows,gold:S.gold,goldPx:S.goldPx,cloud:spCloudExpenses}));
   curScaleAll(x.k,x.from,!!S.space);
   S.currency=x.to; save(); applyCurrency(); $('#currencySel').value=x.to; closeSheets(); renderAll();
   toast('اتحوّلت كل المبالغ من '+CUR_NAME(x.from)+' لـ '+CUR_NAME(x.to),'تراجع',()=>curRestore(snap),10000);
 }
 function curRestore(snap){
-  Object.assign(S,{currency:snap.currency,expenses:snap.expenses,budget:snap.budget,saveTarget:snap.saveTarget,incomes:snap.incomes,goals:snap.goals,debts:snap.debts,gams:snap.gams,fixed:snap.fixed,plans:snap.plans||S.plans,cats:snap.cats,insts:snap.insts||S.insts,instPays:snap.instPays||S.instPays,inflows:snap.inflows||S.inflows,gold:snap.gold||S.gold,goldPx:snap.goldPx||S.goldPx,bMoves:snap.bMoves||S.bMoves});
+  Object.assign(S,{currency:snap.currency,expenses:snap.expenses,budget:snap.budget,saveTarget:snap.saveTarget,incomes:snap.incomes,goals:snap.goals,debts:snap.debts,gams:snap.gams,fixed:snap.fixed,plans:snap.plans||S.plans,iplans:snap.iplans||S.iplans,refunds:snap.refunds||S.refunds,cats:snap.cats,insts:snap.insts||S.insts,instPays:snap.instPays||S.instPays,inflows:snap.inflows||S.inflows,gold:snap.gold||S.gold,goldPx:snap.goldPx||S.goldPx,bMoves:snap.bMoves||S.bMoves});
   spCloudExpenses=snap.cloud||{}; syncCats(); save(); applyCurrency(); $('#currencySel').value=S.currency; renderAll();
   toast('رجّعنا العملة والمبالغ زي ما كانت');
 }
@@ -326,7 +340,7 @@ async function bkMake(now){
   let text=JSON.stringify(file); if(bkeOn()) text=await bkeSeal(text,now); // encryption on: the file is sealed, never plain
   return {name:`${fileTag()}-auto-${dayKey(now)}.json`, b64:await toB64(new Blob([text])), skipped:rc.skipped||0};
 }
-const bkHasData=()=>S.expenses.length||S.debts.length||S.gams.length||S.incomes.length||S.goals.length||S.fixed.length||S.plans.length||S.gold.length;
+const bkHasData=()=>S.expenses.length||S.debts.length||S.gams.length||S.incomes.length||S.goals.length||S.fixed.length||S.plans.length||S.iplans.length||S.gold.length;
 async function maybeAutoBackup(){
   if(!AB||!AB.autoBackup||autoBkBusy) return;
   const n=+S.autoBkDays||0; if(n<1||!bkHasData()) return;

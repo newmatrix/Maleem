@@ -58,6 +58,7 @@ function debtSym(x){return curSym(debtCur(x))}
 function debtToAcc(v,a,cur){const k=cur===a.cur?1:rateFor(cur,a.cur);return k>0?Math.max(0.01,r2(v*k)):null}
 function debtTotalsHtml(rows){const totals={};rows.forEach(x=>{const c=debtCur(x);totals[c]=(totals[c]||0)+debtRem(x)});return Object.keys(totals).length?Object.entries(totals).map(([c,v])=>`<span>${money(v)} <small>${esc(curSym(c))}</small></span>`).join(''):`<span>${money(0)} <small>${CS()}</small></span>`}
 function renderDebts(){
+  paintObFixed();
   const act=S.debts.filter(x=>!x.closed);
   const inL=act.filter(x=>x.dir==='in'&&isMine(x)), outL=act.filter(x=>x.dir==='out'&&isMine(x));
   $('#sumIn').innerHTML=debtTotalsHtml(inL);
@@ -160,12 +161,18 @@ function dueItems(range){
   fixedDueItems(range).forEach(x=>out.push(x));
   S.plans.forEach(p=>{const n=diffDays(p.due); if(n>range) return; const c=CAT[p.cat]||CAT.other;
     out.push({id:'p:'+p.id,n,icon:c.e,title:p.name,amount:+p.amount||0,when:relDay(n),cls:dueCls(n),ppay:p.id})});
+  S.iplans.forEach(p=>{const n=diffDays(p.due); if(n>range) return;
+    out.push({id:'ip:'+p.id,n,icon:'💰',title:`هتستلم ${p.name}`,amount:+p.amount||0,when:relDay(n),cls:dueCls(n),ipin:p.id,rcv:true})});
   return out.sort((a,b)=>a.n-b.n);
 }
+/* a way into the fixed expenses and subscriptions from the التزاماتي tab (they live in أنا ← المصاريف الثابتة والجاية) */
+function paintObFixed(){ const a=S.fixed.length, b=S.plans.length, c=S.iplans.length;
+  $('#obFixedSub').textContent= a||b||c? [a?`${a} ثابتة`:'',b?`${b} جاية`:'',c?`${c} دخل جاي`:''].filter(Boolean).join(' · ') : 'الإيجار والنت والاشتراكات اللي بتتكرر'}
+$('#obFixedGo').onclick=()=>{go('me');meGo('fixed')};
 function renderUpcoming(){
   const it=dueItems(3);
   $('#upcoming').innerHTML= it.length? `<div class="upc"><div class="upc-h"><b>مواعيد قريبة</b><button data-goob="">كل الالتزامات</button></div>
-    ${it.slice(0,4).map(x=>`<div class="ur"${x.fpay||x.ppay?'':` data-goob="${x.ipay?'insts':x.gpay||x.id.startsWith('t:')?'gams':'debts'}"`}><div class="ui">${esc(x.icon)}</div><div class="ut">${esc(x.title)}<small><span class="due ${x.cls}">${x.when}</span></small></div>${x.amount? `<span class="ua">${money(x.amount)} <small style="font-weight:500;color:var(--muted)">${x.cur||CS()}</small></span>`:''}${x.gpay?`<button class="paybtn" style="--cc:#0E7490" data-gpay="${esc(x.gpay)}">دفعت</button>`:''}${x.ipay?`<button class="paybtn" style="--cc:#7C3AED" data-ipay="${esc(x.ipay)}">دفعت</button>`:''}${x.fpay?`<button class="paybtn" style="--cc:var(--brand)" data-fpay="${esc(x.fpay)}">سجّل</button>`:''}${x.ppay?`<button class="paybtn" style="--cc:var(--brand)" data-ppay="${esc(x.ppay)}">سجّل</button>`:''}</div>`).join('')}</div>` : '';
+    ${it.slice(0,4).map(x=>`<div class="ur"${x.fpay||x.ppay||x.ipin?'':` data-goob="${x.ipay?'insts':x.gpay||x.id.startsWith('t:')?'gams':'debts'}"`}><div class="ui">${esc(x.icon)}</div><div class="ut">${esc(x.title)}<small><span class="due ${x.cls}">${x.when}</span></small></div>${x.amount? `<span class="ua">${money(x.amount)} <small style="font-weight:500;color:var(--muted)">${x.cur||CS()}</small></span>`:''}${x.gpay?`<button class="paybtn" style="--cc:#0E7490" data-gpay="${esc(x.gpay)}">دفعت</button>`:''}${x.ipay?`<button class="paybtn" style="--cc:#7C3AED" data-ipay="${esc(x.ipay)}">دفعت</button>`:''}${x.fpay?`<button class="paybtn" style="--cc:var(--brand)" data-fpay="${esc(x.fpay)}">سجّل</button>`:''}${x.ppay?`<button class="paybtn" style="--cc:var(--brand)" data-ppay="${esc(x.ppay)}">سجّل</button>`:''}${x.ipin?`<button class="paybtn" style="--cc:#16A34A" data-ipin="${esc(x.ipin)}">استلمت</button>`:''}</div>`).join('')}</div>` : '';
 }
 function checkDue(){
   if(!S.dueRemind) return;

@@ -194,7 +194,7 @@ window.__captures=show=>{
   if(show){capWanted=true; setTimeout(runQuickAdd,150)}
   else if(got) renderHome();
 };
-const capCurrency=c=>!c.cur||/^(egp|le|l\.e\.?|جنيه|جنية|جنيها|جنيهات|ج\.?م?\.?|جم)$/i.test(c.cur)?'EGP':String(c.cur).toUpperCase();
+const capCurrency=c=>c.pkg&&S.capCurBy&&S.capCurBy[c.pkg]? S.capCurBy[c.pkg] : !c.cur||/^(egp|le|l\.e\.?|جنيه|جنية|جنيها|جنيهات|ج\.?م?\.?|جم)$/i.test(c.cur)?'EGP':String(c.cur).toUpperCase();
 const capCur=c=>esc(curSym(capCurrency(c)));
 function capAmount(c,cur=S.currency){const from=capCurrency(c), k=from===cur?1:rateFor(from,cur);
   if(!(k>0)){toast('مفيش سعر صرف للعملية دي. اتصل بالنت وحاول تاني');ratesRefresh(false);return null}

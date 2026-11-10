@@ -46,7 +46,7 @@ function renderAll(){
 /* Navigation */
 let tab='expenses';
 let fabIdleTimer;
-function fabRest(){clearTimeout(fabIdleTimer);document.documentElement.classList.remove('fab-awake')}
+function fabRest(){clearTimeout(fabIdleTimer);document.documentElement.classList.toggle('fab-awake',S.fabPin===true)} // pinned: the + and the mic always stay out, one tap does it
 function fabWake(){
   document.documentElement.classList.add('fab-awake');
   clearTimeout(fabIdleTimer);fabIdleTimer=setTimeout(fabRest,3000);
@@ -60,6 +60,7 @@ function fabWake(){
   $('#'+id).addEventListener('keydown',e=>{if(e.key==='Escape')fabRest()});
 });
 document.addEventListener('visibilitychange',()=>{if(document.hidden)fabRest()});
+fabRest();
 const TABS=['expenses','reports','debts','me','settings'];
 /* Each tab remembers how far down its main screen you were (until the app closes). A page opened inside a tab
    (a settings section, managing the shared space, a report's details, search) closes when you leave the tab,

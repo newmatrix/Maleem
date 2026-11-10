@@ -1,7 +1,7 @@
 /* expense date: today / yesterday / any past day */
 const todayKey=()=>dayKey(Date.now());
 const yestKey=()=>{const d=new Date();d.setDate(d.getDate()-1);return dayKey(d)};
-let selDay=dayKey(Date.now());
+let selDay=dayKey(Date.now()), ipfPre=false;
 const expenseClock=ts=>{const d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 function expenseTimestamp(keep){
   const time=$('#expenseTime').value;
@@ -15,7 +15,8 @@ const CHEV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
 function paintDate(){
   const t=todayKey(), y=yestKey(), other=selDay!==t&&selDay!==y;
   const [sy,sm,sd]=selDay.split('-'), label= selDay===t?'النهارده': selDay===y?'امبارح': (+sy===new Date().getFullYear()? `${sd}/${sm}` : dkToDMY(selDay));
-  $('#datePill').innerHTML=`📅 <span>${label}</span>${CHEV}`;
+  const ets=expenseTimestamp(), tt=ets===null?'':' · '+timeStr(ets); // the time is always visible: tap the pill, then «غيّر الوقت»
+  $('#datePill').innerHTML=`📅 <span>${label}${tt}</span>${CHEV}`;
   $('#datePill').classList.toggle('alt',selDay!==t);
   $('#datePill').setAttribute('aria-label','تاريخ المصروف: '+(other?dkToDMY(selDay):label));
   document.querySelectorAll('#dateMenu [data-d]').forEach(b=>b.setAttribute('aria-checked',String((b.dataset.d==='0'?t:y)===selDay)));
@@ -55,7 +56,7 @@ function expenseWheelsSet(){
   cols[0].scrollTop=(h||0)*44;cols[1].scrollTop=(m||0)*44;cols.forEach(expenseWheelMark);
 }
 $('#expenseTime').addEventListener('input',paintDate);
-$('#dateOtherOpen').onclick=()=>{
+$('#dateOtherOpen').onclick=$('#dateTimeOpen').onclick=()=>{
   closeDateMenu();$('#dateIn').value=selDay;$('#dateIn').max=todayKey();$('#expenseTimeDraft').value=$('#expenseTime').value;$('#expenseDateError').textContent='';
   $('#expenseDatePopup').showModal();expenseWheelsSet();
 };
@@ -116,7 +117,7 @@ $('#payPill').onclick=e=>{e.stopPropagation(); const m=$('#payMenu');
   m.classList.add('open'); m.classList.remove('up'); $('#payPill').setAttribute('aria-expanded','true');
   const r=$('#payPill').getBoundingClientRect(); m.style.left=Math.max(8,r.left)+'px'; m.style.top=(r.bottom+6)+'px'};
 $('#payMenu').addEventListener('mousedown',e=>e.preventDefault());
-$('#payMenu').onclick=e=>{const b=e.target.closest('[data-pay]'); if(!b) return; selPay=b.dataset.pay; paintPay(); closePayMenu()};
+$('#payMenu').onclick=e=>{const b=e.target.closest('[data-pay]'); if(!b) return; selPay=b.dataset.pay; paintPay(); ipFeeSync(); closePayMenu()};
 document.addEventListener('click',e=>{if(!e.target.closest('#payMenu,#payPill')) closePayMenu()});
 function openSheet(id,pre){
   const target=id?S.expenses.find(e=>e.id===id):null;
@@ -129,9 +130,9 @@ function openSheet(id,pre){
   renderCatGrid();
   amtIn.value= x? String(x.amount): pre&&pre.amount? String(pre.amount):''; selCat= x&&CAT[x.cat]? x.cat: pre&&CAT[pre.cat]? pre.cat:null;
   $('#noteInput').value= x? (x.note||''): pre? (pre.note||''):'';
-  $('#ipFeeRow').hidden=!(!target&&pre&&pre.ipf&&S.ipFee.on); $('#ipFeeChk').checked=true; ipFeePaint();
+  ipfPre=!!(!target&&pre&&pre.ipf); $('#ipFeeChk').checked=true;
   $('#fxSkip').hidden=!(fxPending||plPending); $('#fxSkip').textContent= plPending? 'مش هسجله، شيله من المصروفات الجاية' : TX('تخطي الاستحقاق ده'); setCalc(false); showCalc(); renderNoteSug();
-  selPay= x? payOf(x) : pre&&PAY[pre.pay]? pre.pay : (PAY[S.lastPay]?S.lastPay:'cash'); paintPay(); closePayMenu();
+  selPay= x? payOf(x) : pre&&PAY[pre.pay]? pre.pay : (PAY[S.lastPay]?S.lastPay:'cash'); paintPay(); closePayMenu(); ipFeeSync();
   selAcc= x? (x.acc||'') : pre&&typeof pre.acc==='string'? (ACC(pre.acc)?pre.acc:'') : (ACC(S.lastAcc)?S.lastAcc:''); paintAccRow();
   $('#expenseTime').value=expenseClock(x?x.ts:capOpen&&capOpen.ts?capOpen.ts:Date.now());
   selDay= x? dayKey(x.ts) : pre&&isDK(pre.day)&&pre.day<=todayKey()? pre.day : todayKey(); paintDate();
@@ -144,6 +145,8 @@ function openSheet(id,pre){
   $('#scrim').classList.add('open');$('#sheet').classList.add('open');
   amtIn.focus({preventScroll:true}); if(x||(pre&&pre.amount)) amtIn.select();
 }
+/* the fee row: a captured InstaPay payment, or any new expense paid by InstaPay, when the fee setting is on */
+function ipFeeSync(){ $('#ipFeeRow').hidden=!(!editId&&S.ipFee.on&&(ipfPre||selPay==='instapay')); ipFeePaint() }
 function ipFeePaint(){ if($('#ipFeeRow').hidden) return; const v=readAmt(), f=v>0?ipFeeOf(v):0; $('#ipFeeTxt').innerHTML=`سجّل رسوم إنستاباي كمان${f?': '+fmt(f)+' '+CS():''}<small>مصروف منفصل بفئة «رسوم بنكية»، على نفس الحساب وطريقة الدفع</small>` }
 amtIn.addEventListener('input',ipFeePaint);
 function closeSheets(){

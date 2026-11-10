@@ -47,6 +47,8 @@ function syncNative(){ if(AB) try{syncWidget()}catch(e){}
       })});
     S.plans.forEach(x=>{ const body= x.amount? `${fmt(x.amount)} ${CS()}، سجله في مليم` : 'سجله في مليم';
       out.push({at:at10(x.due,-1),title:'بكرة ميعاد '+x.name,body},{at:at10(x.due,0),title:'النهارده ميعاد '+x.name,body}) });
+    S.iplans.forEach(x=>{ const body= x.amount? `${fmt(x.amount)} ${CS()}، سجله في مليم` : 'سجله في مليم';
+      out.push({at:at10(x.due,-1),title:'بكرة هتستلم '+x.name,body},{at:at10(x.due,0),title:'النهارده هتستلم '+x.name,body}) });
   }
   let sn=null; try{sn=sumNotif(now)}catch(e){}
   const due=(sn?[sn]:[]).concat(out.filter(x=>x.at>now).sort((a,b)=>a.at-b.at).slice(0,sn?39:40));

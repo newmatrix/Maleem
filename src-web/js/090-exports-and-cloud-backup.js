@@ -224,7 +224,7 @@ $('#expCancel').onclick=closeSheets;
 /* Cloud backup */
 let db=null, myId=null;
 async function backupDoc(){return db.collection('data/users/'+myId).doc(ME.id==='m1'?'backup':'backup-'+ME.id)}
-const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,plans:S.plans,closedP:S.closedP,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,bMoves:S.bMoves,insts:S.insts,instPays:S.instPays,inflows:S.inflows,gold:S.gold,goldPx:S.goldPx,manRates:S.manRates,payType:S.payType,payAnchor:S.payAnchor,prefs:{lang:S.lang||LANG,moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,curs:S.curs,press:S.press,trans:S.trans,haptic:S.haptic,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide,ipFee:S.ipFee}});
+const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,plans:S.plans,iplans:S.iplans,refunds:S.refunds,capCurBy:S.capCurBy,closedP:S.closedP,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,bMoves:S.bMoves,insts:S.insts,instPays:S.instPays,inflows:S.inflows,gold:S.gold,goldPx:S.goldPx,manRates:S.manRates,payType:S.payType,payAnchor:S.payAnchor,prefs:{lang:S.lang||LANG,moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,curs:S.curs,press:S.press,trans:S.trans,haptic:S.haptic,fabPin:S.fabPin,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide,ipFee:S.ipFee}});
 let restoreReloadT;
 function applyBackup(p,at,onUndo){
   clearTimeout(restoreReloadT);
@@ -244,7 +244,7 @@ function applyBackup(p,at,onUndo){
   {const ids=new Set(); S.accounts=(Array.isArray(p.accounts)?p.accounts:[]).map(cleanAcc).filter(a=>a&&!ids.has(a.id)&&ids.add(a.id)); S.transfers=(Array.isArray(p.transfers)?p.transfers:[]).map(cleanTr).filter(Boolean); S.bMoves=(Array.isArray(p.bMoves)?p.bMoves:[]).map(cleanBMove).filter(Boolean); if(!ACC(S.lastAcc)) S.lastAcc=''}
   S.insts=(Array.isArray(p.insts)?p.insts:[]).map(cleanInst).filter(Boolean); S.instPays=(Array.isArray(p.instPays)?p.instPays:[]).map(cleanInstPay).filter(Boolean);
   S.inflows=(Array.isArray(p.inflows)?p.inflows:[]).map(cleanInflow).filter(Boolean);
-  S.plans=(Array.isArray(p.plans)?p.plans:[]).map(cleanPlan).filter(Boolean);
+  S.plans=(Array.isArray(p.plans)?p.plans:[]).map(cleanPlan).filter(Boolean); S.iplans=(Array.isArray(p.iplans)?p.iplans:[]).map(cleanIplan).filter(Boolean); S.capCurBy=cleanCapCur(p.capCurBy); S.refunds=(Array.isArray(p.refunds)?p.refunds:[]).map(cleanRefund).filter(Boolean).sort((a,b)=>b.ts-a.ts).slice(0,300);
   S.gold=(Array.isArray(p.gold)?p.gold:[]).map(cleanGold).filter(Boolean); S.goldPx=cleanGoldPx(p.goldPx); S.manRates=cleanManRates(p.manRates);
   S.closedP=cleanClosed(p.closedP);
   S.payType=['monthly','weekly','biweekly','variable'].includes(p.payType)?p.payType:'monthly'; S.payAnchor=typeof p.payAnchor==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(p.payAnchor)?p.payAnchor:'';
@@ -256,7 +256,7 @@ function applyBackup(p,at,onUndo){
   syncPays();
   if(p.prefs&&typeof p.prefs==='object'){const f=p.prefs;
     if(['eg','ar','en'].includes(f.lang)) S.lang=f.lang;
-    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look; if(FONTS.some(x=>x.id===f.font)) S.font=f.font; if(f.fontW==='bold'||f.fontW==='normal') S.fontW=f.fontW; if(PRESSES.some(x=>x.id===f.press)) S.press=f.press; if(TRANSES.some(x=>x.id===f.trans)) S.trans=f.trans; if(typeof f.haptic==='boolean') S.haptic=f.haptic;
+    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look; if(FONTS.some(x=>x.id===f.font)) S.font=f.font; if(f.fontW==='bold'||f.fontW==='normal') S.fontW=f.fontW; if(PRESSES.some(x=>x.id===f.press)) S.press=f.press; if(TRANSES.some(x=>x.id===f.trans)) S.trans=f.trans; if(typeof f.haptic==='boolean') S.haptic=f.haptic; S.fabPin=f.fabPin===true;
     if(['off','sum','split'].includes(f.moneyView)) S.moneyView=f.moneyView;
     S.homeHide=f.homeHide&&typeof f.homeHide==='object'?Object.fromEntries(['upcoming','caps','summary','close','today'].filter(k=>f.homeHide[k]===true).map(k=>[k,true])):{};
     ['alert80','remind','dueRemind','sumOn'].forEach(k=>{if(typeof f[k]==='boolean') S[k]=f[k]});

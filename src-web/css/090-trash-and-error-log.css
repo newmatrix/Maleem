@@ -20,3 +20,17 @@
 .sq-chips button[aria-pressed=true]{background:color-mix(in srgb,var(--brand) 14%,transparent);border-color:var(--brand);color:var(--brand);font-weight:700}
 #searchSheet .sq-chips{flex:none}
 #bkPassSheet{z-index:63} /* above the restore sheet (62): the password is asked while that one is open */
+.toast{touch-action:none;cursor:pointer}
+.toast button{cursor:pointer}
+.hero .hero-go{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:10px;white-space:nowrap;flex:none;font-size:.85rem;font-weight:700;opacity:.92;cursor:pointer;color:inherit}
+.hero .hero-go:active{opacity:.7}
+#datePill span{white-space:nowrap}
+.cap-cur{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:.8rem}
+.cap-cur select{max-width:140px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:.8rem;padding:6px}
+.ob-fixed{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:10px 0 16px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-weight:700;text-align:start;cursor:pointer}
+.ob-fixed small{display:block;margin-top:2px;font-weight:500;color:var(--muted);font-size:.78rem}
+.ob-fixed:active{transform:scale(.99)}
+.hero .hero-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:13px}
+.hero .hero-foot .fc{margin:0;flex:1 1 auto;min-width:0}
+.hero .hero-foot .hero-go{margin-top:0}
+.hero .hero-foot .hero-go:only-child{margin-inline-start:auto}

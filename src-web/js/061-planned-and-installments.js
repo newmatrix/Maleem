@@ -1,13 +1,18 @@
 /* --- add / edit a plan --- */
 var instEdit=null, instMonthlyAuto=true;
 (function(){ const m=$('#instMonths'); for(let i=1;i<=60;i++) m.insertAdjacentHTML('beforeend',`<option value="${i}">${i} ${i<=10?(i===1?'شهر':'شهور'):'شهر'}</option>`) })();
-function instAutoMonthly(){ if(!instMonthlyAuto) return; const t=evalExpr($('#instTotal').value), n=+$('#instMonths').value; $('#instMonthly').value= t>0&&n>0? String(r2(t/n)) : '' }
+/* how often a payment falls: every month, 2, 3 (quarterly), 6 (half-yearly) or 12 (yearly). «مدة التقسيط» stays the whole length in months. */
+(function(){ const e=$('#instEvery'); [[1,'كل شهر'],[2,'كل شهرين'],[3,'كل 3 شهور (ربع سنوي)'],[6,'كل 6 شهور (نصف سنوي)'],[12,'كل سنة']].forEach(([v,t])=>e.insertAdjacentHTML('beforeend',`<option value="${v}">${t}</option>`)) })();
+const instEvery=()=>+$('#instEvery').value||1, instN=()=>Math.max(1,Math.ceil((+$('#instMonths').value||1)/instEvery()));
+function instPaintLab(){ $('#instMonthlyLab').textContent= instEvery()===1?'القسط الشهري':'قيمة القسط' }
+function instAutoMonthly(){ instPaintLab(); if(!instMonthlyAuto) return; const t=evalExpr($('#instTotal').value), n=instN(); $('#instMonthly').value= t>0&&n>0? String(r2(t/n)) : '' }
+$('#instEvery').onchange=instAutoMonthly;
 $('#instTotal').oninput=instAutoMonthly; $('#instMonths').onchange=instAutoMonthly; $('#instMonthly').oninput=()=>{instMonthlyAuto=false};
 function openInstSheet(id){
   const p=id?S.insts.find(x=>x.id===id):null; instEdit=p?p.id:null; instMonthlyAuto=true;
   $('#instTitle').textContent=p?'تعديل التقسيط':'تقسيط جديد'; $('#instSave').textContent=p?'حفظ التعديل':'حفظ';
   $('#instName').value=p?p.name:''; $('#instParty').value=p?p.party:''; $('#instGen').hidden=!!p; $('#instCur').textContent=CS();
-  $('#instTotal').value=''; $('#instMonths').value='6'; $('#instMonthly').value=''; $('#instFirst').value=addMonthDK(todayKey(),1);
+  $('#instTotal').value=''; $('#instMonths').value='6'; $('#instEvery').value='1'; instPaintLab(); $('#instMonthly').value=''; $('#instFirst').value=addMonthDK(todayKey(),1);
   $('#instRec').checked=p?p.rec:false; $('#instRec').disabled=!!p; $('#instErr').textContent='';
   $('#scrim').classList.add('open'); $('#instSheet').classList.add('open');
 }
@@ -16,12 +21,12 @@ $('#instSave').onclick=()=>{
   const E=m=>{$('#instErr').textContent=m}, name=$('#instName').value.trim(), party=$('#instParty').value.trim();
   if(!name){E('اكتب اشتريت إيه');return}
   if(instEdit){ const p=S.insts.find(x=>x.id===instEdit); if(!p) return; p.name=name.slice(0,60); p.party=party.slice(0,40); save();closeSheets();renderAll();toast('اتعدّل التقسيط');return }
-  const total=evalExpr($('#instTotal').value), n=+$('#instMonths').value, monthly=evalExpr($('#instMonthly').value), first=$('#instFirst').value;
+  const total=evalExpr($('#instTotal').value), n=instN(), every=instEvery(), monthly=evalExpr($('#instMonthly').value), first=$('#instFirst').value;
   if(!(total>0&&total<MAXAMT)){E('اكتب إجمالي المبلغ');return}
-  if(!(monthly>0&&monthly<MAXAMT)){E('اكتب القسط الشهري');return}
+  if(!(monthly>0&&monthly<MAXAMT)){E(every===1?'اكتب القسط الشهري':'اكتب قيمة القسط');return}
   if(!isDK(first)){E('اختار ميعاد أول قسط');return}
-  const last=r2(total-r2(monthly)*(n-1)); if(!(last>0)){E('القسط الشهري × عدد الشهور أكبر من الإجمالي');return}
-  const items=[]; for(let i=0;i<n;i++) items.push({id:uid(),amount:i===n-1?last:r2(monthly),due:addMonthDK(first,i)});
+  const last=r2(total-r2(monthly)*(n-1)); if(!(last>0)){E(every===1?'القسط الشهري × عدد الشهور أكبر من الإجمالي':'قيمة القسط × عدد الأقساط أكبر من الإجمالي');return}
+  const items=[]; for(let i=0;i<n;i++) items.push({id:uid(),amount:i===n-1?last:r2(monthly),due:addMonthDK(first,i*every)});
   const id=uid(); justAddedOb=id; S.insts.push({id,name:name.slice(0,60),party:party.slice(0,40),rec:$('#instRec').checked,items,created:Date.now()});
   obTab='insts'; save();closeSheets();renderAll();justAddedOb=null;
   toast(`اتسجّل تقسيط «${name}»: ${n} ${n<=10?'أقساط':'قسط'}`);

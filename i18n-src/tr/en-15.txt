@@ -1,0 +1,10 @@
+المبالغ المرجوعة => Refunds
+سجل الاسترجاع => Refund log
+كل مرة تدوس «رجعتلي منها فلوس» على مصروف بتتسجل هنا بتاريخها ومبلغها والحساب اللي رجعت عليه. المصروف نفسه بينقص أو بيتشال زي ما هو. => Every time you tap “Got money back” on an expense it is logged here with its date, amount and the account it came back to. The expense itself still gets smaller or goes away as before.
+لسه مفيش مبالغ مرجوعة. => No refunds yet.
+الفلوس اللي رجعتلك من مصروفات => Money that came back from expenses
+رجع => Back
+كله => All of it
+جزء منه => Part of it
+عملية واحدة => 1 operation
+عمليتين => 2 operations

@@ -1,0 +1,4 @@
+عملة عمليات التطبيق ده => Currency of this app's operations
+زي ما في الرسالة => As in the message
+اتحفظت العملة لعمليات التطبيق ده => Saved the currency for this app's operations
+رجعنا لعملة الرسالة نفسها => Back to the message's own currency

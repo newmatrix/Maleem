@@ -96,7 +96,7 @@ function renderCaps(){
       <div class="ut" data-capdet="${esc(e.id)}"><b>${money(c.amount)} <small style="display:inline">${capCur(c)}</small></b>
         <small>${esc(title)}${!e.pair&&c.merchant&&c.source?' · '+esc(c.source):''} · ${esc(capAgo(c.at))}</small>
         ${lab?`<small class="cap-acc">${lab}</small>`:''}${!e.pair?`<button type="button" class="cap-alt" data-capask="${esc(e.id)}">نوع تاني؟</button>`:''}
-        ${capDetail===e.id?`<div class="cap-det">${esc(c.text)}${e.pair&&e.i?'<br>'+esc(e.i.text):''}${e.pair?`<button type="button" data-capsplit="${esc(e.id)}">مش تحويل؟ سجّلهم لوحدهم</button>`:''}${!e.pair&&c.pkg?`<button type="button" data-capblock="${esc(c.id)}">تجاهل كل اللي جاي من «${esc(c.source||'التطبيق ده')}»</button>`:''}</div>`:''}</div>
+        ${capDetail===e.id?`<div class="cap-det">${esc(c.text)}${e.pair&&e.i?'<br>'+esc(e.i.text):''}${e.pair?`<button type="button" data-capsplit="${esc(e.id)}">مش تحويل؟ سجّلهم لوحدهم</button>`:''}${!e.pair&&c.pkg?`<label class="cap-cur"><span>عملة عمليات التطبيق ده</span><select data-capcur="${esc(c.pkg)}" aria-label="عملة عمليات التطبيق ده"><option value="">زي ما في الرسالة</option>${CURRENCIES.map(x=>`<option value="${esc(x.id)}"${S.capCurBy[c.pkg]===x.id?' selected':''}>${esc(x.id)} ${esc(curSym(x.id))}</option>`).join('')}</select></label>`:''}${!e.pair&&c.pkg?`<button type="button" data-capblock="${esc(c.id)}">تجاهل كل اللي جاي من «${esc(c.source||'التطبيق ده')}»</button>`:''}</div>`:''}</div>
       <div class="cap-act"><button type="button" class="cap-ok" data-capok="${esc(e.id)}">${btn}</button><button type="button" class="cap-no" data-capno="${esc(e.id)}" aria-label="تجاهل العملية دي">✕</button></div></div>`}).join('')}
     ${view.length>CAP_SHOW?`<button type="button" class="cap-more" data-capmore>${capExpanded?'عرض أقل':'+ '+(view.length-CAP_SHOW)+' كمان'}</button>`:''}</div>`;
 }
@@ -107,7 +107,7 @@ const ipFeeOf=a=>r2(Math.min(S.ipFee.max,Math.max(S.ipFee.min,a*S.ipFee.pct/100)
    the message does not already talk about a fee (then it is probably the fee itself, or the amount already includes it) */
 function capIpFee(c){
   if(!S.ipFee.on||S.currency!=='EGP'||c.dir!=='out'||c.method!=='instapay') return 0;
-  if(!/^(egp|le|l\.e\.?|جنيه|جنية|جنيها|جنيهات|ج\.?م?\.?|جم)?$/i.test(c.cur||'')) return 0;
+  if(capCurrency(c)!=='EGP') return 0;
   if(/رسوم|عمولة|عموله|مصاريف الخدمة|\bfees?\b|\bcharges?\b/i.test(capDigits((c.text||'')+' '+(c.merchant||'')))) return 0;
   return ipFeeOf(c.amount);
 }
@@ -265,12 +265,15 @@ $('#rfSave').onclick=()=>{
     if(s.A.cur!==s.B.cur){tr.rate=s.r/s.rA;tr.rs='m'} S.transfers.push(tr) }
   if(!s.A&&s.B){ openOld=s.B.open; s.B.open=r2(s.B.open+s.r) }
   if(capId) S.capQ=(S.capQ||[]).filter(q=>q.id!==capId);
+  const logE={id:uid(),ts:when,amount:s.full?snap.amount:r2(snap.amount-s.left),cat:snap.cat,note:str(snap.note||'',80),full:!!s.full,acc:s.B?s.B.id:'',accName:s.B?str(accDisp(s.B),40):''}; // the log entry (undo removes it)
+  S.refunds.unshift(logE); if(S.refunds.length>300) S.refunds.length=300;
   save(); closeSheets(); renderAll();
   toast(s.full?'اتشال المصروف: فلوسه رجعت كلها':`المصروف بقى ${fmt(s.left)} ${CS()}`,'تراجع',()=>{
     const j=S.expenses.findIndex(x=>String(x.id)===String(snap.id));
     if(j>=0) S.expenses[j]=snap;
     else { if(S.space&&snap.sp===S.space.code&&expenseCanManage(snap)) S.space.manual=Array.from(new Set([...(S.space.manual||[]),String(snap.id)])); S.expenses.splice(Math.min(idx,S.expenses.length),0,snap) }
     if(tr) S.transfers=S.transfers.filter(t=>t.id!==tr.id);
+    S.refunds=S.refunds.filter(x=>x.id!==logE.id);
     if(openOld!=null&&ACC(s.B.id)) ACC(s.B.id).open=openOld;
     if(capOld&&!(S.capQ||[]).some(q=>q.id===capOld.id)) S.capQ=[capOld].concat(S.capQ||[]).sort((a,b)=>b.at-a.at);
     save(); renderAll() },6000);
@@ -295,7 +298,12 @@ function capRemove(id,msg){
   const [c]=S.capQ.splice(i,1); save(); renderHome();
   toast(msg||'اتجاهلت العملية','تراجع',()=>{S.capQ.splice(Math.min(i,S.capQ.length),0,c);save();renderHome()},3000);
 }
+$('#capBox').addEventListener('change',e=>{const sel=e.target.closest('[data-capcur]'); if(!sel) return;
+  const pkg=sel.dataset.capcur, v=sel.value; if(!/^[A-Za-z0-9_.]{1,200}$/.test(pkg)) return;
+  if(v&&CURRENCIES.some(x=>x.id===v)) S.capCurBy[pkg]=v; else delete S.capCurBy[pkg];
+  save(); renderCaps(); toast(v?'اتحفظت العملة لعمليات التطبيق ده':'رجعنا لعملة الرسالة نفسها')});
 $('#capBox').addEventListener('click',e=>{
+  if(e.target.closest('.cap-cur')) return; // choosing a currency must not fold the details
   const ok=e.target.closest('[data-capok]'), no=e.target.closest('[data-capno]'), all=e.target.closest('[data-capall]'),
         more=e.target.closest('[data-capmore]'), blk=e.target.closest('[data-capblock]'), det=e.target.closest('[data-capdet]');
   if(ok){const en=capView().find(x=>x.id===ok.dataset.capok); if(!en) return; capConfirm(en); return}

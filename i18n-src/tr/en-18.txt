@@ -1,0 +1,10 @@
+ثبّت زرّا + والمايك ظاهرين => Keep the + and mic buttons out
+من غير ما يستخبوا على الجنب، ودوسة واحدة تكفي => They don't hide at the edge, and one tap is enough
+تثبيت زرّا الإضافة والمايك => Keep the add and mic buttons out
+زرّا + والمايك هيفضلوا ظاهرين => The + and mic buttons will stay out
+زرّا + والمايك هيرجعوا يستخبوا على الجنب => The + and mic buttons will hide at the edge again
+🔁 المصاريف الثابتة والاشتراكات والجاية => 🔁 Fixed expenses, subscriptions and upcoming
+الإيجار والنت والاشتراكات اللي بتتكرر => Rent, internet and recurring subscriptions
+№ ثابتة => № fixed
+№ جاية => № upcoming
+№ دخل جاي => № upcoming income

@@ -23,6 +23,7 @@ $('#transList').onclick=e=>{const b=e.target.closest('[data-trans]'); if(!b||b.d
   S.trans=b.dataset.trans; save(); applyTheme();
   const pg=document.querySelector('#v-settings>.set-page[data-page="appearance"]'); if(pg&&!pg.hidden){pg.style.setProperty('--dx','-24px');pg.classList.remove('sub-anim');void pg.offsetWidth;pg.classList.add('sub-anim')} // a quick taste of it
   toast('حركة التنقل: '+TRANSES.find(x=>x.id===S.trans).name)};
+$('#fabPinToggle').checked=S.fabPin; $('#fabPinToggle').onchange=e=>{S.fabPin=e.target.checked; save(); fabRest(); toast(S.fabPin?'زرّا + والمايك هيفضلوا ظاهرين':'زرّا + والمايك هيرجعوا يستخبوا على الجنب')};
 $('#hapticToggle').onchange=e=>{S.haptic=e.target.checked; save(); if(S.haptic){try{AB.haptic()}catch(err){}} toast(S.haptic?'اتفعل الاهتزاز الخفيف':'اتقفل الاهتزاز الخفيف')};
 $('#styleGrid').onclick=e=>{const b=e.target.closest('[data-style]');if(!b)return;const id=b.dataset.style; S.style=id; if(STYLES[id].ac) S.accent=STYLES[id].ac; save(); applyTheme()};
 $('#accentRow').onclick=e=>{const b=e.target.closest('[data-accent]');if(!b)return;S.accent=b.dataset.accent;save();applyTheme()};
@@ -196,12 +197,12 @@ $('#wipeConfirm').onclick=()=>{
   const sel=k=>wipeSel[k]&&WIPE_OPTS.find(o=>o[0]===k)[2](); if(!WIPE_OPTS.some(([k])=>sel(k))) return;
   if(sel('inc')&&!sel('exp')&&S.expenses.some(e=>e.fund==='free')){toast(TX('غيّر مصدر مصاريف الدخل الحر أو امسحها مع الدخل.'));return}
   if(sel('exp')&&S.space) spDetach();
-  const keys=['budget','expenses','debts','gams','plans','alerted','dueSeen','accounts','transfers','bMoves','insts','instPays','inflows','lastAcc','gold','goldPx','trash'];
+  const keys=['budget','expenses','debts','gams','plans','iplans','refunds','alerted','dueSeen','accounts','transfers','bMoves','insts','instPays','inflows','lastAcc','gold','goldPx','trash'];
   const old=JSON.parse(JSON.stringify(keys.reduce((o,k)=>(o[k]=S[k],o),{})));
   const bal={}; S.accounts.forEach(a=>{bal[a.id]=accBal(a.id)});
-  if(sel('exp')){S.expenses=[];S.alerted={};S.dueSeen={};S.trash=trashAll().filter(t=>t.k!=='xp')}
+  if(sel('exp')){S.expenses=[];S.refunds=[];S.alerted={};S.dueSeen={};S.trash=trashAll().filter(t=>t.k!=='xp')}
   if(sel('obl')){S.debts=[];S.gams=[];S.insts=[];S.instPays=[];S.plans=[];S.trash=trashAll().filter(t=>!['debt','gam','inst','plan'].includes(t.k))}
-  if(sel('inc')){S.budget=Math.max(0,r2(S.budget-S.inflows.filter(x=>x.fund==='permanent').reduce((a,x)=>a+x.amount,0)));S.inflows=[];}
+  if(sel('inc')){S.budget=Math.max(0,r2(S.budget-S.inflows.filter(x=>x.fund==='permanent').reduce((a,x)=>a+x.amount,0)));S.inflows=[]; S.iplans=[]; S.trash=trashAll().filter(t=>t.k!=='ipl');}
   if(sel('gold')){S.gold=[];S.goldPx={}}
   if(sel('tr')||sel('acc')){S.transfers=[];S.bMoves=[]}
   if(sel('acc')){

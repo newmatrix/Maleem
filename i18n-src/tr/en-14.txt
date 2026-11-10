@@ -1,0 +1,11 @@
+دخل جاي => Upcoming income
+إضافة دخل جاي => Add upcoming income
+تعديل الدخل الجاي => Edit upcoming income
+مفيش دخل جاي. => No upcoming income.
+ميعاد الاستلام => Date to receive
+اختار ميعاد الاستلام => Pick the date you'll receive it
+هتستلم إيه؟ مثلاً المرتب أو عيدية => What will you receive? For example salary or Eid money
+دخل متوقع هتستلمه في يوم معين (مرتب، عيدية، مستحقات). هيظهرلك في الصفحة الرئيسية قبل ميعاده ويجيلك تنبيه، وتدوس «استلمت» فتسجله بدوسة. => Income you expect on a certain day (salary, Eid money, dues). It shows on the home page before its date and you get a reminder; tap “Received” to record it in one tap.
+هتستلم § => You'll receive §
+بكرة هتستلم § => Tomorrow you'll receive §
+النهارده هتستلم § => Today you'll receive §

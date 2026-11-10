@@ -92,6 +92,13 @@ function toast(msg,actLabel,act,ms){
   clearTimeout(toastT);toastT=setTimeout(()=>$('#toast').classList.remove('show'),ms);
 }
 
+/* a message can be pushed away: tap it, or swipe it sideways / down (the «تراجع» button still works) */
+(()=>{const t=$('#toast'); let x0=0,y0=0,down=false;
+  t.addEventListener('pointerdown',e=>{if(e.target.closest('#toastAct')) return; down=true; x0=e.clientX; y0=e.clientY; try{t.setPointerCapture(e.pointerId)}catch(err){}}); // keep the finger's moves even when it leaves the message
+  t.addEventListener('pointerup',e=>{if(!down) return; down=false; const dx=e.clientX-x0, dy=e.clientY-y0;
+    if(Math.abs(dx)>40||dy>25||(Math.abs(dx)<10&&Math.abs(dy)<10)){clearTimeout(toastT); t.classList.remove('show')}});
+  t.addEventListener('pointercancel',()=>{down=false});
+})();
 /* Item row */
 const ICON_MORE='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg>';
 let justAdded=null;

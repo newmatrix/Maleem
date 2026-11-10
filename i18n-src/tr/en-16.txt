@@ -1,0 +1,10 @@
+كل شهر => Every month
+كل شهرين => Every 2 months
+كل 3 شهور (ربع سنوي) => Every 3 months (quarterly)
+كل 6 شهور (نصف سنوي) => Every 6 months (half-yearly)
+كل سنة => Every year
+القسط بيتدفع => Payment frequency
+شهري، أو كل 3 أو 6 شهور، أو سنوي => Monthly, every 3 or 6 months, or yearly
+كل كام شهر بيتدفع القسط => How often the installment is paid
+قيمة القسط × عدد الأقساط أكبر من الإجمالي => Installment amount × number of installments is more than the total
+اكتب قيمة القسط => Enter the installment amount

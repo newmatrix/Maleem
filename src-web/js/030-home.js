@@ -133,7 +133,7 @@ function renderHome(){
          <span class="chip">${daysLeft(P)?'فاضل '+daysTxt(daysLeft(P)):'آخر يوم'}</span></div>
        <div class="bar ${cls}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.min(100,pct)}" aria-label="نسبة الصرف من الميزانية"><i id="heroFill" style="width:0"></i><span class="pct${w>.84?' dark':''}">${pct}%</span></div>
        <div class="meta"><div class="m"><small>صرفت</small><b>${money(spent)}</b> <small style="display:inline">${CS()}</small></div>
-         <div class="m left${rem<0?' over':''}"><small>${rem<0?'متجاوز الميزانية':'المتبقي'}</small><b>${money(Math.abs(rem))}</b> <small style="display:inline">${CS()}</small></div></div>${dailyLine(rem,P)}${forecastLine(budgetExpenses(P),P.start,P.next,B)}`;
+         <div class="m left${rem<0?' over':''}"><small>${rem<0?'متجاوز الميزانية':'المتبقي'}</small><b>${money(Math.abs(rem))}</b> <small style="display:inline">${CS()}</small></div></div>${dailyLine(rem,P)}<div class="hero-foot">${forecastLine(budgetExpenses(P),P.start,P.next,B)}<div class="hero-go" id="heroGo" role="button" tabindex="0">شوف التفاصيل <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg></div></div>`;
   }else if(fixed){
     h=`<div class="label">${periodLabel(P)}</div><div class="big">—</div>
        <p class="ctxt">اخترت تحديد ميزانية بس لسه مكتبتش الرقم.</p>
@@ -145,13 +145,14 @@ function renderHome(){
          <span class="chip">ميزانية مفتوحة</span></div>
        <div class="stats"><div class="st"><small>النهارده</small><b>${money(tSum)}</b></div>
          <div class="st"><small>متوسط اليوم</small><b>${money(spent/nDays)}</b></div>
-         <div class="st"><small>عدد المصاريف</small><b>${money(cnt)}</b></div></div>`;
+         <div class="st"><small>عدد المصاريف</small><b>${money(cnt)}</b></div></div><div class="hero-go" id="heroGo" role="button" tabindex="0">شوف التفاصيل <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg></div>`;
   }
   $('#hero').innerHTML=h;
   $('#freeWallet').hidden=!freeIncomeActive();
   $('#freeWallet').innerHTML=freeIncomeActive()?`<div class="fw-amt">${money(freeIncomeBalance())} ${CS()}</div><p class="hint center">${esc(TX('منفصل عن ميزانية المرتب؛ الرصيد الباقي بيكمل للفترات الجاية.'))}</p>`:'';
   if(!fixed) countUp($('#heroBig'),spent);
   if(B>0){countUp($('#heroBig'),B);requestAnimationFrame(()=>requestAnimationFrame(()=>{const f=$('#heroFill');if(f)f.style.width=Math.min(100,spent/B*100)+'%'}))}
+  const hg=$('#heroGo'); if(hg){const open=()=>{go('reports');showDetail(true)}; hg.onclick=open; hg.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}}
   const cta=$('#setBudgetCta'); if(cta) cta.onclick=()=>{go('me');meGo('budget');setTimeout(()=>$('#budgetInput').focus(),350)};
 
   try{renderMoney()}catch(e){console.error(e)}

@@ -116,6 +116,28 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-ppay]'); i
   const x=S.plans.find(y=>y.id===b.dataset.ppay); if(!x) return;
   openSheet(null,{amount:+x.amount||'',cat:x.cat,note:x.name,pl:x.id})});
 
+/* expected incomes (one time) */
+function openIPlan(id){
+  const p=id? S.iplans.find(x=>x.id===id):null, tm=new Date(todayStart()); tm.setDate(tm.getDate()+1);
+  openForm({title:p?'تعديل الدخل الجاي':'دخل جاي', save:p?'حفظ التعديل':'إضافة',
+    fields:[{key:'name',placeholder:'هتستلم إيه؟ مثلاً المرتب أو عيدية',value:p?p.name:''},
+      {key:'amount',type:'money',label:'المبلغ (سيبه فاضي لو لسه متعرفش)',value:p&&p.amount?p.amount:''},
+      {key:'due',type:'date',label:'ميعاد الاستلام',min:p?'':todayKey(),value:p?p.due:dayKey(tm)}],
+    onSave:v=>{const amount=parseFloat(v.amount)||0;
+      if(!v.name) return 'اكتب اسم الدخل';
+      if(!isDK(v.due)) return 'اختار ميعاد الاستلام';
+      if(!p&&v.due<todayKey()) return 'اختار ميعاد من النهارده وجاي';
+      if(p){Object.assign(p,{name:v.name,amount,due:v.due}); save();renderAll();toast('اتعدل '+v.name);return}
+      S.iplans.push({id:uid(),name:v.name,amount,due:v.due,created:Date.now()}); save();renderAll();
+      toast(`اتضاف ${v.name}، وهيفكّرك يوم ${dkToDMY(v.due)}`)}});
+}
+function deleteIPlan(id){const i=S.iplans.findIndex(x=>x.id===id); if(i<0) return; const [x]=S.iplans.splice(i,1); const tid=trashPut('ipl',x,i); save();renderAll();
+  toast('اتحذف '+x.name,'تراجع',()=>{trashDel(tid);S.iplans.splice(i,0,x);save();renderAll()},3000)}
+$('#addIPlan').onclick=()=>openIPlan();
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ipin]'); if(!b) return; e.stopPropagation();
+  const x=S.iplans.find(y=>y.id===b.dataset.ipin); if(!x) return;
+  closeSheets(); openInSheet(null,{amount:+x.amount||'',src:x.name,ipl:x.id})});
+
 /* goals */
 function openGoal(id){
   const g=id? S.goals.find(x=>x.id===id):null;

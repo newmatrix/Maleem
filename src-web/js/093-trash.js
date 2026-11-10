@@ -1,6 +1,6 @@
 /* ===== Trash: what you delete stays here for 30 days, and you can bring it back (Settings > سلة المحذوفات). Entries: see cleanTrash. ===== */
-const TRASH_LABEL={xp:'مصروف',debt:'سلفة',gam:'جمعية',inc:'دخل',goal:'هدف',fix:'مصروف ثابت',plan:'مصروف جاي',inst:'تقسيط'};
-const TRASH_ARR={xp:'expenses',debt:'debts',gam:'gams',inc:'incomes',goal:'goals',fix:'fixed',plan:'plans',inst:'insts'};
+const TRASH_LABEL={xp:'مصروف',debt:'سلفة',gam:'جمعية',inc:'دخل',goal:'هدف',fix:'مصروف ثابت',plan:'مصروف جاي',ipl:'دخل جاي',inst:'تقسيط'};
+const TRASH_ARR={xp:'expenses',debt:'debts',gam:'gams',inc:'incomes',goal:'goals',fix:'fixed',plan:'plans',ipl:'iplans',inst:'insts'};
 const trashAll=()=>Array.isArray(S.trash)?S.trash:(S.trash=[]);
 /* a record leaves the trash for good: its receipt photo goes too, unless something else still uses that photo */
 function trashLetGo(t){
