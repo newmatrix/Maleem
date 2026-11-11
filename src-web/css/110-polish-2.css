@@ -1,0 +1,49 @@
+/* Polish pass 2: contrast, empty states, limit and month cards, category tiles */
+/* 1: contrast (measured on 8 theme combinations x 2 widths, see the scan in the notes) */
+:root{--bad-text:color-mix(in srgb,var(--bad) 85%,#000)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bad-text:color-mix(in srgb,var(--bad) 70%,#fff)}}
+:root[data-theme="dark"]{--bad-text:color-mix(in srgb,var(--bad) 70%,#fff)}
+:root[data-theme="light"]{--bad-text:color-mix(in srgb,var(--bad) 85%,#000)}
+:root:not([data-style="royal"]) .btn.primary{background:color-mix(in srgb,var(--brand) 90%,#000)}
+.btn.danger-solid{background:color-mix(in srgb,var(--bad) 72%,#000)}
+.btn.danger,.due.late,.cap-det button{color:var(--bad-text)}
+.add-cat,.dev2 .dv-av,.dev2 .dv-ver,.nav button[aria-current="page"],.cap-det button[data-capteach]{color:var(--brand-text)}
+.paybtn{color:color-mix(in srgb,var(--cc) 65%,var(--ink))}
+.due,.c.cur{color:color-mix(in srgb,var(--muted) 65%,var(--ink))}
+/* 3: every empty list gets the same calm card with its own icon */
+.empty{border:1px solid var(--line);box-shadow:var(--shadow)}
+.empty::before{content:var(--ico,"📭");display:grid;place-items:center;width:48px;height:48px;margin:0 auto 10px;border-radius:15px;font-size:1.4rem;background:color-mix(in srgb,var(--brand) 12%,transparent)}
+#accList .empty,#repAcEmpty{--ico:"🏦"}
+#savList .empty{--ico:"💰"}
+#obDebts .empty{--ico:"🤝"}
+#obGams .empty{--ico:"👥"}
+#obInsts .empty{--ico:"🧾"}
+#repOvEmpty{--ico:"📊"}
+/* 5: categories near or over their limit, on the home screen */
+#limBox .upc{margin-top:var(--gap-card,12px)}
+.lim-row{cursor:pointer}
+.lim-row .ut{min-width:0;flex:1}
+.lim-row .lim-bar{max-width:none;margin-top:6px}
+.lim-more{padding:8px 14px 12px;font-size:.8rem;color:var(--muted);text-align:center;border-top:1px solid var(--line)}
+/* 7: this month's fixed expenses */
+#obMonth .upc{margin:0 0 12px}
+.mo-card .upc-h .mo-sum{font-size:.82rem;color:var(--muted);font-weight:600}
+.mo-bar{height:6px;margin:4px 14px 0;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.mo-bar i{display:block;height:100%;border-radius:3px;background:var(--ok)}
+.mo-left{padding:6px 14px 8px;font-size:.84rem;color:var(--muted)}
+.mo-row.done{opacity:.62}
+.due.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:color-mix(in srgb,var(--ok) 70%,var(--ink))}
+/* 9: «my money» chip warns when an account has no exchange rate */
+.hchip-warn{font-style:normal;margin-inline-start:6px;color:var(--warn)}
+/* capture details: the currency picker label was squeezed into one letter per line in the narrow panel */
+.cap-cur{flex-direction:column;align-items:stretch;gap:4px}
+.cap-cur select{max-width:none;width:100%}
+/* more contrast: category-colored amounts, the period pill, gray text in the light ocean and paper palettes */
+.xp .title .val{color:color-mix(in srgb,var(--cc) 50%,var(--ink))}
+#homeExpensePick{color:var(--brand-text)}
+:root[data-style="ocean"][data-theme="light"]{--muted:#4B6774}
+:root[data-style="paper"][data-theme="light"]{--muted:#706150}
+#ss-widget{white-space:normal;overflow:visible;text-overflow:clip}
+.mm.in b{color:color-mix(in srgb,var(--ok) 75%,var(--ink))}
+.mm.out b,.mm.sv.neg b{color:var(--bad-text)}
+.mm.sv b{color:var(--brand-text)}

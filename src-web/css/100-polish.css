@@ -1,0 +1,32 @@
+/* Polish pass (preview): numbers, spacing scale, softer hero, header, empty state */
+:root{--gap-card:12px;--gap-section:20px}
+body{font-variant-numeric:tabular-nums}
+/* 3: one spacing scale + one radius for cards on the home screen */
+#sumBox .sum-card,#capBox .upc,#upcoming .upc,#closeCard>*{margin-top:var(--gap-card)}
+.home-chips{margin-top:var(--gap-card)}
+#todayBlock .section-h,#v-expenses .section-h{margin-top:var(--gap-section)}
+.upc,.sum-card,.group,.empty{border-radius:var(--r-card,18px)}
+/* 4: calmer hero: lighter pattern and frame, number leads */
+.hero{background:repeating-radial-gradient(circle at 12% 120%,rgba(255,255,255,.035) 0 1px,transparent 1px 9px),linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%)}
+.hero::after{border-color:rgba(255,255,255,.11)}
+.hero .big{letter-spacing:-.01em}
+.hero .stats>*{background:rgba(255,255,255,.10)}
+/* 5: greeting and emoji stay on one line */
+.topbar.home h1{display:block;font-size:clamp(.95rem,4.5vw,1.35rem);line-height:1.35}
+.topbar.home .sub .wave{display:inline-block;margin-inline-start:2px;animation:wave 1.6s ease .3s 1;transform-origin:70% 70%}
+.home-header-actions{gap:6px}
+/* 6: friendlier empty state for today's list */
+#todayList .empty{border:1px solid var(--line);box-shadow:var(--shadow);padding:26px 20px 24px}
+#todayList .empty::before{content:"🧾";display:grid;place-items:center;width:52px;height:52px;margin:0 auto 12px;border-radius:16px;font-size:1.5rem;background:color-mix(in srgb,var(--brand) 12%,transparent)}
+/* 7: no empty pill next to the search button */
+#todayTotal:empty{display:none}
+/* 2: brand-colored text links/pills reach AA contrast (3.8:1 in dark before) */
+:root{--brand-text:color-mix(in srgb,var(--brand) 85%,#000)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--brand-text:color-mix(in srgb,var(--brand) 70%,#fff)}}
+:root[data-theme="dark"]{--brand-text:color-mix(in srgb,var(--brand) 70%,#fff)}
+:root[data-theme="light"]{--brand-text:color-mix(in srgb,var(--brand) 85%,#000)}
+.upc-h button,.section-h .tot,.sec-search{color:var(--brand-text)}
+/* 8: installment sheet has three buttons (save / paid / cancel): one row, no orphan under the grid */
+#iiSheet .sheet-actions{display:flex;gap:10px}
+#iiSheet .sheet-actions>.btn{flex:1;min-width:0}
+#iiSheet .sheet-actions>#iiSave{flex:2}

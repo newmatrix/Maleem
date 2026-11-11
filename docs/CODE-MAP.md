@@ -9,7 +9,7 @@
 | `001-error-log.js` | 37 | Local error log: catches script errors, unhandled promises and console.error(Error) into a small cleaned list on the phone (errLog / errReport); outside the app data and the backups. |
 | `010-state-and-storage.js` | 529 | Storage and the state S: persistence, member keys, save(); the translation engine (trText / TX / trNode) and language; payment methods; the currency table and custom currencies. |
 | `020-theme-and-toast.js` | 118 | Theme / palette / font, toast messages, the list row of an expense. |
-| `030-home.js` | 177 | Home (expenses) screen helpers: pay periods (periodOf, daysLeft), forecast and daily allowance, the eye toggle, closing a period, renderHome. |
+| `030-home.js` | 178 | Home (expenses) screen helpers: pay periods (periodOf, daysLeft), forecast and daily allowance, the eye toggle, closing a period, renderHome. |
 | `031-reports.js` | 121 | Reports screen, report periods and the category detail. |
 | `032-search.js` | 132 | Search over every movement and its filters. |
 | `040-navigation-and-sheets.js` | 186 | Settings render, renderAll, tab navigation (go), the amount box with its calculator, category grid, note suggestions. |
@@ -27,6 +27,7 @@
 | `093-trash.js` | 74 | Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet. |
 | `094-error-log-ui.js` | 14 | The error log card in the feedback page: count, see / copy the report, clear. |
 | `095-backup-encryption.js` | 94 | Optional backup encryption: AES-GCM with a key from a password (bkeSeal / bkOpen), the password prompt while restoring, and the settings row with its sheet. |
+| `096-polish-extras.js` | 53 | Home card for categories near or over their monthly limit (renderLimCard), the month's fixed expenses checklist on the obligations tab (renderMonthFixed), «send this message as an example» for the bank-notification capture (capMask). |
 | `100-debts-and-gameyas.js` | 548 | Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text. |
 | `110-profile-currency-income-payments.js` | 381 | Me / profile, app currency change and exchange rates, income list, payment methods. |
 | `120-google-drive-updates-reminder.js` | 320 | Google Drive backup and restore (driveCall, restore sheet), app updates (check / download), the developer message and the periodic support reminder (nudge). |
@@ -62,7 +63,7 @@ Theme / palette / font, toast messages, the list row of an expense.
 ### 030-home.js
 Home (expenses) screen helpers: pay periods (periodOf, daysLeft), forecast and daily allowance, the eye toggle, closing a period, renderHome.
 
-`payLen` `wk` `unitPrev` `unitBefore` `endWord` `repPd` `periodOf` `periodAt` `daysTxt` `ofPeriod` `daysLeft` `periodRange` `periodLabel` `greet` `countUp` `forecastLine` `dailyAllowance` `dailyLine` `EYE_ON` `EYE_OFF` `paintEye` `cleanClosed` `closeInfo` `renderCloseCard` `openClose` `homeExpenseView` `homeExpenseRow` `closeHomeExpenseMenu` `renderHome`
+`payLen` `wk` `unitPrev` `unitBefore` `endWord` `repPd` `periodOf` `periodAt` `daysTxt` `ofPeriod` `daysLeft` `periodRange` `periodLabel` `greet` `GREET_EMO` `countUp` `forecastLine` `dailyAllowance` `dailyLine` `EYE_ON` `EYE_OFF` `paintEye` `cleanClosed` `closeInfo` `renderCloseCard` `openClose` `homeExpenseView` `homeExpenseRow` `closeHomeExpenseMenu` `renderHome`
 
 ### 031-reports.js
 Reports screen, report periods and the category detail.
@@ -148,6 +149,11 @@ The error log card in the feedback page: count, see / copy the report, clear.
 Optional backup encryption: AES-GCM with a key from a password (bkeSeal / bkOpen), the password prompt while restoring, and the settings row with its sheet.
 
 `BKE_KEY` `bkeOk` `bkeB64` `bkeCfg` `bkeOn` `bkeAad` `bkeDerive` `bkeSave` `bkeSeal` `bkSniffEnc` `bkeIsEnv` `bkeDecrypt` `bkOpen` `bkePassRes` `bkePrompt` `bkePassDone` `bkePassClose` `bkePaint` `openBkEnc`
+
+### 096-polish-extras.js
+Home card for categories near or over their monthly limit (renderLimCard), the month's fixed expenses checklist on the obligations tab (renderMonthFixed), «send this message as an example» for the bank-notification capture (capMask).
+
+`renderLimCard` `renderMonthFixed` `capMask`
 
 ### 100-debts-and-gameyas.js
 Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text.

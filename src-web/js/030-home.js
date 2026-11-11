@@ -36,9 +36,10 @@ function greet(){
   const h=new Date().getHours();
   const [t,e]= h>=5&&h<12? ['صباح الخير','☀️'] : h>=12&&h<17? ['مساء الخير','🌤️'] : ['مساء الخير','🌙'];
   const first=((S.profile&&S.profile.name)||'').trim().split(/\s+/)[0]||'';
-  const key=t+e+first, el=$('#greet'); if(el.dataset.g===key) return; el.dataset.g=key;
-  el.innerHTML=`${t}${first?' يا '+esc(first):''} <span class="wave" aria-hidden="true">${e}</span>`;
+  GREET_EMO=e; const key=t+e+first, el=$('#greet'); if(el.dataset.g===key) return; el.dataset.g=key;
+  el.textContent=`${t}${first?' يا '+first:''}`;
 }
+let GREET_EMO='';
 function countUp(el,to){
   const from=parseFloat(el.dataset.v||'0'); el.dataset.v=to;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||from===to){el.textContent=fmt(to);return}
@@ -122,7 +123,7 @@ $('#todayList').onclick=e=>{if(e.target.closest('[data-more],[data-rc]'))return;
 function renderHome(){
   const now=Date.now(), mk=monKey(now), tk=dayKey(now);
   greet(); paintEye(); try{renderCloseCard()}catch(e){console.error(e)}
-  $('#todayLabel').textContent=new Date().toLocaleDateString(LOC,{weekday:'long',day:'numeric',month:'long'});
+  $('#todayLabel').innerHTML=esc(new Date().toLocaleDateString(LOC,{weekday:'long',day:'numeric',month:'long'}))+(GREET_EMO?` <span class="wave" aria-hidden="true">${GREET_EMO}</span>`:'');
   const fixed=S.budgetMode==='fixed', P=periodOf(now), spent= fixed? budgetSpent(P) : sum(ofMonth(mk)), B=fixed&&S.budget>0?budOf(P):0;
   let h='';
   if(B>0){

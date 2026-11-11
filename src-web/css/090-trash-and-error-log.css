@@ -34,3 +34,4 @@
 .hero .hero-foot .fc{margin:0;flex:1 1 auto;min-width:0}
 .hero .hero-foot .hero-go{margin-top:0}
 .hero .hero-foot .hero-go:only-child{margin-inline-start:auto}
+#updGo[hidden]+#updLater{grid-column:1/-1;justify-self:center;width:min(100%,280px)}

@@ -250,7 +250,7 @@ function paintHomeChips(){
   const fa=freeIncomeActive(), ma=S.accounts.length>0&&S.moneyView!=='off';
   f.hidden=!fa; m.hidden=!ma; $('#homeChips').hidden=!(fa||ma);
   if(fa) f.innerHTML=`<span>💼 ${esc(TX('الدخل الحر'))}</span><b>${money(freeIncomeBalance())} ${CS()}</b>`;
-  if(ma){const mv=mvState(); m.innerHTML=`<span>👛 ${esc(TX('فلوسي'))}</span><b>${money(mv.tot)} ${CS()}</b>`}
+  if(ma){const mv=mvState(); m.innerHTML=`<span>👛 ${esc(TX('فلوسي'))}</span><b>${money(mv.tot)} ${CS()}</b>${mv.missing&&mv.missing.length?'<i class="hchip-warn" aria-hidden="true">⚠</i>':''}`}
 }
 $('#chipFree').onclick=()=>{closeSheets();openSheetEl('freeSheet')};
 $('#chipMoney').onclick=()=>{closeSheets();openSheetEl('moneySheet')};

@@ -479,7 +479,7 @@ function deleteGam(id){
   const [g]=S.gams.splice(i,1); const tid=trashPut('gam',g,i); save();renderAll();
   toast('اتحذفت '+g.name+' (الأقساط المدفوعة فاضلة في مصاريفك)','تراجع',()=>{trashDel(tid);S.gams.splice(i,0,g);save();renderAll()},3000);
 }
-const HOME_BLOCKS=[['upcoming','المواعيد القريبة','#upcoming'],['caps','العمليات اللي لقطها مليم من الإشعارات','#capBox'],['summary','ملخص الشهر','#sumBox'],['close','كارت «قفّل الفترة»','#closeCard'],['today','مصاريف النهارده','#todayBlock']];
+const HOME_BLOCKS=[['upcoming','المواعيد القريبة','#upcoming'],['limits','حدود الفئات','#limBox'],['caps','العمليات اللي لقطها مليم من الإشعارات','#capBox'],['summary','ملخص الشهر','#sumBox'],['close','كارت «قفّل الفترة»','#closeCard'],['today','مصاريف النهارده','#todayBlock']];
 function applyHomeShow(){ const h=S.homeHide||{}; HOME_BLOCKS.forEach(([k,,sel])=>{ const el=document.querySelector(sel); if(el) el.hidden=!!h[k] }) }
 function renderHomeToggles(){
   const box=$('#homeToggles'); if(!box) return; const h=S.homeHide||{};
