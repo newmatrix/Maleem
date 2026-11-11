@@ -27,7 +27,7 @@
 | `093-trash.js` | 74 | Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet. |
 | `094-error-log-ui.js` | 14 | The error log card in the feedback page: count, see / copy the report, clear. |
 | `095-backup-encryption.js` | 94 | Optional backup encryption: AES-GCM with a key from a password (bkeSeal / bkOpen), the password prompt while restoring, and the settings row with its sheet. |
-| `096-polish-extras.js` | 53 | Home card for categories near or over their monthly limit (renderLimCard), the month's fixed expenses checklist on the obligations tab (renderMonthFixed), «send this message as an example» for the bank-notification capture (capMask). |
+| `096-polish-extras.js` | 32 | Home card for categories near or over their monthly limit (renderLimCard), «send this message as an example» for the bank-notification capture (capMask). |
 | `100-debts-and-gameyas.js` | 548 | Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text. |
 | `110-profile-currency-income-payments.js` | 381 | Me / profile, app currency change and exchange rates, income list, payment methods. |
 | `120-google-drive-updates-reminder.js` | 320 | Google Drive backup and restore (driveCall, restore sheet), app updates (check / download), the developer message and the periodic support reminder (nudge). |
@@ -151,9 +151,9 @@ Optional backup encryption: AES-GCM with a key from a password (bkeSeal / bkOpen
 `BKE_KEY` `bkeOk` `bkeB64` `bkeCfg` `bkeOn` `bkeAad` `bkeDerive` `bkeSave` `bkeSeal` `bkSniffEnc` `bkeIsEnv` `bkeDecrypt` `bkOpen` `bkePassRes` `bkePrompt` `bkePassDone` `bkePassClose` `bkePaint` `openBkEnc`
 
 ### 096-polish-extras.js
-Home card for categories near or over their monthly limit (renderLimCard), the month's fixed expenses checklist on the obligations tab (renderMonthFixed), «send this message as an example» for the bank-notification capture (capMask).
+Home card for categories near or over their monthly limit (renderLimCard), «send this message as an example» for the bank-notification capture (capMask).
 
-`renderLimCard` `renderMonthFixed` `capMask`
+`renderLimCard` `capMask`
 
 ### 100-debts-and-gameyas.js
 Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text.

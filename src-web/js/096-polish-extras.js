@@ -17,27 +17,6 @@ function renderLimCard(){
 }
 document.addEventListener('click',e=>{if(!e.target.closest('[data-golim]'))return; closeSheets(); go('settings'); setGo('cats')});
 
-/* Obligations: this month's monthly fixed expenses, logged or still waiting */
-function renderMonthFixed(){
-  const box=$('#obMonth'); if(!box) return;
-  const mk=monKey(Date.now()), start=dkToTs(mk+'-01'), end=dkToTs(nextMonth(mk)+'-01'), items=[];
-  S.fixed.forEach(f=>{
-    if(f.paused||fixedUnit(f)!=='monthly'||!(+f.amount>0)) return;
-    fixedOccurrences(f,start,end).forEach(o=>items.push({f,o,st:S.fixedLog[f.id+':'+o.key]}));
-  });
-  if(!items.length){box.innerHTML='';return}
-  items.sort((a,b)=>a.o.dk<b.o.dk?-1:a.o.dk>b.o.dk?1:0);
-  const total=r2(items.reduce((a,x)=>a+(+x.f.amount),0)), logged=items.filter(x=>x.st==='done'), paid=r2(logged.reduce((a,x)=>a+(+x.f.amount),0));
-  const waiting=items.filter(x=>x.st!=='done'&&x.st!=='skip'), left=r2(waiting.reduce((a,x)=>a+(+x.f.amount),0));
-  const pc=total>0?Math.min(100,Math.round(paid/total*100)):0;
-  box.innerHTML=`<div class="upc mo-card"><div class="upc-h"><b>ثوابت الشهر ده</b><span class="mo-sum">اتسجل ${logged.length} من ${items.length}</span></div>
-<div class="mo-bar"><i style="width:${pc}%"></i></div>
-<div class="mo-left">${waiting.length?`فاضل تسجّل ${money(left)} ${CS()}`:'كله اتسجل ✓'}</div>`+
-  items.map(({f,o,st})=>{const c=CAT[f.cat]||CAT.other, n=diffDays(o.dk), late=!st&&n<0;
-    const right=st==='done'?`<span class="due ok">اتسجل ✓</span>`:st==='skip'?`<span class="due">اتخطى</span>`:`<button class="paybtn" style="--cc:var(--brand)" data-fpay="${esc(f.id+':'+o.key)}">سجّل</button>`;
-    return `<div class="ur mo-row${st==='done'||st==='skip'?' done':''}"><div class="ui">${esc(c.e)}</div><div class="ut">${esc(f.name)}<small><span class="due${late?' late':''}">${esc(relDay(n))}</span></small></div><span class="ua">${money(f.amount)} <small style="font-weight:500;color:var(--muted)">${CS()}</small></span>${right}</div>`}).join('')+`</div>`;
-}
-
 /* Bank-notification capture: send a message the app could not read, with the long numbers hidden first */
 function capMask(t){
   const D='[\\d\\u0660-\\u0669]';

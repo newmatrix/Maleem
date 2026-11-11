@@ -25,14 +25,6 @@
 .lim-row .ut{min-width:0;flex:1}
 .lim-row .lim-bar{max-width:none;margin-top:6px}
 .lim-more{padding:8px 14px 12px;font-size:.8rem;color:var(--muted);text-align:center;border-top:1px solid var(--line)}
-/* 7: this month's fixed expenses */
-#obMonth .upc{margin:0 0 12px}
-.mo-card .upc-h .mo-sum{font-size:.82rem;color:var(--muted);font-weight:600}
-.mo-bar{height:6px;margin:4px 14px 0;border-radius:3px;background:var(--surface-2);overflow:hidden}
-.mo-bar i{display:block;height:100%;border-radius:3px;background:var(--ok)}
-.mo-left{padding:6px 14px 8px;font-size:.84rem;color:var(--muted)}
-.mo-row.done{opacity:.62}
-.due.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:color-mix(in srgb,var(--ok) 70%,var(--ink))}
 /* 9: «my money» chip warns when an account has no exchange rate */
 .hchip-warn{font-style:normal;margin-inline-start:6px;color:var(--warn)}
 /* capture details: the currency picker label was squeezed into one letter per line in the narrow panel */

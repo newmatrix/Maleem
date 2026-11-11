@@ -3,11 +3,6 @@
 عدّت الحد => Over the limit
 قربت => Near the limit
 و№ فئة كمان قربت => + № more near the limit
-ثوابت الشهر ده => This month's fixed expenses
-اتسجل № من № => № of № logged
-فاضل تسجّل § => Left to log §
-كله اتسجل ✓ => All logged ✓
-اتسجل ✓ => Logged ✓
 اتخطى => Skipped
 الرسالة دي مش مفهومة؟ ابعتها كمثال => Not understood? Send it as an example
 رسالة بنك مليم مفهمهاش صح. اتخفت منها الأرقام الطويلة، راجعها قبل ما تبعت: => Maleem could not read this bank message. Long numbers were hidden; review it before sending:
