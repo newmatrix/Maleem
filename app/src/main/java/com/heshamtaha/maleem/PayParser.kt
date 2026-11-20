@@ -42,7 +42,35 @@ object PayParser {
     )
 
     private const val NUM = "(\\d{1,3}(?:[,٬]\\d{3})+|\\d+)([.٫]\\d{1,2})?"
-    private const val CUR = "(EGP|LE|L\\.E\\.?|جنيه(?:ا|ات)?|جنية|ج\\.م\\.?|جم|ج)"
+    private const val CUR = "(AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BRL|BSD|BTN|BWP|BYN|BZD|CAD|CDF|CHF|CLF|CLP|CNH|CNY|COP|CRC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|FOK|GBP|GEL|GGP|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HRK|HTG|HUF|IDR|ILS|IMP|INR|IQD|IRR|ISK|JEP|JMD|JOD|JPY|KES|KGS|KHR|KID|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRU|MUR|MVR|MWK|MXN|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SLL|SOS|SRD|SSP|STN|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TVD|TWD|TZS|UAH|UGX|USD|UYU|UZS|VES|VND|VUV|WST|XAF|XCD|XCG|XOF|XPF|YER|ZAR|ZMW|ZWG|ZWL|LE|L\\.E\\.?|ريال(?: سعودي| قطري| عماني)?|ر\\.س\\.?|درهم(?: إماراتي| اماراتي| مغربي)?|دولار(?: أمريكي| امريكي| كندي| أسترالي)?|يورو|ليرة(?: تركية| سورية| لبنانية)?|دينار(?: كويتي| بحريني| أردني| اردني| عراقي| تونسي)?|جنيه(?:ا|ات| مصري)?|جنية|ج\\.م\\.?|جم|ج)"
+
+    fun currencyCode(raw: String): String {
+        val value = raw.trim().uppercase(java.util.Locale.ROOT)
+        if (Regex("[A-Z]{3}").matches(value)) return value
+        return when {
+            value.contains("قطري") -> "QAR"
+            value.contains("عماني") -> "OMR"
+            value.contains("مغربي") -> "MAD"
+            value.contains("كندي") -> "CAD"
+            value.contains("أسترالي") -> "AUD"
+            value.contains("لبنانية") -> "LBP"
+            value.contains("سورية") -> "SYP"
+            value.contains("كويتي") -> "KWD"
+            value.contains("بحريني") -> "BHD"
+            value.contains("أردني") || value.contains("اردني") -> "JOD"
+            value.contains("عراقي") -> "IQD"
+            value.contains("تونسي") -> "TND"
+            value.startsWith("ريال") || value.startsWith("ر.س") -> "SAR"
+            value.startsWith("درهم") -> "AED"
+            value.startsWith("دولار") -> "USD"
+            value == "يورو" -> "EUR"
+            value.startsWith("ليرة") -> if (value.contains("تركية")) "TRY" else ""
+            value.startsWith("دينار") -> ""
+            value.isEmpty() -> ""
+            else -> "EGP"
+        }
+    }
+
     private val CUR_THEN_NUM = Regex("(?i)(?<![A-Za-z\\u0600-\\u06FF])$CUR\\s*[:.]?\\s*$NUM")
     private val NUM_THEN_CUR = Regex("(?i)$NUM\\s*$CUR(?![A-Za-z\\u0600-\\u06FF])")
     private val AMOUNT_WORD = Regex("(?i)(?:مبلغ|بمبلغ|قيمة|بقيمة|amount|amt)\\s*[:.]?\\s*$NUM")
@@ -126,6 +154,6 @@ object PayParser {
         val incoming = returned || INCOMING.containsMatchIn(t)
         if (!incoming && !OUTGOING.containsMatchIn(t)) return null
         val (amount, cur) = pickAmount(t) ?: return null
-        return Result(amount, cur, if (incoming) sender(t) else merchant(t), method(pkg, t), if (incoming) "in" else "out")
+        return Result(amount, currencyCode(cur), if (incoming) sender(t) else merchant(t), method(pkg, t), if (incoming) "in" else "out")
     }
 }

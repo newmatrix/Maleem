@@ -27,6 +27,7 @@ function trashRestore(id){
   const cl=TRASH_CLEAN[t.k](t.d), arr=S[TRASH_ARR[t.k]];
   if(!cl){trashDel(id);save();return false}
   if(arr.some(x=>x.id===cl.id)) cl.id=uid();
+  if(t.k==='debt')debtAccRows(cl).forEach(r=>{if(r.acc&&!ACC(r.acc)){delete r.acc;delete r.accAmt}});
   if(t.k==='xp'){
     if(cl.acc&&!ACC(cl.acc)){delete cl.acc;delete cl.accAmt} // its account was deleted meanwhile
     if(cl.inst&&!S.insts.some(p=>p.items.some(it=>it.id===cl.inst))) delete cl.inst;

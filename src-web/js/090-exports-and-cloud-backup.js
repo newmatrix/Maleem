@@ -224,15 +224,18 @@ $('#expCancel').onclick=closeSheets;
 /* Cloud backup */
 let db=null, myId=null;
 async function backupDoc(){return db.collection('data/users/'+myId).doc(ME.id==='m1'?'backup':'backup-'+ME.id)}
-const backupData=()=>({expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,plans:S.plans,iplans:S.iplans,refunds:S.refunds,capCurBy:S.capCurBy,closedP:S.closedP,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,bMoves:S.bMoves,insts:S.insts,instPays:S.instPays,inflows:S.inflows,gold:S.gold,goldPx:S.goldPx,manRates:S.manRates,payType:S.payType,payAnchor:S.payAnchor,prefs:{lang:S.lang||LANG,moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,curs:S.curs,press:S.press,trans:S.trans,haptic:S.haptic,fabPin:S.fabPin,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide,ipFee:S.ipFee}});
+const backupData=()=>({space:spCleanMembership(S.space),spaceRecovery:spRecoverySnapshot(),expenses:S.expenses,budget:S.budget,budgetMode:S.budgetMode,payday:S.payday,cats:S.cats,debts:S.debts,gams:S.gams,profile:S.profile,since:S.since,incomes:S.incomes,goals:S.goals,saveTarget:S.saveTarget,currency:S.currency,fixed:S.fixed,fixedLog:S.fixedLog,plans:S.plans,iplans:S.iplans,refunds:S.refunds,capCurBy:S.capCurBy,closedP:S.closedP,pays:S.pays,lastPay:S.lastPay,accounts:S.accounts,transfers:S.transfers,bMoves:S.bMoves,insts:S.insts,instPays:S.instPays,inflows:S.inflows,gold:S.gold,goldPx:S.goldPx,manRates:S.manRates,payType:S.payType,payAnchor:S.payAnchor,prefs:{lang:S.lang||LANG,moneyView:S.moneyView,theme:S.theme,accent:S.accent,style:S.style,look:S.look,font:S.font,fontW:S.fontW,curs:S.curs,press:S.press,trans:S.trans,haptic:S.haptic,fabPin:S.fabPin,blockScreenshots:S.blockScreenshots,catGrouping:S.catGrouping,fixedLinks:S.fixedLinks,alert80:S.alert80,alertPct:S.alertPct,remind:S.remind,remindAt:S.remindAt,dueRemind:S.dueRemind,autoBkDays:S.autoBkDays,sumOn:S.sumOn,homeHide:S.homeHide,ipFee:S.ipFee}});
 let restoreReloadT;
 function applyBackup(p,at,onUndo){
   clearTimeout(restoreReloadT);
   const beforeRestore=JSON.parse(JSON.stringify(S));
-  if(S.space) spDetach();
+  if(S.space) spStop();
+  // Older backups never contained membership: preserve the current one instead of silently leaving it.
+  const restoredSpace=spCleanMembership(p.space);
+  if(restoredSpace){S.space=restoredSpace;S.spaceRequest=null;S.spaceRecovery=spCleanRecovery(p.spaceRecovery,restoredSpace.uid)}
   curMerge(p.prefs&&typeof p.prefs==='object'?p.prefs.curs:[]); // custom currencies first: accounts and the currency check below use them
   /* every record goes through the same cleaners used for stored data: a crafted file can't inject HTML or break the screens */
-  {const seen=new Set(); S.expenses=(Array.isArray(p.expenses)?p.expenses:[]).map(x=>cleanExpense(x,false)).filter(Boolean)
+  {const seen=new Set(); S.expenses=(Array.isArray(p.expenses)?p.expenses:[]).map(x=>cleanExpense(x,!!(S.space&&x&&x.sp===S.space.code))).filter(Boolean)
     .map(e=>{if(seen.has(e.id)) e.id=uid(); seen.add(e.id); return e})}
   {const old=trashAll(); S.trash=[]; old.forEach(trashLetGo)} // the trash belongs to the data it was made from
   if(p.budget!==undefined) S.budget=numIn(p.budget,0,MAXAMT,0);
@@ -256,7 +259,7 @@ function applyBackup(p,at,onUndo){
   syncPays();
   if(p.prefs&&typeof p.prefs==='object'){const f=p.prefs;
     if(['eg','ar','en'].includes(f.lang)) S.lang=f.lang;
-    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look; if(FONTS.some(x=>x.id===f.font)) S.font=f.font; if(f.fontW==='bold'||f.fontW==='normal') S.fontW=f.fontW; if(PRESSES.some(x=>x.id===f.press)) S.press=f.press; if(TRANSES.some(x=>x.id===f.trans)) S.trans=f.trans; if(typeof f.haptic==='boolean') S.haptic=f.haptic; S.fabPin=f.fabPin===true;
+    if(['light','dark','system'].includes(f.theme)) S.theme=f.theme; if(ACCENTS.some(a=>a.id===f.accent)) S.accent=f.accent; if(typeof f.style==='string'&&STYLES[f.style]) S.style=f.style; if(LOOKS.some(x=>x.id===f.look)) S.look=f.look; if(FONTS.some(x=>x.id===f.font)) S.font=f.font; if(f.fontW==='bold'||f.fontW==='normal') S.fontW=f.fontW; if(PRESSES.some(x=>x.id===f.press)) S.press=f.press; if(TRANSES.some(x=>x.id===f.trans)) S.trans=f.trans; if(typeof f.haptic==='boolean') S.haptic=f.haptic; S.fabPin=f.fabPin===true;S.blockScreenshots=f.blockScreenshots!==false;S.catGrouping=f.catGrouping===true;S.fixedLinks=Array.isArray(f.fixedLinks)?[...new Set(f.fixedLinks.filter(x=>typeof x==='string'&&/^(inst|gam):[A-Za-z0-9_-]+$/.test(x)))].slice(0,500):[];applySecure();
     if(['off','sum','split'].includes(f.moneyView)) S.moneyView=f.moneyView;
     S.homeHide=f.homeHide&&typeof f.homeHide==='object'?Object.fromEntries(['upcoming','caps','summary','close','today'].filter(k=>f.homeHide[k]===true).map(k=>[k,true])):{};
     ['alert80','remind','dueRemind','sumOn'].forEach(k=>{if(typeof f[k]==='boolean') S[k]=f[k]});
@@ -271,7 +274,8 @@ function applyBackup(p,at,onUndo){
   S.onboarded=true; hideWelcome();
   save();syncCats();renderAll();
   const langChanged=(S.lang||LANG)!==LANG;
-  if(langChanged) restoreReloadT=setTimeout(()=>location.reload(),8500);
+  if(langChanged||restoredSpace) restoreReloadT=setTimeout(()=>location.reload(),8500);
+  else if(S.space)spListen();
   toast('اترجعت '+S.expenses.length+' مصروف من نسخة '+shortDate(at)+(langChanged?' · اللغة هتتطبق بعد مهلة التراجع':''),'تراجع',()=>{
     clearTimeout(restoreReloadT); if(S.space) spStop(); S=beforeRestore;
     if(onUndo) Promise.resolve(onUndo()).catch(()=>toast('تعذر إرجاع بعض صور الإيصالات'));

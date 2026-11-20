@@ -39,7 +39,7 @@ function renderSettings(){
 function renderAll(){
   userTextCache=null;
   /* each screen renders on its own: a problem in one of them must not leave the whole app blank */
-  [renderMe,renderMeHome,renderGold,paintIpFee,renderIncome,renderAccounts,renderHome,renderLimCard,renderDebts,renderReports,()=>{if(!$('#reportsDetail').hidden)renderDetail()},()=>{if(!$('#reportsCategory').hidden)renderReportCategory()},()=>{if($('#searchSheet').classList.contains('open'))renderSearch()},bkePaint,renderSettings]
+  [renderFeedbackControls,renderMe,renderMeHome,renderGold,paintIpFee,renderIncome,renderAccounts,renderHome,renderLimCard,renderDebts,renderReports,()=>{if(!$('#reportsDetail').hidden)renderDetail()},()=>{if(!$('#reportsCategory').hidden)renderReportCategory()},()=>{if($('#searchSheet').classList.contains('open'))renderSearch()},bkePaint,renderSettings]
     .forEach(f=>{try{f()}catch(e){console.error(e)}});
 }
 
@@ -160,7 +160,7 @@ function buildPad(el,onKey,withDot){
   el.innerHTML=keys.map(k=>k?`<button type="button" data-k="${k}" aria-label="${k==='⌫'?'مسح':k}">${k}</button>`:'<span></span>').join('');
   el.onclick=e=>{const b=e.target.closest('button');if(b)onKey(b.dataset.k)};
 }
-function renderCatGrid(keepScroll){const n=S.cats.length, cols=Math.max(6,Math.ceil(n/2)); $('#cats').style.setProperty('--cols',cols); $('#cats').classList.toggle('wide',cols>6); if(!keepScroll) $('#cats').scrollLeft=0;
+function renderCatGrid(keepScroll){if(S.catGrouping){renderGroupedCategories();return}$('#cats').classList.remove('grouped');$('#catGrouping').checked=false;const n=S.cats.length, cols=Math.max(6,Math.ceil(n/2)); $('#cats').style.setProperty('--cols',cols); $('#cats').classList.toggle('wide',cols>6); if(!keepScroll) $('#cats').scrollLeft=0;
   $('#cats').innerHTML=S.cats.map(c=>`<button type="button" class="cat" data-cat="${esc(c.id)}" aria-pressed="false"><span class="e">${esc(c.e)}</span><span class="cat-name"${CATS.some(d=>d.id===c.id&&d.name===c.name)?'':' data-notr'}>${esc(c.name)}</span></button>`).join('')}
 renderCatGrid(true); // at start: no scroll reset (it would force a full layout before the first frame)
 $('#cats').onclick=e=>{const b=e.target.closest('.cat');if(!b)return;selCat=b.dataset.cat;markCat();renderNoteSug();$('#cats').classList.remove('err');$('#sheetErr').textContent=''};

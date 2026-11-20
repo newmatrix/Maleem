@@ -38,7 +38,7 @@ await run('InstaPay fee shows for a typed InstaPay expense (setting on), not oth
   await p.locator('#cats .cat').first().click();await p.click('#saveBtn');await p.waitForTimeout(300);
   const r=await p.evaluate(()=>testApp.S.expenses.map(x=>({a:x.amount,n:x.note,pay:x.pay})));
   assert.equal(r.length,2);assert(r.some(x=>x.a===1000)&&r.some(x=>x.n==='رسوم إنستاباي'&&x.a>0),JSON.stringify(r));
-  await open(false);await pickPay('instapay');assert.equal(await vis(p,'#ipFeeRow'),false);
+  await open(false);await pickPay('instapay');assert.equal(await vis(p,'#ipFeeRow'),true);assert.equal(await p.locator('#ipFeeChk').isChecked(),false);
   await p.evaluate(()=>{const a=testApp;a.S.ipFee={on:true,pct:0.1,min:0.5,max:20};a.S.expenses=[{id:'old',amount:50,cat:'food',ts:Date.now()-36e5,pay:'instapay'}];a.save();a.openSheet('old')});await p.waitForTimeout(300);
   assert.equal(await vis(p,'#ipFeeRow'),false);
 },'eg',390);
@@ -47,7 +47,7 @@ await run('The time is shown on the date pill and can be changed from its menu',
   assert(/\d{1,2}:\d{2}/.test(await p.locator('#datePill').textContent()),await p.locator('#datePill').textContent());
   await p.click('#datePill');assert.equal(await vis(p,'#dateTimeOpen'),true);await p.click('#dateTimeOpen');
   assert.equal(await p.evaluate(()=>document.querySelector('#expenseDatePopup').open),true);
-  await p.evaluate(()=>{document.querySelector('#expenseTimeDraft').value='00:07'});await p.click('#expenseDateApply');
+  await p.evaluate(()=>{document.querySelector('#expenseHourWheel').scrollTop=0;document.querySelector('#expenseMinuteWheel').scrollTop=7*44;document.querySelector('#expenseMinuteWheel').dispatchEvent(new Event('scroll'))});await p.click('#expenseDateApply');
   const t=await p.locator('#datePill').textContent();assert(/(12|0):07/.test(t.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d))),t);
   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),true);
 },'eg',390);

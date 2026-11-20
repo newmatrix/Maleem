@@ -89,14 +89,14 @@ function renderDetail(){
   // by day
   const days={};list.forEach(x=>{(days[dayKey(x.ts)]=days[dayKey(x.ts)]||[]).push(x)});
   const keys=Object.keys(days).sort().reverse();
-  $('#dayByDay').innerHTML= keys.map(k=>{const arr=days[k].sort((a,b)=>b.ts-a.ts);
+  $('#dayByDay').innerHTML= keys.map(k=>{const arr=days[k].reverse().sort((a,b)=>b.ts-a.ts);
     return `<div class="day-h"><span>${dayName(k)}</span><span>${money(sum(arr))} ${CS()}</span></div><div class="day-list">${arr.map(homeExpenseRow).join('')}</div>`}).join('');
 }
 
 var reportCategoryId='',reportCategoryReturn='detail';
 function openReportCategory(id){if(!CAT[id])return;reportCategoryId=id;reportCategoryReturn=$('#reportsDetail').hidden?'main':'detail';showSub('category')}
 function renderReportCategory(){
-  const c=CAT[reportCategoryId]||CAT.other,P=repP(curMonth),list=ofPeriod(P).filter(x=>x.cat===reportCategoryId).sort((a,b)=>b.ts-a.ts);
+  const c=CAT[reportCategoryId]||CAT.other,P=repP(curMonth),list=ofPeriod(P).filter(x=>x.cat===reportCategoryId).reverse().sort((a,b)=>b.ts-a.ts);
   $('#reportCategoryTitle').textContent=c.e+' '+c.name;
   $('#reportCategoryPeriod').textContent=repName(P);
   $('#reportCategoryTotal').innerHTML=money(sum(list))+' '+esc(CS());

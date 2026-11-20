@@ -723,6 +723,12 @@ class MainActivity : AppCompatActivity() {
 
         /** Summary for the home-screen widgets (today, period total, budget...). */
         @JavascriptInterface
+        fun captureCurrency(json: String) {
+            if (!pageOk || json.length > 40_000) return
+            try { PayCapture.configureCurrency(this@MainActivity, json) } catch (_: Exception) { }
+        }
+
+        @JavascriptInterface
         fun syncWidget(json: String) {
             if (!pageOk || json.length > 20_000) return
             try {

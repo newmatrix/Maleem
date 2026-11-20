@@ -123,14 +123,15 @@ function openSheet(id,pre){
   const target=id?S.expenses.find(e=>e.id===id):null;
   if(target&&!expenseCanManage(target)){toast('مصروفات الأعضاء الآخرين للقراءة فقط');return}
   editId=id||null; fxPending= pre&&pre.fx? pre.fx : null; plPending= !target&&pre&&pre.pl? pre.pl : null;
-  capOpen= !target&&pre&&pre.cap? {id:pre.cap,ts:pre.ts} : null;
+  capOpen= !target&&pre&&pre.cap? {id:pre.cap,ts:pre.ts,noFee:pre.noFee===true,original:pre.original} : null;
   rcStage=null;
   const x=target;
   $('#expenseFund').value=x&&x.fund==='free'?'free':'budget';paintExpenseFund();
-  renderCatGrid();
+  selCat=x&&CAT[x.cat]?x.cat:pre&&CAT[pre.cat]?pre.cat:null;renderCatGrid();
   amtIn.value= x? String(x.amount): pre&&pre.amount? String(pre.amount):''; selCat= x&&CAT[x.cat]? x.cat: pre&&CAT[pre.cat]? pre.cat:null;
   $('#noteInput').value= x? (x.note||''): pre? (pre.note||''):'';
-  ipfPre=!!(!target&&pre&&pre.ipf); $('#ipFeeChk').checked=true;
+  const orig=entryOriginal(x);entryCurrencyOptions($('#expenseCurrency'),orig?orig.c:pre&&pre.cur||S.currency);if(orig)amtIn.value=String(orig.a);
+  ipfPre=!!(!target&&pre&&pre.ipf); $('#ipFeeChk').checked=!!((S.ipFee.on&&!(capOpen&&capOpen.original&&capOpen.original.c!=='EGP'))||ipfPre);$('#ipFeeAmount').dataset.manual='';
   $('#fxSkip').hidden=!(fxPending||plPending); $('#fxSkip').textContent= plPending? 'مش هسجله، شيله من المصروفات الجاية' : TX('تخطي الاستحقاق ده'); setCalc(false); showCalc(); renderNoteSug();
   selPay= x? payOf(x) : pre&&PAY[pre.pay]? pre.pay : (PAY[S.lastPay]?S.lastPay:'cash'); paintPay(); closePayMenu(); ipFeeSync();
   selAcc= x? (x.acc||'') : pre&&typeof pre.acc==='string'? (ACC(pre.acc)?pre.acc:'') : (ACC(S.lastAcc)?S.lastAcc:''); paintAccRow();
@@ -143,11 +144,13 @@ function openSheet(id,pre){
   $('#delInSheet').hidden=!x; $('#expActions').classList.toggle('has-del',!!x);
   $('#amountBox').classList.remove('err');$('#sheetErr').textContent='';markCat();$('#cats').classList.remove('err');
   $('#scrim').classList.add('open');$('#sheet').classList.add('open');
+  paintEntryCurrency();
   amtIn.focus({preventScroll:true}); if(x||(pre&&pre.amount)) amtIn.select();
 }
 /* the fee row: a captured InstaPay payment, or any new expense paid by InstaPay, when the fee setting is on */
-function ipFeeSync(){ $('#ipFeeRow').hidden=!(!editId&&S.ipFee.on&&(ipfPre||selPay==='instapay')); ipFeePaint() }
-function ipFeePaint(){ if($('#ipFeeRow').hidden) return; const v=readAmt(), f=v>0?ipFeeOf(v):0; $('#ipFeeTxt').innerHTML=`سجّل رسوم إنستاباي كمان${f?': '+fmt(f)+' '+CS():''}<small>مصروف منفصل بفئة «رسوم بنكية»، على نفس الحساب وطريقة الدفع</small>` }
+function ipFeeSync(){ $('#ipFeeRow').hidden=!(!editId&&!(capOpen&&capOpen.noFee)&&(ipfPre||selPay==='instapay'));$('#ipFeeAmountRow').hidden=$('#ipFeeRow').hidden||!$('#ipFeeChk').checked;ipFeePaint() }
+$('#ipFeeChk').onchange=ipFeeSync;
+function ipFeePaint(){ if($('#ipFeeRow').hidden) return; const v=readAmt(), c=$('#expenseCurrency').value||S.currency, f=v>0&&c==='EGP'&&!(capOpen&&capOpen.original&&capOpen.original.c!=='EGP')?ipFeeOf(v):0;if(!$('#ipFeeAmount').dataset.manual)$('#ipFeeAmount').value=String(f); $('#ipFeeTxt').innerHTML=`سجّل رسوم إنستاباي كمان${f?': '+fmt(f)+' '+curSym(c):''}<small>مصروف منفصل بفئة «رسوم بنكية»، على نفس الحساب وطريقة الدفع</small>` }
 amtIn.addEventListener('input',ipFeePaint);
 function closeSheets(){
   $('#updNever').hidden=true;
@@ -168,34 +171,39 @@ $('#fab').onclick=()=>{ if(tab==='debts'){ obTab==='gams'? openGamSheet() : obTa
 $('#cancelBtn').onclick=closeSheets;
 $('#scrim').onclick=closeSheets;
 $('#saveBtn').onclick=()=>{
-  const v=readAmt();
+  const raw=readAmt(), cur=$('#expenseCurrency').value, oldEntry=editId&&S.expenses.find(e=>e.id===editId);
+  const v=entryValue(raw,cur,oldEntry);
+  if(raw>0&&v===null){$('#sheetErr').textContent=TX('مفيش سعر صرف للعملية دي');return}
   if(!v||v<=0){$('#amountBox').classList.add('err');$('#sheetErr').textContent='اكتب المبلغ الأول';amtIn.focus();return}
   if(!selCat){$('#cats').classList.add('err');$('#sheetErr').textContent='اختار الفئة';return}
   const note=$('#noteInput').value.trim();
   const ac=selAcc&&ACC(selAcc)||null; let accAmt=null;
   if(ac){ const x0=editId&&S.expenses.find(e=>e.id===editId);
-    accAmt= x0&&x0.acc===ac.id&&x0.accAmt&&x0.amount===v? x0.accAmt : toAcc(v,ac);
+    accAmt=entryAccountAmount(raw,cur,v,ac,x0);
     if(accAmt==null){$('#sheetErr').textContent='الحساب ده بعملة تانية ومفيش سعر صرف متاح دلوقتي. اختار حساب بنفس العملة، أو جرّب لما النت يشتغل'; ratesRefresh(false); return} }
   const funding=$('#expenseFund').value==='free'?'free':'budget';
-  const extraFee=!editId&&!$('#ipFeeRow').hidden&&$('#ipFeeChk').checked?ipFeeOf(v):0;
+  const feeRaw=!editId&&!$('#ipFeeRow').hidden&&$('#ipFeeChk').checked?evalExpr($('#ipFeeAmount').value):0;
+  const extraFee=feeRaw>0?entryValue(feeRaw,cur,null):0;
+  if(!Number.isFinite(feeRaw)||feeRaw<0||extraFee===null){$('#sheetErr').textContent=TX('راجع مبلغ الرسوم وسعر الصرف');return}
   if(funding==='free'&&v+extraFee>freeIncomeBalance(editId)+EPS){$('#sheetErr').textContent=TX('رصيد الدخل الحر مش كفاية للمصروف ورسومه. اختار ميزانية المرتب أو زوّد الدخل الحر.');return}
   const previous=editId&&S.expenses.find(e=>e.id===editId);
   const expenseTs=expenseTimestamp(previous?previous.ts:capOpen&&capOpen.ts);
   if(expenseTs===null){$('#sheetErr').textContent=TX('اختار وقت صحيح للمصروف');return}
   if(expenseTs>Date.now()){$('#sheetErr').textContent=TX('وقت المصروف مينفعش يكون في المستقبل');return}
   if(!editId&&fxPending&&S.fixedLog[fxPending.id+':'+fxPending.mk]){$('#sheetErr').textContent=TX('الاستحقاق ده متسجل بالفعل');return}
+  if(extraFee>0&&ac&&entryAccountAmount(feeRaw,cur,extraFee,ac,null)===null){$('#sheetErr').textContent=TX('راجع مبلغ الرسوم وسعر الصرف');return}
   let savedId=editId, feeAdded=0;
-  if(editId){const x=S.expenses.find(e=>e.id===editId); if(x&&!expenseCanManage(x)){closeSheets();toast('مصروفات الأعضاء الآخرين للقراءة فقط');return} if(x){x.amount=v;if(funding==='free')x.fund='free';else delete x.fund;delete x.o;x.cat=selCat;x.note=note;x.pay=selPay;x.ts=expenseTs; if(ac){x.acc=ac.id;x.accAmt=accAmt}else{delete x.acc;delete x.accAmt}}}
+  if(editId){const x=S.expenses.find(e=>e.id===editId); if(x&&!expenseCanManage(x)){closeSheets();toast('مصروفات الأعضاء الآخرين للقراءة فقط');return} if(x){x.amount=v;if(funding==='free')x.fund='free';else delete x.fund;if(cur!==S.currency)x.o={a:r2(raw),c:cur};else delete x.o;x.cat=selCat;x.note=note;x.pay=selPay;x.ts=expenseTs; if(ac){x.acc=ac.id;x.accAmt=accAmt}else{delete x.acc;delete x.accAmt}}}
   else {const id=uid();justAdded=id;savedId=id;
     const ts=expenseTs; // Keep captured timestamps unless the user changes their date or time.
-    const e={id,amount:v,cat:selCat,note,pay:selPay,ts};if(funding==='free')e.fund='free'; S.lastPay=selPay; if(S.accounts.length) S.lastAcc=ac?ac.id:''; if(ac){e.acc=ac.id;e.accAmt=accAmt}
+    const e={id,amount:v,cat:selCat,note,pay:selPay,ts};if(cur!==S.currency)e.o={a:r2(raw),c:cur};else if(capOpen&&capOpen.original&&raw===capOpen.original.base)e.o={a:capOpen.original.a,c:capOpen.original.c};if(funding==='free')e.fund='free'; S.lastPay=selPay; if(S.accounts.length) S.lastAcc=ac?ac.id:''; if(ac){e.acc=ac.id;e.accAmt=accAmt}
     if(fxPending){e.fx=fxPending.id;S.fixedLog[fxPending.id+':'+fxPending.mk]='done'}
     if(plPending) S.plans=S.plans.filter(x=>x.id!==plPending); // the planned expense became a real one
     if(capOpen) S.capQ=(S.capQ||[]).filter(q=>q.id!==capOpen.id);
     S.expenses.push(e)
-    if(!$('#ipFeeRow').hidden&&$('#ipFeeChk').checked){ const fee=ipFeeOf(v), fa=ac&&fee>0?toAcc(fee,ac):null;
+    if(!$('#ipFeeRow').hidden&&$('#ipFeeChk').checked){ const fee=extraFee, fa=ac&&fee>0?entryAccountAmount(feeRaw,cur,fee,ac,null):null;
       if(fee>0){ if(!CAT.bank){const k=S.cats.findIndex(c=>c.id==='other'); S.cats.splice(k<0?S.cats.length:k,0,{id:'bank',name:'رسوم بنكية',e:'🏦',c:'#0F766E'}); syncCats()}
-        const fe={id:uid(),amount:fee,cat:CAT.bank?'bank':'other',note:'رسوم إنستاباي',pay:selPay,ts};if(funding==='free')fe.fund='free'; if(ac&&fa!=null){fe.acc=ac.id;fe.accAmt=fa} S.expenses.push(fe); feeAdded=fee } } }
+        const fe={id:uid(),amount:fee,cat:CAT.bank?'bank':'other',note:'رسوم إنستاباي',pay:selPay,ts};if(cur!==S.currency)fe.o={a:r2(feeRaw),c:cur};if(funding==='free')fe.fund='free'; if(ac&&fa!=null){fe.acc=ac.id;fe.accAmt=fa} S.expenses.push(fe); feeAdded=fee } } }
   fxPending=null; plPending=null; capOpen=null;
   rcCommit(savedId);
   save();closeSheets();renderAll();justAdded=null;

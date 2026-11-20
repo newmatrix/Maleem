@@ -34,6 +34,8 @@
     <div id="closeCard"></div>
     <div id="upcoming"></div>
     <div id="limBox"></div>
+    <div class="available-balance" id="availableBalance" hidden><span>الرصيد المتاح المسجل</span><b id="availableValue"></b><small>من أرصدة الحسابات المسجلة، مش حد الميزانية</small></div>
+    <div class="home-tools"><button type="button" class="dchip" id="homeFilterGo">فلترة</button><button type="button" class="dchip" id="homeSortGo">ترتيب</button></div>
     <div id="todayBlock"><div class="section-h"><h2><span id="homeExpenseTitle">مصاريف النهارده</span><span class="cnt" id="todayCount"></span></h2><div class="sec-end"><span class="tot" id="todayTotal"></span><button type="button" class="sec-search" id="homeSearchBtn" aria-label="بحث في كل الحركات" aria-haspopup="dialog"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button></div></div>
     <div id="todayList"></div></div>
   </section>
@@ -168,6 +170,7 @@
     </div>
     <div class="me-page" data-mepage="fixed" hidden>
     <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>المصاريف الثابتة والجاية</h1></div>
+    <div class="card"><h3>أقساط وجمعيات مرتبطة</h3><p class="hint">نفس الالتزامات، من غير تكرار المصروف. سجّل الدفعة حتى لو تجاهلت الإشعار.</p><details><summary>اختار الأقساط والجمعيات</summary><div id="fixedLinkChoices"></div></details><div id="fixedLinkedList"></div></div>
     <div class="card">
       <div class="card-h"><h3>مصاريف ثابتة</h3><span class="hint" id="fixTotal"></span></div>
       <p class="hint">زي الإيجار والنت والاشتراكات. هتظهرلك في الصفحة الرئيسية في ميعادها عشان تسجلها بدوسة.</p>
@@ -188,7 +191,7 @@
     </div>
     </div>
     <div class="me-page" data-mepage="saving" hidden>
-    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>الادخار</h1></div>
+    <div class="topbar set-top"><button class="back" type="button" data-me-back aria-label="رجوع"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button><h1>أهدافي والادخار</h1></div>
     <div class="card">
       <h3>الادخار</h3>
       <div class="pay-row"><div class="txt">هدف الادخار الشهري<small>اللي عايز تحوشه كل شهر</small></div><input id="saveTargetIn" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" aria-label="هدف الادخار الشهري"></div>
@@ -257,7 +260,7 @@
       <div class="data-av-wrap"><button class="data-av" id="dataAv" type="button" aria-label="الصورة الشخصية"></button><span class="data-av-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg></span></div>
       <div class="field"><input id="profName" type="text" placeholder="اسمك" maxlength="24" autocomplete="given-name" aria-label="الاسم" style="font-size:1.05rem"></div>
       <div class="field"><input id="profAge" type="text" inputmode="numeric" placeholder="العمر" maxlength="3" aria-label="العمر" style="font-size:1.05rem"><span>سنة</span></div>
-      <div class="pay-row"><div class="txt">العملة</div><select id="currencySel" aria-label="العملة"></select></div>
+      <div class="pay-row"><div class="txt">العملة الأساسية<small>تغييرها يحتاج مراجعة تحويل المبالغ القديمة</small></div><select id="currencySel" aria-label="العملة الأساسية"></select></div>
       <p class="err-msg" id="profErr" style="text-align:start"></p>
       <button class="btn primary" id="saveProfile" style="width:100%">حفظ بياناتي</button>
     </div>
@@ -336,6 +339,7 @@
         <div class="txt">قفل بكلمة سر<small>رقم سري من 4 أرقام أو كلمة سر عند فتح التطبيق</small></div>
         <label class="switch"><input type="checkbox" id="pinToggle" aria-label="قفل بكلمة سر"><i></i></label>
       </div>
+      <div class="set-row"><div class="txt">منع لقطات الشاشة مع القفل<small>امنع تصوير الشاشة وتسجيلها لما القفل يكون شغّال</small></div><label class="switch"><input type="checkbox" id="screenshotBlock" aria-label="منع لقطات الشاشة مع القفل" checked><i></i></label></div>
       <div class="set-row" id="lockChangeRow" hidden>
         <div class="txt">تغيير كلمة السر<small>أو التحويل من رقم سري لكلمة سر والعكس</small></div>
         <button class="btn" id="lockChange" type="button">تغيير</button>
@@ -585,6 +589,7 @@
     <div class="card" id="bkCard">
       <h3>النسخ الاحتياطي</h3>
       <p class="hint" id="backupHint"></p>
+      <p class="hint">نسخة المساحة المشتركة بتحفظ هوية دخولك. احتفظ بيها لنفسك، ويفضل تشفيرها بكلمة سر.</p>
       <div class="set-row" id="bkEncRow" style="margin-top:12px"><div class="txt">تشفير النسخ بكلمة سر<small id="bkEncSub"></small></div><button type="button" class="time-chip" id="bkEncChip" aria-label="تشفير النسخ الاحتياطي بكلمة سر">شغّله</button></div>
       <div id="bkAuto" hidden>
         <div id="driveOff"><button class="btn primary" id="driveLink" style="width:100%;margin-top:10px">ربط Google Drive</button></div>
@@ -653,10 +658,13 @@
   <div class="sheet-head"><h2 id="sheetTitle">مصروف جديد</h2><button type="button" class="kind-pill" id="kindPill" aria-haspopup="menu" aria-expanded="false" aria-label="نوع العملية: مصروف"><span>مصروف</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="head-pills"><button type="button" class="pay-pill" id="fundPill" aria-haspopup="menu" aria-expanded="false" hidden><span id="fundPillText">المرتب</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><select id="expenseFund" aria-label="يتخصم من" hidden><option value="budget">المرتب</option><option value="free">دخل حر</option></select><button type="button" class="pay-pill date-pill" id="datePill" aria-haspopup="menu" aria-expanded="false" aria-label="تاريخ المصروف"></button><button type="button" class="pay-pill" id="payPill" aria-haspopup="menu" aria-expanded="false" aria-label="طريقة الدفع"></button><button type="button" class="pay-pill" id="accPill" aria-haspopup="menu" aria-expanded="false" aria-label="الحساب اللي اتخصم منه المبلغ" hidden></button></div></div>
   <label class="amount-box" id="amountBox" for="amountInput"><button type="button" class="calc-tg" id="calcTg" aria-label="آلة حاسبة" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01"/></svg></button><input id="amountInput" class="v" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" placeholder="0" aria-label="المبلغ" dir="ltr"><span class="c cur">ج.م</span></label>
   <div class="calc-row" id="calcRow" hidden><span class="calc-res" id="calcRes"></span><div class="calc-ops" id="calcOps" aria-label="آلة حاسبة"><button type="button" data-op="+" aria-label="زائد">+</button><button type="button" data-op="-" aria-label="ناقص">−</button><button type="button" data-op="×" aria-label="ضرب">×</button><button type="button" data-op="÷" aria-label="قسمة">÷</button><button type="button" class="eq" data-op="=" aria-label="يساوي">=</button></div></div>
+  <div class="entry-controls"><label>الوقت<input type="time" id="expenseTime" aria-label="وقت المصروف" dir="ltr" step="60"></label><label>عملة المعاملة<select id="expenseCurrency" aria-label="عملة المصروف"></select></label></div>
+  <label class="cat-group-toggle"><input type="checkbox" id="catGrouping">عرض الفئات في مجموعات</label>
   <div class="cats" id="cats" role="group" aria-label="الفئة"></div>
   <input class="note" id="noteInput" type="text" placeholder="ملاحظة (اختياري)" maxlength="80">
   <div class="note-sug" id="noteSug" hidden></div>
   <label class="pay-row" id="ipFeeRow" style="cursor:pointer;margin-top:8px" hidden><span class="txt" id="ipFeeTxt"></span><input type="checkbox" id="ipFeeChk" style="width:22px;height:22px;accent-color:var(--brand)"></label>
+  <div class="pay-row" id="ipFeeAmountRow" hidden><label for="ipFeeAmount">قيمة الرسوم</label><input id="ipFeeAmount" class="date-in" type="text" inputmode="decimal" aria-label="قيمة الرسوم"></div>
   <div class="rc-row" id="rcRow">
     <input type="file" id="rcCam" accept="image/*" capture="environment" hidden>
     <input type="file" id="rcGal" accept="image/*" hidden>
@@ -927,6 +935,7 @@
   <div class="in-chips" id="inRepeatRow" hidden><button type="button" id="inRepeatChip" aria-pressed="false">🔁 بيتكرر كل شهر</button><input type="checkbox" id="inRepeat" hidden></div>
   <div class="pay-row" id="inAccRow"><div class="txt">استلمته على<small>الحساب اللي رصيده هيزيد</small></div><select id="inAcc" aria-label="الحساب"></select></div>
   <p class="hint" id="inNoAcc" style="margin:4px 0 8px" hidden>الدخل بيتسجل مرة واحدة، ومصدر الصرف منفصل عن الحساب البنكي أو المحفظة.</p>
+  <div class="entry-controls"><label>الوقت<input type="time" id="incomeTime" aria-label="وقت الدخل" dir="ltr" step="60"></label><label>عملة المعاملة<select id="incomeCurrency" aria-label="عملة الدخل"></select></label></div>
   <div class="pay-row"><div class="txt">التاريخ</div><input id="inDay" class="date-in" type="date" aria-label="تاريخ الاستلام" style="width:150px"></div>
   <div class="income-funding-options" id="incomeFundingOptions">
   <div class="pay-row fund-row"><label class="txt" for="incomeFund">أضيف الدخل للميزانية؟</label><select id="incomeFund"><option value="free">لا، يفضل دخل حر</option><option value="add">أيوه، أضيفه للميزانية</option><option value="salary">مرتب محسوب أصلًا في الميزانية</option></select></div>
@@ -934,6 +943,7 @@
   </div>
   <p class="hint" id="incomeFundHint"></p>
   <details id="inAlloc" class="inst-all"><summary>وزّع الفلوس دي (اختياري)</summary>
+    <p class="hint">التوزيع بالعملة الأساسية: <span class="cur"></span></p>
     <p class="hint" id="inAllocHint" style="margin:6px 0"></p>
     <div class="pay-row"><div class="txt">للمصاريف</div><input id="inAlSpend" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="للمصاريف" style="width:110px"></div>
     <div class="pay-row"><div class="txt">للأقساط والفواتير</div><input id="inAlBills" class="date-in" type="text" inputmode="decimal" placeholder="0" dir="ltr" autocomplete="off" aria-label="للأقساط والفواتير" style="width:110px"></div>
@@ -1244,6 +1254,7 @@
   <div class="field"><input id="catLim" type="text" inputmode="decimal" maxlength="12" placeholder="مثلاً 2000، وسيبه فاضي لو مش عايز حد" aria-label="حد شهري للفئة"></div>
   <p class="hint" style="margin:6px 2px 0">هننبهك لما تقرب منه (بنفس نسبة تنبيه الميزانية)، ولما تعدّيه.</p>
   <p class="err-msg" id="catErr"></p>
+  <div class="field"><input id="catGroupName" maxlength="30" placeholder="اسم المجموعة (اختياري)" aria-label="اسم المجموعة" list="catGroupNames"><datalist id="catGroupNames"></datalist></div>
   <div class="sheet-actions"><button class="btn primary" id="catSave">حفظ</button><button class="btn" id="catCancel">إلغاء</button></div>
 </div>
 
@@ -1269,7 +1280,7 @@
   <button type="button" class="dm-time" id="dateTimeOpen" role="menuitem"><span class="pe">⏰</span>غيّر الوقت</button>
   <button type="button" role="menuitem" id="dmPlan"><span class="pe">📌</span>مصروف جاي (فكّرني)</button>
 </div>
-<input type="hidden" id="expenseTime">
+
 <dialog id="expenseDatePopup" aria-labelledby="expenseDateTitle">
   <h3 id="expenseDateTitle">تاريخ ووقت المصروف</h3>
   <label class="expense-day"><span>اليوم</span><input type="date" id="dateIn" min="2000-01-01" aria-label="اختيار تاريخ المصروف"></label>

@@ -18,7 +18,8 @@ function syncWidget(){
     hide: !!S.wgHide
   }));
 }
-function syncNative(){ if(AB) try{syncWidget()}catch(e){}
+function syncNative(){
+  try{if(AB&&AB.captureCurrency)AB.captureCurrency(JSON.stringify({base:S.currency,apps:S.capCurBy}))}catch(e){} if(AB) try{syncWidget()}catch(e){}
   if(AB&&AB.captureIncoming) try{AB.captureIncoming(S.accounts.length>0)}catch(e){}
   if(!AB||!AB.syncReminders) return;
   const out=[], now=Date.now();

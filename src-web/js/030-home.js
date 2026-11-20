@@ -163,7 +163,8 @@ function renderHome(){
   try{renderCaps()}catch(e){console.error(e)}
   renderUpcoming();
   const monthView=homeExpenseView==='month';
-  const list=S.expenses.filter(x=>monthView?monKey(x.ts)===mk:dayKey(x.ts)===tk).sort((a,b)=>b.ts-a.ts);
+  // Expenses are appended when saved; reverse first so equal timestamps show the latest addition first.
+  const list=S.expenses.filter(x=>monthView?monKey(x.ts)===mk:dayKey(x.ts)===tk).reverse().sort((a,b)=>b.ts-a.ts);
   document.querySelectorAll('#homeExpenseMenu button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.homeView===homeExpenseView)));
   $('#homeExpensePick').innerHTML='<span>'+esc(TX(monthView?'الشهر ده':'النهارده'))+'</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg>';
   $('#homeExpenseTitle').textContent=monthView?TX('مصاريف الشهر ده'):TX('مصاريف النهارده');

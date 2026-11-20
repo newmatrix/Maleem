@@ -37,16 +37,18 @@ function searchOthers(words,numQ){
 }
 function sfCompare(a,b){
   const mode=$('#sfSort').value,asc=mode.endsWith('asc'),dir=asc?1:-1;
-  if(mode.startsWith('amount'))return dir*(a.amount-b.amount)||b.ts-a.ts||String(a.id).localeCompare(String(b.id));
-  if(mode.startsWith('cat'))return dir*(CAT[a.cat]||CAT.other).name.localeCompare((CAT[b.cat]||CAT.other).name,LOC)||b.ts-a.ts||String(a.id).localeCompare(String(b.id));
-  return dir*(a.ts-b.ts)||String(a.id).localeCompare(String(b.id));
+  if(mode.startsWith('amount'))return dir*(a.amount-b.amount)||b.ts-a.ts;
+  if(mode.startsWith('cat'))return dir*(CAT[a.cat]||CAT.other).name.localeCompare((CAT[b.cat]||CAT.other).name,LOC)||b.ts-a.ts;
+  return dir*(a.ts-b.ts);
 }
 function renderSearch(){
   sfPaintPicks(); sqPaint();
   const q=normAr($('#searchIn').value.trim()), f=sfGet();
   $('#sfBtn').classList.toggle('on',f.on); $('#sfBtn').textContent=f.on?'فلاتر شغالة':'فلاتر'; $('#sfClear').hidden=!f.on;
   const words=q?q.split(/\s+/):[], numQ=/^\d+(\.\d+)?$/.test(q)? parseFloat(q) : null;
-  const hits=S.expenses.filter(x=>{
+  // Stable sorting uses insertion order for ties: newest first, except explicit oldest-first mode.
+  const ordered=$('#sfSort').value==='time-asc'?S.expenses:S.expenses.slice().reverse();
+  const hits=ordered.filter(x=>{
     if(!sfPass(x,f)) return false;
     if(!q) return true;
     if(numQ!==null && x.amount===numQ) return true;
@@ -118,7 +120,7 @@ $('#sqChips').onclick=e=>{const b=e.target.closest('[data-sq]'); if(!b) return;
 let srBack=false;
 $('#searchRes').addEventListener('click',e=>{if(e.target.closest('[data-more],[data-rc]')||!e.target.closest('.xp')) return;
   srBack=true; $('#searchSheet').classList.remove('open'); // the expense form opens in its place (it would sit behind the search otherwise)
-  setTimeout(()=>{if(!$('#sheet').classList.contains('open')){srBack=false; openSearch()}},0)},true); // a read-only expense does not open: bring the search back
+  setTimeout(()=>{if(srBack&&!$('#sheet').classList.contains('open')){srBack=false; openSearch()}},0)},true); // a read-only expense does not open: bring the search back
 new MutationObserver(()=>{if(!srBack||$('#sheet').classList.contains('open')) return; srBack=false;
   setTimeout(()=>{if(!document.querySelector('.sheet.open')) openSearch()},320)}).observe($('#sheet'),{attributes:true,attributeFilter:['class']});
 function openSearch(){closeSheets();sfFill();renderSearch();openSheetEl('searchSheet');setTimeout(()=>$('#searchIn').focus({preventScroll:true}),320)}

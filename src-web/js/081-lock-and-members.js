@@ -4,7 +4,7 @@ function pinFailed(){const T=lkS(), f=T.pinFail=(T.pinFail&&typeof T.pinFail==='
 function pinOk(){const T=lkS(); if(T.pinFail){delete T.pinFail;lkSave()}}
 const waitTxt=w=>w>90? `استنى ${Math.ceil(w/60)} دقيقة وجرب تاني` : `استنى ${w} ثانية وجرب تاني`;
 /* FLAG_SECURE while a PIN is on: no screenshots and no preview of your numbers in the recent-apps screen */
-function applySecure(){try{AB&&AB.setSecure&&AB.setSecure(hasPin())}catch(e){}}
+function applySecure(){try{AB&&AB.setSecure&&AB.setSecure(hasPin()&&S.blockScreenshots!==false)}catch(e){}}
 /* migrate a plain PIN saved by an older version right away */
 if(typeof S.pin==='string'&&!(S.pinH&&S.pinH.h)){ if(/^\d{4}$/.test(S.pin)){const p=S.pin; pinMake(p).then(h=>{if(S.pin===p){S.pinH=h;delete S.pin;save()}}).catch(()=>{})} else delete S.pin }
 else if(S.pin!==undefined) delete S.pin;

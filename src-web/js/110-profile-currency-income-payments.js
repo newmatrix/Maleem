@@ -208,13 +208,13 @@ function curScaleAll(k,from,keepO){
   S.fixed.forEach(f=>{f.amount=sc(f.amount)});
   S.plans.forEach(x=>{x.amount=sc(x.amount)}); S.iplans.forEach(x=>{x.amount=sc(x.amount)}); S.refunds.forEach(x=>{x.amount=sc(x.amount)});
   S.insts.forEach(p=>p.items.forEach(i=>{i.amount=sc(i.amount)||0.01})); S.instPays.forEach(x=>{x.amount=sc(x.amount)||0.01});
-  S.inflows.forEach(x=>{x.amount=sc(x.amount)||0.01; if(x.alloc){x.alloc={spend:sc(x.alloc.spend),bills:sc(x.alloc.bills),save:sc(x.alloc.save)}}});
+  S.inflows.forEach(x=>{if(keepO&&!x.o)x.o={a:x.amount,c:from};x.amount=sc(x.amount)||0.01; if(x.alloc){x.alloc={spend:sc(x.alloc.spend),bills:sc(x.alloc.bills),save:sc(x.alloc.save)}}});
   S.gold.forEach(g=>{g.price=sc(g.price)||0.01; if(g.sold) g.sold.price=sc(g.sold.price)||0.01}); GOLD_KS.forEach(k=>{if(S.goldPx[k]>0) S.goldPx[k]=sc(S.goldPx[k])});
   S.cats.forEach(c=>{if(c.lim>0) c.lim=sc(c.lim)}); syncCats();
 }
 function curApply(x){
   const snap=JSON.parse(JSON.stringify({currency:S.currency,expenses:S.expenses,budget:S.budget,bMoves:S.bMoves,saveTarget:S.saveTarget,incomes:S.incomes,goals:S.goals,debts:S.debts,gams:S.gams,fixed:S.fixed,plans:S.plans,iplans:S.iplans,refunds:S.refunds,cats:S.cats,insts:S.insts,instPays:S.instPays,inflows:S.inflows,gold:S.gold,goldPx:S.goldPx,cloud:spCloudExpenses}));
-  curScaleAll(x.k,x.from,!!S.space);
+  curScaleAll(x.k,x.from,true);
   S.currency=x.to; save(); applyCurrency(); $('#currencySel').value=x.to; closeSheets(); renderAll();
   toast('اتحوّلت كل المبالغ من '+CUR_NAME(x.from)+' لـ '+CUR_NAME(x.to),'تراجع',()=>curRestore(snap),10000);
 }

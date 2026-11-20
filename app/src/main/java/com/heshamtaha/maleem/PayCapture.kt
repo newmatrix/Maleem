@@ -38,6 +38,24 @@ object PayCapture {
 
     private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
+    fun configureCurrency(c: Context, json: String) {
+        val input = JSONObject(json)
+        val base = input.optString("base", "EGP").takeIf { Regex("[A-Z]{3}").matches(it) } ?: "EGP"
+        val apps = input.optJSONObject("apps") ?: JSONObject()
+        val clean = JSONObject()
+        apps.keys().asSequence().take(100).forEach { pkg ->
+            val cur = apps.optString(pkg)
+            if (pkg.length <= 200 && Regex("[A-Z]{3}").matches(cur)) clean.put(pkg, cur)
+        }
+        prefs(c).edit().putString("baseCurrency", base).putString("appCurrencies", clean.toString()).apply()
+    }
+
+    fun displayCurrency(c: Context, pkg: String, raw: String): String {
+        val p = prefs(c)
+        val apps = try { JSONObject(p.getString("appCurrencies", "{}") ?: "{}") } catch (_: Exception) { JSONObject() }
+        return apps.optString(pkg).ifBlank { PayParser.currencyCode(raw).ifBlank { p.getString("baseCurrency", "EGP") ?: "EGP" } }
+    }
+
     fun enabled(c: Context) = prefs(c).getBoolean("on", false)
 
     /** Money coming IN is only picked up when the user has accounts in the app (the web app switches this on / off). */
@@ -149,7 +167,7 @@ object PayCapture {
     }
 
     @SuppressLint("MissingPermission")
-    fun notifyUser(c: Context, count: Int, amount: Double, source: String, dir: String = "out") {
+    fun notifyUser(c: Context, count: Int, amount: Double, source: String, dir: String = "out", currency: String = "EGP") {
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(c, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) return
@@ -160,8 +178,9 @@ object PayCapture {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val amt = if (amount == Math.floor(amount)) amount.toLong().toString() else String.format(java.util.Locale.US, "%.2f", amount)
-        val title = if (count > 1) "$count عمليات دفع مستنية تسجلها" else if (dir == "in") "لقيت فلوس داخلة: $amt" else "لقيت عملية دفع: $amt"
-        val body = if (count > 1) "آخرها $amt من $source. افتح مليم وراجعها." else "من $source. دوس عشان تسجلها في مليم."
+        val money = "$amt $currency"
+        val title = if (count > 1) "$count عمليات دفع مستنية تسجلها" else if (dir == "in") "لقيت فلوس داخلة: $money" else "لقيت عملية دفع: $money"
+        val body = if (count > 1) "آخرها $money من $source. افتح مليم وراجعها." else "من $source. دوس عشان تسجلها في مليم."
         val n = NotificationCompat.Builder(c, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat)
             .setColor(ContextCompat.getColor(c, R.color.brand))
@@ -225,6 +244,6 @@ class PayListener : NotificationListenerService() {
 
         val live = PayCapture.onNew
         if (live != null) live()
-        else PayCapture.notifyUser(this, PayCapture.pendingCount(this), r.amount, source, r.dir)
+        else PayCapture.notifyUser(this, PayCapture.pendingCount(this), r.amount, source, r.dir, PayCapture.displayCurrency(this, pkg, r.currency))
     }
 }

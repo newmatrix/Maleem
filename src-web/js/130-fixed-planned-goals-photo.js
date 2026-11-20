@@ -143,8 +143,8 @@ function openGoal(id){
   const g=id? S.goals.find(x=>x.id===id):null;
   openForm({title:g?'تعديل الهدف':'هدف ادخار جديد', save:g?'حفظ التعديل':'إضافة',
     fields:[{type:'emoji',value:g?g.e:null},{key:'name',placeholder:'بتحوش لإيه؟ مثلاً موبايل جديد',value:g?g.name:''},{key:'target',type:'money',label:'المبلغ المطلوب',value:g?g.target:''},{key:'saved',type:'money',label:'حوشت قد إيه لحد دلوقتي',value:g?(g.saved||''):''}],
-    onSave:v=>{const target=parseFloat(v.target), saved=parseFloat(v.saved)||0; if(!v.name) return 'اكتب اسم الهدف'; if(!(target>0)) return 'اكتب المبلغ المطلوب';
-      if(g) Object.assign(g,{name:v.name,target,saved,e:v.e}); else S.goals.push({id:uid(),name:v.name,target,saved,e:v.e,created:Date.now()});
+    onSave:v=>{const target=parseFloat(v.target), saved=parseFloat(v.saved)||0; if(!v.name) return 'اكتب اسم الهدف'; if(!(target>0&&target<MAXAMT)||!Number.isFinite(saved)||saved<0||saved>=MAXAMT) return 'اكتب المبلغ المطلوب';
+      if(g) Object.assign(g,{name:v.name,target:r2(target),saved:r2(saved),e:v.e}); else S.goals.push({id:uid(),name:v.name,target:r2(target),saved:r2(saved),e:v.e,created:Date.now()});
       save();renderAll();toast(g?'اتعدل الهدف':`اتضاف هدف ${v.name}`)}});
 }
 function deleteGoal(id){const i=S.goals.findIndex(x=>x.id===id); if(i<0) return; const [g]=S.goals.splice(i,1); const tid=trashPut('goal',g,i); save();renderAll();
@@ -153,7 +153,7 @@ function depositGoal(id){
   const g=S.goals.find(x=>x.id===id); if(!g) return;
   openForm({title:`ضيف فلوس لـ ${g.name}`, save:'ضيف', fields:[{key:'amount',type:'money',label:`فاضل ${fmt(g.target-(g.saved||0))} ${CS()}`}],
     onSave:v=>{const a=parseFloat(v.amount); if(!(a>0)) return 'اكتب المبلغ';
-      const before=g.saved||0; g.saved=before+a; save();renderAll();
+      const before=g.saved||0;if(!(a<MAXAMT&&before+a<MAXAMT))return 'المبلغ كبير قوي'; g.saved=r2(before+a); save();renderAll();
       toast(g.saved>=g.target? `وصلت لهدف ${g.name} 🎉` : `حوشت ${fmt(a)} ${CS()} لـ ${g.name}`,'تراجع',()=>{g.saved=before;save();renderAll()},3000)}});
 }
 $('#addGoal').onclick=()=>openGoal();

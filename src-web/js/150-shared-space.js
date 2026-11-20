@@ -16,7 +16,7 @@ let fbP=null, fb=null, spUnsub=null, spUnsubM=null, spUnsubR=null, spUnsubP=null
 const SP_RETRY_MS=10*60*1000; // keep in sync with firestore.rules (requesterRetriesRequest)
 const spCurrencyBlocked={};
 let spExtraUnsubs=[], spExtraData={reports:[],debts:[],gams:[],goals:[],incomes:[],fixed:[]}, spExtraCloud={reports:{},debts:{},gams:{},goals:{},incomes:{},fixed:{}}, spExtraReady={}, spMemberProfiles=[];
-const spMe=()=>(fb&&fb.uid)||(S.space&&S.space.uid)||'';
+const spMe=()=>(S.space&&S.space.uid)||(fb&&fb.uid)||'';
 function expenseCanManage(e){
   if(!e||!S.space)return true;
   if(e.legacyReadOnly)return false;
@@ -51,16 +51,46 @@ function spErrMsg(e){const c=e&&e.code;
   (c==='timeout'||c==='unavailable')?'مفيش اتصال بالسيرفر. اتأكد من الإنترنت وجرب تاني':
   c==='permission-denied'?'تعذر تنفيذ العملية؛ اتأكد من نشر قواعد Firestore المحدّثة':
   (c==='auth/operation-not-allowed'||c==='auth/admin-restricted-operation')?'فعّل الدخول المجهول (Anonymous) من Firebase Authentication':'حصلت مشكلة، جرب تاني'}
+/* Recovery adapter for the pinned Firebase SDK's browserLocalPersistence schema.
+   This is a credential, never a membership grant: Firebase still validates tokens and rules.
+   Keep it out of shared documents, reports and logs. Re-test against the bundled SDK on upgrades. */
+function spCleanRecovery(raw,uid){
+  if(!raw||raw.v!==1||!raw.user||raw.user.uid!==uid||raw.user.apiKey!==FB_CFG.apiKey)return null;
+  const u=raw.user,t=u.stsTokenManager;
+  if(!isId(uid)||!t||typeof t.refreshToken!=='string'||!t.refreshToken||t.refreshToken.length>16384||typeof t.accessToken!=='string'||t.accessToken.length>16384)return null;
+  return {v:1,user:{uid,apiKey:FB_CFG.apiKey,appName:fbAppName(ME.id),emailVerified:false,isAnonymous:true,providerData:[],stsTokenManager:{refreshToken:t.refreshToken,accessToken:t.accessToken,expirationTime:Number.isFinite(+t.expirationTime)?+t.expirationTime:0},createdAt:String(u.createdAt||''),lastLoginAt:String(u.lastLoginAt||'')}};
+}
+function spCleanMembership(x){
+  if(!x||!spCodeOk(x.code)||!isId(x.uid))return null;
+  const prefs=spNormPrefs(x.sharePrefs,true);
+  return {code:x.code,uid:x.uid,name:str(x.name,24),auto:x.auto===true,manual:Array.isArray(x.manual)?x.manual.filter(isId).slice(0,100000):[],old:Array.isArray(x.old)?x.old.filter(isId).slice(0,100000):[],sharePrefs:prefs,shareDraft:{...prefs}};
+}
+function spRecoverySnapshot(){
+  const member=S.space||S.spaceRequest;if(!member)return null;
+  const user=fb&&fb.auth&&fb.auth.currentUser;
+  const r=spCleanRecovery(user&&user.uid===member.uid?{v:1,user:user.toJSON()}:S.spaceRecovery,member.uid);
+  if(r)S.spaceRecovery=r;return r;
+}
+function spSeedRecovery(){
+  const member=S.space||S.spaceRequest,r=member&&spCleanRecovery(S.spaceRecovery,member.uid);
+  if(!r)return false;
+  const key='firebase:authUser:'+FB_CFG.apiKey+':'+fbAppName(ME.id);
+  let old;try{old=JSON.parse(localStorage.getItem(key))}catch(e){}
+  if(!spCleanRecovery({v:1,user:old},member.uid)||+(old.stsTokenManager||{}).expirationTime<r.user.stsTokenManager.expirationTime)localStorage.setItem(key,JSON.stringify(r.user));
+  return true;
+}
 function fbInit(){
   if(fbP) return fbP;
   fbP=loadScript('libs/fb.js').then(async()=>{
     const F=window.FB, app=ME.id==='m1'?F.initializeApp(FB_CFG):F.initializeApp(FB_CFG,fbAppName(ME.id)); // each member has his own anonymous account
-    const auth=F.initializeAuth(app,{persistence:[F.indexedDBLocalPersistence,F.browserLocalPersistence]});
+    const recovered=spSeedRecovery();
+    const auth=F.initializeAuth(app,{persistence:recovered?[F.browserLocalPersistence,F.indexedDBLocalPersistence]:[F.indexedDBLocalPersistence,F.browserLocalPersistence]});
     let db; try{db=F.initializeFirestore(app,{localCache:F.persistentLocalCache({tabManager:F.persistentSingleTabManager(undefined)}),experimentalAutoDetectLongPolling:true})}
     catch(e){db=F.initializeFirestore(app,{localCache:F.memoryLocalCache(),experimentalAutoDetectLongPolling:true})}
     await new Promise(res=>{const un=F.onAuthStateChanged(auth,()=>{un();res()})});
+    if(!auth.currentUser&&(S.space||S.spaceRequest))throw {code:'identity-missing'};
     if(!auth.currentUser) await F.signInAnonymously(auth);
-    fb={F,db,auth,uid:auth.currentUser.uid}; return fb;
+    fb={F,db,auth,uid:auth.currentUser.uid}; spRecoverySnapshot();persist();return fb;
   }).catch(e=>{fbP=null;throw e});
   return fbP;
 }
@@ -111,7 +141,7 @@ function renderSpace(){
   $('#spOff').hidden=on||waiting; $('#spWait').hidden=!waiting; $('#spOn').hidden=!on;
   const wipeNote=$('#wipeSpNote');if(wipeNote)wipeNote.hidden=!on;
   const st={on:'متصل',sync:'بيتزامن...',off:'أوفلاين',err:'مشكلة في الاتصال',denied:'راجع قواعد Firebase'};
-  $('#spStatus').textContent=on?(st[spSt]||''):(waiting?'في انتظار الموافقة':'');
+  $('#spStatus').textContent=on?(spSt==='identity'?TX('هوية الدخول محتاجة استعادة من نسخة حديثة'):(st[spSt]||'')):(waiting?'في انتظار الموافقة':'');
   if(waiting){
     const rejected=S.spaceRequest.status==='rejected';
     $('#spWaitText').textContent=rejected?'صاحب المساحة رفض طلب الانضمام. تقدر تعدل اختيارات المشاركة، تمسح الرسالة، وتبعت طلبًا جديدًا.':'طلب الانضمام اتبعت لصاحب المساحة. هتقدر تدخل بعد ما يوافق.';
@@ -148,7 +178,7 @@ function spStop(){
 function spStopJoinWatch(){if(spJoinUnsub){spJoinUnsub();spJoinUnsub=null}}
 function spActivateJoin(code,uid,name,prefs){
   spStopJoinWatch();const p=spNormPrefs(prefs||S.spaceRequest&&S.spaceRequest.sharePrefs,true);
-  S.space={code,uid,name,auto:false,old:S.expenses.map(e=>e.id),sharePrefs:p,shareDraft:{...p}};S.spaceRequest=null;S.spaceShareDraft=null;
+  S.space={code,uid,name,auto:false,old:S.expenses.map(e=>e.id),sharePrefs:p,shareDraft:{...p}};S.spaceRequest=null;S.spaceShareDraft=null;spRecoverySnapshot();
   save();renderSpace();spListen();toast('صاحب المساحة وافق على انضمامك');
 }
 function spWatchJoinRequest(){
@@ -156,7 +186,7 @@ function spWatchJoinRequest(){
   const pending={...S.spaceRequest};
   fbInit().then(f=>{
     if(!S.spaceRequest||S.spaceRequest.code!==pending.code||S.spaceRequest.uid!==pending.uid||spJoinUnsub)return;
-    if(f.uid!==pending.uid){S.spaceRequest=null;S.spaceLostCode=pending.code;save();renderSpace();toast('طلب الانضمام القديم كان على حساب اتمسح من الموبايل ده. ابعت الطلب تاني بنفس الكود.',null,null,6000);return}
+    if(f.uid!==pending.uid){spSetStatus('denied');return}
     const ref=f.F.doc(f.db,'spaces',pending.code,'joinRequests',pending.uid);
     spJoinUnsub=f.F.onSnapshot(ref,snap=>{
       if(!S.spaceRequest||S.spaceRequest.code!==pending.code||S.spaceRequest.uid!==pending.uid)return;
@@ -442,8 +472,8 @@ async function spListen(){
   try{await spListenInner()}finally{spListening=false}
 }
 async function spListenInner(){
-  if(!S.space||spUnsub)return;spSetStatus('sync');let f;try{f=await fbInit()}catch(e){spSetStatus('off');return}if(!S.space||spUnsub)return;
-  if(S.space.uid&&f.uid!==S.space.uid){spLocalLeave('حساب المساحة على الموبايل ده اتغير (غالبًا بعد مسح بيانات التطبيق أو تثبيته من جديد). ابعت طلب انضمام جديد بنفس الكود من "الانضمام لمساحة".');return}
+  if(!S.space||spUnsub)return;spSetStatus('sync');let f;try{f=await fbInit()}catch(e){spSetStatus(e&&e.code==='identity-missing'?'identity':'off');return}if(!S.space||spUnsub)return;
+  if(S.space.uid&&f.uid!==S.space.uid){spSetStatus('identity');return} // Never erase membership or shared records just because local authentication is unavailable.
   spReady=false;spHash={};spOwners={};spCloudExpenses={};const {F,db}=f,code=S.space.code;
   try{await spEnsureMemberProfile(f,code)}catch(e){}
   spUnsub=F.onSnapshot(F.collection(db,'spaces',code,'expenses'),snap=>{if(!S.space||S.space.code!==code)return;spApply(snap);spReady=true;spSetStatus((snap.metadata.fromCache&&!navigator.onLine)?'off':'on');spPush()},err=>{spSetStatus(err&&err.code==='permission-denied'?'denied':'err');if(err&&err.code==='permission-denied')spCheckRemoved()});
@@ -498,7 +528,7 @@ $('#spGo').onclick=async()=>{
         batch.set(spaceRef,{owner:f.uid,memberIds:[f.uid],createdAt:F.serverTimestamp()});batch.set(memberRef,{uid:f.uid,name,sharePrefs:prefs,updatedAt:F.serverTimestamp()});
         try{await withTimeout(batch.commit(),12000);break}catch(e){if(tries>=2||!e||e.code!=='permission-denied')throw e}
       }
-      S.space={code,uid:f.uid,name,auto:false,old:S.expenses.map(e=>e.id),sharePrefs:prefs,shareDraft:{...prefs}};S.spaceRequest=null;S.spaceShareDraft=null;save();spPanelClose();renderSpace();spListen();toast('اتعملت المساحة. ابعت الكود لصاحبك');
+      S.space={code,uid:f.uid,name,auto:false,old:S.expenses.map(e=>e.id),sharePrefs:prefs,shareDraft:{...prefs}};S.spaceRequest=null;S.spaceShareDraft=null;spRecoverySnapshot();save();spPanelClose();renderSpace();spListen();toast('اتعملت المساحة. ابعت الكود لصاحبك');
     }else{
       if(await spIsClosed(f,code)){$('#spErr').textContent=SP_CLOSED_MSG;return}
       const reqRef=F.doc(db,'spaces',code,'joinRequests',f.uid),snap=await withTimeout(F.getDoc(reqRef),12000);

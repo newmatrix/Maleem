@@ -105,6 +105,7 @@ function renderCaps(){
 const ipFeeOf=a=>r2(Math.min(S.ipFee.max,Math.max(S.ipFee.min,a*S.ipFee.pct/100)));
 /* a fee to suggest for this capture, or 0: only for money going OUT through InstaPay, in pounds, when the person turned it on, and only when
    the message does not already talk about a fee (then it is probably the fee itself, or the amount already includes it) */
+function capFeeIncluded(c){return /رسوم|عمولة|عموله|مصاريف الخدمة|\bfees?\b|\bcharges?\b/i.test(capDigits((c.text||'')+' '+(c.merchant||'')))}
 function capIpFee(c){
   if(!S.ipFee.on||S.currency!=='EGP'||c.dir!=='out'||c.method!=='instapay') return 0;
   if(capCurrency(c)!=='EGP') return 0;
@@ -118,11 +119,11 @@ function capConfirm(e){
   const dest=['cash','transfer'].includes(pl.kind)?pl.from.cur:pl.kind==='refund'&&pl.acc?pl.acc.cur:S.currency;
   const value=capAmount(c,dest); if(value==null) return;
   if(pl.kind==='cash'){ openCashMove(pl.from.id,'wd',{out:value,day:dayKey(c.at),caps:[c.id]}); return }
-  if(pl.kind==='debtback'){ openPaySheet(pl.debt.id,{amount:value,acc:pl.acc.id,cap:c.id,ts:c.at}); return }
-  if(pl.kind==='refund'){ openRefund({amount:value,acc:pl.acc.id,cap:c.id,ts:c.at}); return }
+  if(pl.kind==='debtback'){ openPaySheet(pl.debt.id,{amount:value,acc:pl.acc.id,cap:c.id,ts:c.at,original:{a:c.amount,c:capCurrency(c),base:value}}); return }
+  if(pl.kind==='refund'){ openRefund({amount:value,acc:pl.acc.id,cap:c.id,ts:c.at,original:{a:c.amount,c:capCurrency(c),base:value}}); return }
   if(pl.kind==='transfer'){ openTrSheet(null,{from:pl.from.id,to:pl.to.id,out:value,day:dayKey(c.at),caps:e.pair?[e.o.id,e.i.id]:[c.id],fee:pl.from.cur==='EGP'?capIpFee(c):0}); return }
-  if(pl.kind==='income'){ openInSheet(null,{amount:value,src:c.merchant||c.source,acc:pl.acc.id,day:dayKey(c.at),cap:c.id}); return }
-  openSheet(null,{amount:value,cat:capCat(c),note:c.merchant,pay:capPay(c),day:dayKey(c.at),cap:c.id,ts:c.at,acc:pl.acc?pl.acc.id:undefined,ipf:capIpFee(c)>0});
+  if(pl.kind==='income'){ openInSheet(null,{amount:value,src:c.merchant||c.source,acc:pl.acc.id,day:dayKey(c.at),cap:c.id,ts:c.at,original:{a:c.amount,c:capCurrency(c),base:value}}); return }
+  openSheet(null,{amount:value,cat:capCat(c),note:c.merchant,pay:capPay(c),day:dayKey(c.at),cap:c.id,ts:c.at,original:{a:c.amount,c:capCurrency(c),base:value},acc:pl.acc?pl.acc.id:undefined,ipf:capIpFee(c)>0,noFee:capFeeIncluded(c)});
 }
 /* --- "which account / what kind?" when the app is not sure --- */
 var caFor=null, caMode='';
@@ -181,12 +182,12 @@ $('#caGo').onclick=()=>{
     const caps=en.pair?[en.o.id,en.i.id]:[c.id]; closeSheets(); setTimeout(()=>openTrSheet(null,{from:a,to:o,out:value,day:dayKey(c.at),caps,fee:ACC(a)&&ACC(a).cur==='EGP'?capIpFee(c):0}),260); return }
   if(caMode==='cash'){ if(!a){E('اختار الحساب اللي سحبت منه');return} closeSheets(); setTimeout(()=>openCashMove(a,'wd',{out:value,day:dayKey(c.at),caps:[c.id]}),260); return }
   if(caMode==='cashx'){ closeSheets(); capRemove(c.id,'اتشال السحب: مش هيتحسب مصروف'); return }
-  if(caMode==='debtback'){ if(!o){E('اختار السلفة');return} closeSheets(); setTimeout(()=>openPaySheet(o,{amount:value,acc:a,cap:c.id,ts:c.at}),260); return }
-  if(caMode==='refund'){ closeSheets(); setTimeout(()=>openRefund({amount:value,acc:a,cap:c.id,ts:c.at}),260); return }
-  if(caMode==='loan'){ closeSheets(); setTimeout(()=>openDebtSheet(null,{dir:'in',amount:value,acc:a,cap:c.id,ts:c.at}),260); return }
+  if(caMode==='debtback'){ if(!o){E('اختار السلفة');return} closeSheets(); setTimeout(()=>openPaySheet(o,{amount:value,acc:a,cap:c.id,ts:c.at,original:{a:c.amount,c:capCurrency(c),base:value}}),260); return }
+  if(caMode==='refund'){ closeSheets(); setTimeout(()=>openRefund({amount:value,acc:a,cap:c.id,ts:c.at,original:{a:c.amount,c:capCurrency(c),base:value}}),260); return }
+  if(caMode==='loan'){ closeSheets(); setTimeout(()=>openDebtSheet(null,{dir:'in',amount:value,acc:a,cap:c.id,ts:c.at,original:{a:c.amount,c:capCurrency(c),base:value}}),260); return }
   closeSheets();
-  if(!en.pair&&en.c.dir==='in') setTimeout(()=>openInSheet(null,{amount:value,src:c.merchant||c.source,acc:a,day:dayKey(c.at),cap:c.id}),260);
-  else setTimeout(()=>openSheet(null,{amount:value,cat:capCat(c),note:c.merchant,pay:capPay(c),day:dayKey(c.at),cap:c.id,ts:c.at,acc:a,ipf:capIpFee(c)>0}),260);
+  if(!en.pair&&en.c.dir==='in') setTimeout(()=>openInSheet(null,{amount:value,src:c.merchant||c.source,acc:a,day:dayKey(c.at),cap:c.id,ts:c.at,original:{a:c.amount,c:capCurrency(c),base:value}}),260);
+  else setTimeout(()=>openSheet(null,{amount:value,cat:capCat(c),note:c.merchant,pay:capPay(c),day:dayKey(c.at),cap:c.id,ts:c.at,original:{a:c.amount,c:capCurrency(c),base:value},acc:a,ipf:capIpFee(c)>0,noFee:capFeeIncluded(c)}),260);
 };
 function capDrop(en){
   const ids=en.pair?[en.o.id,en.i.id]:[en.c.id], old=(S.capQ||[]).filter(q=>ids.includes(q.id));
@@ -260,7 +261,7 @@ $('#rfSave').onclick=()=>{
   const e=s.e, idx=S.expenses.indexOf(e), snap=JSON.parse(JSON.stringify(e)), when=RF&&RF.ts>0?Math.min(RF.ts,Date.now()):Date.now();
   const capId=RF&&RF.cap, capOld=capId?(S.capQ||[]).find(q=>q.id===capId):null; let tr=null, openOld=null;
   if(s.full) S.expenses.splice(idx,1);
-  else { e.amount=s.left; delete e.o; if(s.A) e.accAmt=r2(e.accAmt-s.rA) }
+  else { if(e.o&&!e.o.p)e.o={a:r2(e.o.a*s.left/e.amount),c:e.o.c}; e.amount=s.left; if(s.A) e.accAmt=r2(e.accAmt-s.rA) }
   if(s.A&&s.B.id!==s.A.id){ tr={id:uid(),ts:when,from:s.A.id,to:s.B.id,out:s.rA,in:s.r,fee:0,note:str('رجوع من مصروف: '+(e.note||(CAT[e.cat]||CAT.other).name),80)};
     if(s.A.cur!==s.B.cur){tr.rate=s.r/s.rA;tr.rs='m'} S.transfers.push(tr) }
   if(!s.A&&s.B){ openOld=s.B.open; s.B.open=r2(s.B.open+s.r) }

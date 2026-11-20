@@ -1,6 +1,11 @@
 package com.heshamtaha.maleem
 
 fun main() {
+    for ((message, code) in listOf("تم خصم 100 ريال سعودي" to "SAR", "SAR 100 debited" to "SAR", "Paid 100 USD" to "USD", "تم دفع 100 ليرة تركية" to "TRY", "تم شراء 100 درهم إماراتي" to "AED")) {
+        val result = PayParser.parse("bank.test", "Bank", message)
+        check(result?.amount == 100.0 && result.currency == code) { "Wrong currency: $message: $result" }
+    }
+
     check(NativeLanguage.speechLocale("en") == "en-GB")
     check(NativeLanguage.speechLocale("ar") == "ar-SA")
     check(NativeLanguage.speechLocale("eg") == "ar-EG")
@@ -28,5 +33,5 @@ fun main() {
     check(event != event.copy(key = "key2"))
     check(event != event.copy(amount = 101.0))
     check(event != event.copy(dir = "in"))
-    println("PASS: 22 native parser, notification identity and speech locale checks")
+    println("PASS: native parser, notification identity, speech locale and multi-currency checks")
 }

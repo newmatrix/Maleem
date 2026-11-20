@@ -7,35 +7,36 @@
 |---|---:|---|
 | `000-constants.js` | 147 | Default categories (CATS) and the CAT lookup, safe localStorage wrappers (lsGet / lsSet). |
 | `001-error-log.js` | 37 | Local error log: catches script errors, unhandled promises and console.error(Error) into a small cleaned list on the phone (errLog / errReport); outside the app data and the backups. |
-| `010-state-and-storage.js` | 529 | Storage and the state S: persistence, member keys, save(); the translation engine (trText / TX / trNode) and language; payment methods; the currency table and custom currencies. |
-| `020-theme-and-toast.js` | 118 | Theme / palette / font, toast messages, the list row of an expense. |
-| `030-home.js` | 178 | Home (expenses) screen helpers: pay periods (periodOf, daysLeft), forecast and daily allowance, the eye toggle, closing a period, renderHome. |
+| `010-state-and-storage.js` | 532 | Storage and the state S: persistence, member keys, save(); the translation engine (trText / TX / trNode) and language; payment methods; the currency table and custom currencies. |
+| `020-theme-and-toast.js` | 119 | Theme / palette / font, toast messages, the list row of an expense. |
+| `030-home.js` | 179 | Home (expenses) screen helpers: pay periods (periodOf, daysLeft), forecast and daily allowance, the eye toggle, closing a period, renderHome. |
 | `031-reports.js` | 121 | Reports screen, report periods and the category detail. |
-| `032-search.js` | 132 | Search over every movement and its filters. |
+| `032-search.js` | 134 | Search over every movement and its filters. |
 | `040-navigation-and-sheets.js` | 186 | Settings render, renderAll, tab navigation (go), the amount box with its calculator, category grid, note suggestions. |
-| `050-expense-form.js` | 286 | Expense form (date menu, time wheels, funding and payment menus, openSheet / closeSheets) and account helpers (ACC, accBal, moneyTotals, exchange-rate lookups). |
+| `050-expense-form.js` | 294 | Expense form (date menu, time wheels, funding and payment menus, openSheet / closeSheets) and account helpers (ACC, accBal, moneyTotals, exchange-rate lookups). |
 | `060-accounts-and-money-card.js` | 382 | Accounts: list, sheet, reconciliation, transfers, cash withdrawals, the "my money" card, moving money to the budget. |
 | `061-planned-and-installments.js` | 119 | Installments: add / edit / delete, one installment and paying it (plus PT_TXT and the income-in helper). |
-| `062-income-and-budget.js` | 432 | Budget and pay-cycle helpers, income stats and the income list / sheet, InstaPay fee setting, shared-space settings (fb…), gold purchases, end-of-period forecast. |
+| `062-income-and-budget.js` | 440 | Budget and pay-cycle helpers, income stats and the income list / sheet, InstaPay fee setting, shared-space settings (fb…), gold purchases, end-of-period forecast. |
 | `070-voice-entry.js` | 491 | Voice entry: spoken numbers, dates, category guess, debt / gam'eya / installment phrases. |
 | `080-settings-controls-and-alerts.js` | 281 | Settings controls, widgets and the Quick Settings tile, budget alerts, daily reminder time, low-balance alerts. |
 | `081-lock-and-members.js` | 241 | PIN / password / fingerprint lock and the local members list. |
 | `082-settings-pages.js` | 86 | Settings home list, one page per section, and the settings search. |
-| `090-exports-and-cloud-backup.js` | 344 | Exports (Excel / PDF), file saving, the yearly report, backup file writing and restoring (applyBackup). |
+| `090-exports-and-cloud-backup.js` | 348 | Exports (Excel / PDF), file saving, the yearly report, backup file writing and restoring (applyBackup). |
 | `091-import-from-files.js` | 403 | Importing expenses from Excel / CSV / PDF, category guess and the review sheet. |
-| `092-categories.js` | 196 | Category management. |
-| `093-trash.js` | 74 | Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet. |
+| `092-categories.js` | 197 | Category management. |
+| `093-trash.js` | 75 | Trash (30 days): trashPut is called by every delete function; restore, delete forever, empty, and the trash sheet. |
 | `094-error-log-ui.js` | 14 | The error log card in the feedback page: count, see / copy the report, clear. |
 | `095-backup-encryption.js` | 94 | Optional backup encryption: AES-GCM with a key from a password (bkeSeal / bkOpen), the password prompt while restoring, and the settings row with its sheet. |
 | `096-polish-extras.js` | 32 | Home card for categories near or over their monthly limit (renderLimCard), «send this message as an example» for the bank-notification capture (capMask). |
+| `097-user-feedback.js` | 99 | Transaction currency and time controls, grouped categories, linked obligations, debt ledger editing and available balance. |
 | `100-debts-and-gameyas.js` | 548 | Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text. |
 | `110-profile-currency-income-payments.js` | 381 | Me / profile, app currency change and exchange rates, income list, payment methods. |
 | `120-google-drive-updates-reminder.js` | 320 | Google Drive backup and restore (driveCall, restore sheet), app updates (check / download), the developer message and the periodic support reminder (nudge). |
 | `130-fixed-planned-goals-photo.js` | 187 | Recurring (fixed) expenses with their schedule rules, planned expenses, goals, profile photo. |
-| `140-native-sync-effects-welcome.js` | 127 | Syncing reminders / widget with Android, press pulse and vibration, welcome screen. |
-| `150-shared-space.js` | 603 | The shared space (Firebase Firestore): create / join / approve, sharing choices, shared records. |
+| `140-native-sync-effects-welcome.js` | 128 | Syncing reminders / widget with Android, press pulse and vibration, welcome screen. |
+| `150-shared-space.js` | 633 | The shared space (Firebase Firestore): create / join / approve, sharing choices, shared records. |
 | `160-receipts.js` | 215 | Receipt photos (IndexedDB) and OCR. |
-| `170-bank-notification-capture.js` | 321 | Payments captured from bank notifications: matching, review, refunds, InstaPay fee. |
+| `170-bank-notification-capture.js` | 322 | Payments captured from bank notifications: matching, review, refunds, InstaPay fee. |
 | `180-monthly-summary-and-boot.js` | 171 | Notification-capture settings card, the monthly summary card and notification, and the start-up functions (bootRest / renderRest). |
 
 ## ما يُعرَّف في كل ملف (المستوى الأعلى)
@@ -155,6 +156,11 @@ Home card for categories near or over their monthly limit (renderLimCard), «sen
 
 `renderLimCard` `capMask`
 
+### 097-user-feedback.js
+Transaction currency and time controls, grouped categories, linked obligations, debt ledger editing and available balance.
+
+`captureCurrencyCode` `entryCurrencyOptions` `entryOriginal` `entryValue` `entryAccountAmount` `entryStamp` `paintEntryCurrency` `categoryGroup` `renderGroupedCategories` `renderLinkedObligations` `editDebtEntry` `recordedAvailable` `renderFeedbackControls`
+
 ### 100-debts-and-gameyas.js
 Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text.
 
@@ -183,7 +189,7 @@ Syncing reminders / widget with Android, press pulse and vibration, welcome scre
 ### 150-shared-space.js
 The shared space (Firebase Firestore): create / join / approve, sharing choices, shared records.
 
-`FB_CFG` `SP_ABC` `SP_SHARE_META` `SP_EXTRA_TYPES` `spMemberIds` `fbP` `SP_RETRY_MS` `spCurrencyBlocked` `spExtraUnsubs` `spMe` `expenseCanManage` `expenseReadOnly` `cloudAmt` `hashE` `SP_CODE_LEN` `spFmt` `spCodeOk` `spNorm` `spGen` `withTimeout` `spBlankPrefs` `spNormPrefs` `spDraftPrefs` `spPrefSame` `spShareLabels` `spLocalExpenses` `spCountLocal` `spErrMsg` `fbInit` `spSetStatus` `spTypeRows` `spRenderSetupTypes` `spRenderShareTypes` `spRenderSharedData` `renderSpace` `spManageOn` `spManage` `spQueue` `spStop` `spStopJoinWatch` `spActivateJoin` `spWatchJoinRequest` `spDecideRequest` `spPurgeOthers` `spDetach` `spLocalLeave` `spReadOnce` `spWipeSpace` `spIsClosed` `SP_CLOSED_MSG` `spRemovedCheck` `spCheckRemoved` `spRemoveMember` `spClearOldId` `spApply` `spIncoming` `spPushBusy` `spRestoreReadOnlyExpenses` `spPush` `spStable` `spByTag` `spItemClean` `spClone` `rpK` `spReportRows` `spBuildLocalRows` `spDocId` `spBase` `spMergeList` `spMergeMap` `spMerge3` `spApplyShared` `spTypesBusy` `spPushTypes` `spEnsureMemberProfile` `spListen` `spListenInner` `openSpPanel` `spPanelClose` `armBtn` `spLeaving` `copyText` `RC` `rcDB` `rcTx` `rcPut` `rcGet` `rcDel`
+`FB_CFG` `SP_ABC` `SP_SHARE_META` `SP_EXTRA_TYPES` `spMemberIds` `fbP` `SP_RETRY_MS` `spCurrencyBlocked` `spExtraUnsubs` `spMe` `expenseCanManage` `expenseReadOnly` `cloudAmt` `hashE` `SP_CODE_LEN` `spFmt` `spCodeOk` `spNorm` `spGen` `withTimeout` `spBlankPrefs` `spNormPrefs` `spDraftPrefs` `spPrefSame` `spShareLabels` `spLocalExpenses` `spCountLocal` `spErrMsg` `spCleanRecovery` `spCleanMembership` `spRecoverySnapshot` `spSeedRecovery` `fbInit` `spSetStatus` `spTypeRows` `spRenderSetupTypes` `spRenderShareTypes` `spRenderSharedData` `renderSpace` `spManageOn` `spManage` `spQueue` `spStop` `spStopJoinWatch` `spActivateJoin` `spWatchJoinRequest` `spDecideRequest` `spPurgeOthers` `spDetach` `spLocalLeave` `spReadOnce` `spWipeSpace` `spIsClosed` `SP_CLOSED_MSG` `spRemovedCheck` `spCheckRemoved` `spRemoveMember` `spClearOldId` `spApply` `spIncoming` `spPushBusy` `spRestoreReadOnlyExpenses` `spPush` `spStable` `spByTag` `spItemClean` `spClone` `rpK` `spReportRows` `spBuildLocalRows` `spDocId` `spBase` `spMergeList` `spMergeMap` `spMerge3` `spApplyShared` `spTypesBusy` `spPushTypes` `spEnsureMemberProfile` `spListen` `spListenInner` `openSpPanel` `spPanelClose` `armBtn` `spLeaving` `copyText` `RC` `rcDB` `rcTx` `rcPut` `rcGet` `rcDel`
 
 ### 160-receipts.js
 Receipt photos (IndexedDB) and OCR.
@@ -193,7 +199,7 @@ Receipt photos (IndexedDB) and OCR.
 ### 170-bank-notification-capture.js
 Payments captured from bank notifications: matching, review, refunds, InstaPay fee.
 
-`capDigits` `capNorm` `capHints` `capPhoneOf` `capMatch` `capNoPair` `capView` `CAP_CASH_STRONG` `capIsCash` `capDebtCands` `capDebtMatch` `CAP_REFUND` `capPlan` `capLabel` `renderCaps` `ipFeeOf` `capIpFee` `capConfirm` `caFor` `openCapAsk` `caPre` `caPaint` `capDrop` `rfCands` `rfLabel` `rfExp` `openRefund` `rfAccOpts` `rfCalc` `rfPaint` `expToCash` `capRemove`
+`capDigits` `capNorm` `capHints` `capPhoneOf` `capMatch` `capNoPair` `capView` `CAP_CASH_STRONG` `capIsCash` `capDebtCands` `capDebtMatch` `CAP_REFUND` `capPlan` `capLabel` `renderCaps` `ipFeeOf` `capFeeIncluded` `capIpFee` `capConfirm` `caFor` `openCapAsk` `caPre` `caPaint` `capDrop` `rfCands` `rfLabel` `rfExp` `openRefund` `rfAccOpts` `rfCalc` `rfPaint` `expToCash` `capRemove`
 
 ### 180-monthly-summary-and-boot.js
 Notification-capture settings card, the monthly summary card and notification, and the start-up functions (bootRest / renderRest).

@@ -72,7 +72,7 @@ function sortable(box,itemSel,o){
     if(ids.join()!==s.before) o.done(ids);
   };
   box.addEventListener('pointerdown',e=>{
-    if(st||(e.pointerType==='mouse'&&e.button!==0)) return;
+    if(st||(S.catGrouping&&box.id==='cats')||(e.pointerType==='mouse'&&e.button!==0)) return;
     const el=e.target.closest(itemSel); if(!el||!box.contains(el)) return;
     if(o.grip){ if(!e.target.closest(o.grip)) return }
     else if(e.target.closest('.more')) return;
@@ -114,6 +114,7 @@ function openCatSheet(id){
   const c=id?CAT[id]:null; catEdit=c?id:null;
   $('#catTitle').textContent=c?'تعديل الفئة':'فئة جديدة';
   $('#catSave').textContent=c?'حفظ التعديل':'إضافة';
+  $('#catGroupName').value=c&&c.g||'';$('#catGroupNames').innerHTML=[...new Set(S.cats.map(categoryGroup))].map(n=>`<option value="${esc(n)}">`).join('');
   $('#catName').value=c?c.name:''; $('#catLim').value=c&&c.lim?c.lim:'';
   catEmoji=c?c.e:EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
   catColor=c?c.c:COLORS[S.cats.length%COLORS.length];
@@ -171,8 +172,8 @@ $('#catSave').onclick=()=>{
   const limRaw=String($('#catLim').value).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,،\s]/g,'').replace('٫','.');
   const lim=limRaw?parseFloat(limRaw):0;
   if(limRaw&&!(lim>0&&lim<1e9)){$('#catErr').textContent='اكتب الحد رقم بس، أو سيبه فاضي';$('#catLim').focus();return}
-  if(catEdit){Object.assign(CAT[catEdit],{name,e:catEmoji,c:catColor}); if(lim) CAT[catEdit].lim=Math.round(lim*100)/100; else delete CAT[catEdit].lim}
-  else{const id='c_'+uid(), nc={id,name,e:catEmoji,c:catColor}; if(lim) nc.lim=Math.round(lim*100)/100; S.cats.push(nc); justAddedCat=id}
+  if(catEdit){Object.assign(CAT[catEdit],{name,e:catEmoji,c:catColor,g:$('#catGroupName').value.trim().slice(0,30)}); if(lim) CAT[catEdit].lim=Math.round(lim*100)/100; else delete CAT[catEdit].lim}
+  else{const id='c_'+uid(), nc={id,name,e:catEmoji,c:catColor,g:$('#catGroupName').value.trim().slice(0,30)}; if(lim) nc.lim=Math.round(lim*100)/100; S.cats.push(nc); justAddedCat=id}
   const was=catEdit; save();syncCats();closeSheets();renderAll();justAddedCat=null;
   toast(was?'اتعدلت الفئة':'اتضافت فئة '+name);
 };

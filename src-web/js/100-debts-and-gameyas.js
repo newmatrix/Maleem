@@ -246,9 +246,9 @@ $('#debtSave').onclick=()=>{
   toast(was?'اتعدلت السلفة': debtDirSel==='in'? `اتسجل إن ${person} عليه ${fmt(amount)} ${curSym(debtCurSel)}` : `اتسجل إنك عليك ${fmt(amount)} ${curSym(debtCurSel)} لـ ${person}`);
   setTimeout(checkDue,500);
 };
-function deleteDebt(id){
+function deleteDebt(id,confirmed){
   const i=S.debts.findIndex(d=>d.id===id); if(i<0) return;
-  if(debtAccRows(S.debts[i]).some(p=>p.acc)){toast('السلفة دي مربوطة بحساب (هي أو زياداتها أو دفعاتها). فك الربط من «تعديل السلفة» واحذف الدفعات المربوطة من داخل «سدد/استلمت» الأول عشان الأرصدة متتلخبطش',null,null,7000);return}
+  if(!confirmed&&debtAccRows(S.debts[i]).some(p=>p.acc)){closeSheets();openForm({title:'حذف السلفة وإلغاء أثرها على الحسابات؟',save:'حذف',fields:[],onSave:()=>{deleteDebt(id,true)}});return}
   const [x]=S.debts.splice(i,1); const tid=trashPut('debt',x,i); save();renderAll();
   toast('اتحذفت سلفة '+x.person,'تراجع',()=>{trashDel(tid);S.debts.splice(i,0,x);save();renderAll()},3000);
 }
@@ -263,7 +263,7 @@ function openPaySheet(id,pre){
   $('#payAmt').value=''; $('#payErr').textContent=''; $('#payAmtBox').classList.remove('err');
   $('#payAccRow').hidden=!S.accounts.length; $('#payAccLab').textContent= x.dir==='in'?'استلمته على':'اتدفع من';
   $('#payAcc').innerHTML='<option value="">من غير حساب</option>'+S.accounts.map(a=>`<option value="${esc(a.id)}">${esc(accDisp(a))} (${esc(curSym(a.cur))})</option>`).join(''); $('#payAcc').value=ACC(S.lastAcc)?S.lastAcc:'';
-  $('#payHist').innerHTML=(x.payments||[]).slice().reverse().map(p=>`<li><span>${x.dir==='in'?'استلمت':'سددت'} ${fmt(p.amount)} ${debtSym(x)}${ACC(p.acc)?' · '+esc(ACC(p.acc).name):''}</span><span class="ipd">${shortDate(p.ts)}<button type="button" data-pdel="${esc(p.id)}">حذف</button></span></li>`).join('');
+  $('#payHist').innerHTML=(x.payments||[]).slice().reverse().map(p=>`<li><span>${x.dir==='in'?'استلمت':'سددت'} ${fmt(p.amount)} ${debtSym(x)}${ACC(p.acc)?' · '+esc(ACC(p.acc).name):''}</span><span class="ipd">${shortDate(p.ts)}<button type="button" data-debt-entry="${esc(x.id)}|pay|${esc(p.id)}">تعديل</button><button type="button" data-pdel="${esc(p.id)}">حذف</button></span></li>`).join('');
   payCap=null; // money that came in, in a captured notification: the person paid you back (round 47)
   if(pre){ if(pre.amount>0) $('#payAmt').value=String(Math.min(pre.amount,rem)); if(typeof pre.acc==='string') $('#payAcc').value=ACC(pre.acc)?pre.acc:'';
     if(pre.cap) payCap={id:pre.cap,ts:+pre.ts||0};
@@ -352,7 +352,7 @@ function openDebtLog(id){
   const lab={start:'السلفة الأصلية',add:'زيادة',pay:x.dir==='in'?'استلمت':'سددت'};
   const when=ts=>{if(!(ts>0)) return ''; const d=new Date(ts); return `${shortDate(ts)} · ${pad(d.getHours())}:${pad(d.getMinutes())}`};
   $('#dLogList').innerHTML=debtLedger(x).reverse().map(r=>`<li class="${r.k}"><div class="r1"><span>${lab[r.k]}${r.note?` <small>· ${esc(r.note)}</small>`:''}${ACC(r.acc)?` <small>· ${esc(ACC(r.acc).name)}</small>`:''}</span><span class="a">${r.k==='pay'?'−':'+'}${fmt(r.amount)} ${cs}</span></div>
-    <div class="r2"><span>${when(r.ts)}${r.k==='add'?`<button type="button" data-adel="${esc(r.id)}">حذف</button>`:''}</span><span>الإجمالي ${fmt(r.total)} · المتبقي ${fmt(r.rem)}</span></div></li>`).join('');
+    <div class="r2"><span>${when(r.ts)}<button type="button" data-debt-entry="${esc(x.id)}|${r.k}|${esc(r.id)}">تعديل</button>${r.k==='add'?`<button type="button" data-adel="${esc(r.id)}">حذف</button>`:''}</span><span>الإجمالي ${fmt(r.total)} · المتبقي ${fmt(r.rem)}</span></div></li>`).join('');
   openSheetEl('dLogSheet');
 }
 $('#dLogClose').onclick=closeSheets;

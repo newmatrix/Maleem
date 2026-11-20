@@ -170,6 +170,8 @@ if(!['off','sum','split'].includes(S.moneyView)) S.moneyView='sum';
 if(typeof S.lastAcc!=='string') S.lastAcc='';
 if(!S.homeHide||typeof S.homeHide!=='object') S.homeHide={};
 S.fabPin=S.fabPin===true;
+S.blockScreenshots=S.blockScreenshots!==false;S.catGrouping=S.catGrouping===true;
+S.fixedLinks=Array.isArray(S.fixedLinks)?[...new Set(S.fixedLinks.filter(x=>typeof x==='string'&&/^(inst|gam):[A-Za-z0-9_-]+$/.test(x)))].slice(0,500):[];
 if(!Number.isInteger(S.autoBkDays)||S.autoBkDays<0||S.autoBkDays>30) S.autoBkDays=7;
 /* Google Drive backup (per member, this phone only: not part of the backup file) */
 if(!(S.drive&&typeof S.drive==='object'&&typeof S.drive.email==='string'&&S.drive.email)) S.drive=null;
@@ -184,7 +186,7 @@ let PAY={}; const syncPays=()=>{PAY=Object.fromEntries(S.pays.map(x=>[x.id,x]));
 const payOf=x=>PAY[x.pay]?x.pay:'cash';
 if(!S.fixedLog||typeof S.fixedLog!=='object') S.fixedLog={};
 if(!S.currency) S.currency='EGP';
-const CURRENCIES=[{id:'EGP',s:'ج.م',n:'جنيه مصري'},{id:'SAR',s:'ر.س',n:'ريال سعودي'},{id:'AED',s:'د.إ',n:'درهم إماراتي'},{id:'KWD',s:'د.ك',n:'دينار كويتي'},{id:'QAR',s:'ر.ق',n:'ريال قطري'},{id:'BHD',s:'د.ب',n:'دينار بحريني'},{id:'OMR',s:'ر.ع',n:'ريال عماني'},{id:'JOD',s:'د.أ',n:'دينار أردني'},{id:'DZD',s:'د.ج',n:'دينار جزائري'},{id:'SDG',s:'ج.س',n:'جنيه سوداني'},{id:'USD',s:'$',n:'دولار أمريكي'},{id:'EUR',s:'€',n:'يورو'},{id:'GBP',s:'£',n:'جنيه إسترليني'},{id:'ILS',s:'₪',n:'شيكل'}];
+const CURRENCIES=[{id:'EGP',s:'ج.م',n:'جنيه مصري'},{id:'SAR',s:'ر.س',n:'ريال سعودي'},{id:'AED',s:'د.إ',n:'درهم إماراتي'},{id:'KWD',s:'د.ك',n:'دينار كويتي'},{id:'QAR',s:'ر.ق',n:'ريال قطري'},{id:'BHD',s:'د.ب',n:'دينار بحريني'},{id:'OMR',s:'ر.ع',n:'ريال عماني'},{id:'JOD',s:'د.أ',n:'دينار أردني'},{id:'DZD',s:'د.ج',n:'دينار جزائري'},{id:'SDG',s:'ج.س',n:'جنيه سوداني'},{id:'USD',s:'$',n:'دولار أمريكي'},{id:'EUR',s:'€',n:'يورو'},{id:'GBP',s:'£',n:'جنيه إسترليني'},{id:'ILS',s:'₪',n:'شيكل'},{id:'TRY',s:'TRY',n:'ليرة تركية'},{id:'SYP',s:'SYP',n:'ليرة سورية'},{id:'LBP',s:'LBP',n:'ليرة لبنانية'}];
 const CS=()=>(CURRENCIES.find(c=>c.id===S.currency)||CURRENCIES[0]).s;
 /* Currencies the person adds himself (Settings ▸ بياناتي ▸ عملة تانية): any currency that has a rate in rates.json, so the conversion is real.
    They live in S.curs (codes only) and are pushed into CURRENCIES, so every screen, account and backup sees them like the built-in ones. */
@@ -319,7 +321,7 @@ function cleanRefund(x){
 }
 const FXLOG_KEY=/^[A-Za-z0-9_-]{1,64}:\d{4}-\d{2}(?:-\d{2})?$/;
 function cleanFixedLog(l){const o={}; if(l&&typeof l==='object') Object.keys(l).forEach(k=>{if(FXLOG_KEY.test(k)&&(l[k]==='done'||l[k]==='skip')) o[k]=l[k]}); return o}
-function cleanCat(c){if(!(c&&isId(c.id))) return null; const o={id:c.id,name:str(c.name,30).trim()||'فئة',e:cleanE(c.e)||'📦',c:colr(c.c)}; const l=+c.lim; if(l>0&&l<1e9) o.lim=Math.round(l*100)/100; return o}
+function cleanCat(c){if(!(c&&isId(c.id))) return null; const o={id:c.id,name:str(c.name,30).trim()||'فئة',e:cleanE(c.e)||'📦',c:colr(c.c)}; if(typeof c.g==='string'&&c.g.trim())o.g=str(c.g,30).trim(); const l=+c.lim; if(l>0&&l<1e9) o.lim=Math.round(l*100)/100; return o}
 /* Accounts (bank / wallet / cash). Only the last 4 digits of a card are ever kept: never the full number, never the CVV. */
 const ACC_TYPES={bank:{n:'حساب بنكي',e:'🏦'},wallet:{n:'محفظة إلكترونية',e:'👛'},cash:{n:'كاش',e:'💵'}};
 function cleanAcc(x){
@@ -404,6 +406,7 @@ function cleanInflow(x){
   if(!x||typeof x!=='object'||!isId(x.id)) return null;
   const a=+x.amount, ts=+x.ts; if(!(a>0&&a<MAXAMT)||!(ts>0&&ts<MAXTS)) return null;
   const o={id:x.id,amount:r2(a),ts,src:str(x.src,40).trim(),note:str(x.note,80)};
+  if(x.o&&+x.o.a>0&&+x.o.a<MAXAMT&&CURRENCIES.some(c=>c.id===x.o.c))o.o={a:r2(+x.o.a),c:x.o.c};
   if(['free','salary','period','permanent'].includes(x.fund)) o.fund=x.fund;
   if(o.fund==='period'&&isDK(x.fundPk)) o.fundPk=x.fundPk;
   if(isId(x.acc)){const aa=+x.accAmt; if(aa>0&&aa<MAXAMT){o.acc=x.acc;o.accAmt=r2(aa)}}
