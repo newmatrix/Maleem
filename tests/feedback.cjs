@@ -144,12 +144,12 @@ await run('Foreign capture does not invent an EGP InstaPay fee after base conver
  await p.locator('#ipFeeAmount').fill('2');await p.locator('#saveBtn').click();assert.deepEqual(await p.evaluate(()=>testApp.S.expenses.map(e=>e.amount)),[1000,2]);
 });
 
-for(const lang of ['eg','ar','en'])for(const width of [320,360,390,768])await run(`Entry layout and discoverable tools ${lang} ${width}`,async p=>{
+for(const lang of ['eg','ar','en'])for(const width of [320,360,390,768])await run(`Compact entry layout and removed home buttons ${lang} ${width}`,async p=>{
  await p.evaluate(()=>{testApp.renderAll();testApp.openSheet(null,{amount:20,cat:'other'})});
  assert(await p.locator('#expenseTime').isVisible());assert(await p.locator('#expenseCurrency').isVisible());
  const overflow=await p.evaluate(()=>{const s=document.querySelector('#sheet');return {page:document.documentElement.scrollWidth>innerWidth+1,sheet:s.scrollWidth>s.clientWidth+1,inputs:[...s.querySelectorAll('.entry-controls input,.entry-controls select')].some(e=>{const r=e.getBoundingClientRect();return r.left<0||r.right>innerWidth+1})}});
  assert.deepEqual(overflow,{page:false,sheet:false,inputs:false});await p.evaluate(()=>testApp.closeSheets());
- assert(await p.locator('#homeFilterGo').isVisible());assert(await p.locator('#homeSortGo').isVisible());
+ assert.equal(await p.locator('#homeFilterGo,#homeSortGo').count(),0);
 },lang,width);
 }finally{await browser.close();fs.writeFileSync(path.join(__dirname,'feedback-results.json'),JSON.stringify(results,null,2));}
 if(results.some(r=>!r.pass))process.exitCode=1;

@@ -3,10 +3,12 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .sheet{box-sizing:border-box;max-height:96dvh;overscroll-behavior:contain}
 .sheet input,.sheet select,.sheet textarea{box-sizing:border-box;min-width:0;max-width:100%}
 #sheet .head-pills{max-width:100%;flex-wrap:wrap}
-.entry-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
-.entry-controls label{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:.8rem;color:var(--muted)}
-.entry-controls input,.entry-controls select{width:100%;min-height:40px;border:1px solid var(--line);border-radius:12px;padding:7px;color:var(--ink);background:var(--surface-2);font:inherit}
-.home-tools{display:flex;gap:8px;justify-content:flex-end;margin:8px 0}
+.entry-controls{display:flex;justify-content:flex-end;gap:6px;margin:6px 0;max-width:100%}
+.entry-controls label{display:block;min-width:0;max-width:55%;border-radius:999px;background:var(--surface-2);font-size:.75rem;color:var(--ink)}
+.entry-controls input,.entry-controls select{display:block;width:100%;min-width:0;min-height:34px;height:34px;border:0;border-radius:999px;padding:4px 10px;color:var(--ink);background:transparent;font:inherit}
+.entry-controls input{width:132px}
+.entry-controls select{width:112px;cursor:pointer}
+.entry-controls input:focus-visible,.entry-controls select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .available-balance{display:grid;grid-template-columns:1fr auto;gap:6px;background:var(--surface);border-radius:16px;padding:12px;margin:12px 0;font-size:.9rem}
 .available-balance small{grid-column:1/-1;color:var(--muted);font-size:.75rem}
 .cat-group-toggle{display:flex;align-items:center;gap:8px;font-size:.8rem;margin:8px 0}

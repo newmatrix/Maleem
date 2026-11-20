@@ -28,7 +28,7 @@
 | `094-error-log-ui.js` | 14 | The error log card in the feedback page: count, see / copy the report, clear. |
 | `095-backup-encryption.js` | 94 | Optional backup encryption: AES-GCM with a key from a password (bkeSeal / bkOpen), the password prompt while restoring, and the settings row with its sheet. |
 | `096-polish-extras.js` | 32 | Home card for categories near or over their monthly limit (renderLimCard), «send this message as an example» for the bank-notification capture (capMask). |
-| `097-user-feedback.js` | 99 | Transaction currency and time controls, grouped categories, linked obligations, debt ledger editing and available balance. |
+| `097-user-feedback.js` | 97 | Transaction currency and time controls, grouped categories, linked obligations, debt ledger editing and available balance. |
 | `100-debts-and-gameyas.js` | 548 | Loans & debts and savings circles: lists, sheets, ledger, date helpers (relDay, addMonths), reminders text. |
 | `110-profile-currency-income-payments.js` | 381 | Me / profile, app currency change and exchange rates, income list, payment methods. |
 | `120-google-drive-updates-reminder.js` | 320 | Google Drive backup and restore (driveCall, restore sheet), app updates (check / download), the developer message and the periodic support reminder (nudge). |

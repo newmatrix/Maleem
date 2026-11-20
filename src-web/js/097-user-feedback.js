@@ -33,8 +33,6 @@ function paintEntryCurrency(){
 }
 $('#expenseCurrency').onchange=paintEntryCurrency;$('#incomeCurrency').onchange=paintEntryCurrency;
 $('#ipFeeAmount').addEventListener('input',()=>{$('#ipFeeAmount').dataset.manual='1'});
-$('#homeFilterGo').onclick=()=>{openSearch();$('#sfBtn').click()};
-$('#homeSortGo').onclick=()=>{openSearch();$('#sfSortPick').click()};
 $('#screenshotBlock').onchange=e=>{S.blockScreenshots=e.target.checked;save();applySecure()};
 
 function categoryGroup(c){
